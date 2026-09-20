@@ -13,11 +13,11 @@ export function useSchedule() {
   const [error, setError] = useState<Error | null>(null);
   const isLoaded = useRef(false);
 
-  const fetchSchedule = useCallback(async () => {
+  const fetchSchedule = useCallback(async (forceRefresh: boolean = false) => {
     try {
       setIsLoading(true);
       const today = new Date();
-      const daySchedule = await getScheduleForDate(today);
+      const daySchedule = await getScheduleForDate(today, forceRefresh);
       setSchedule(daySchedule);
       setScheduleType(daySchedule.scheduleType);
       setPeriods(daySchedule.periods);
@@ -40,7 +40,7 @@ export function useSchedule() {
 
   useEffect(() => {
     if (!isLoaded.current) {
-      fetchSchedule();
+      fetchSchedule(false);
     }
   }, [fetchSchedule]);
 
@@ -65,6 +65,6 @@ export function useSchedule() {
     nextPeriod,
     isLoading,
     error,
-    refresh: fetchSchedule,
+    refresh: () => fetchSchedule(true),
   };
 }

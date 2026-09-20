@@ -55,23 +55,25 @@ export async function fetchCalendarCSV(type: string): Promise<string> {
   }
 }
 
-export async function loadAllScheduleData(): Promise<ScheduleCache> {
-  const cached = await getCachedSchedules();
-  if (cached && Date.now() - cached.lastUpdated < 12 * 60 * 60 * 1000) {
-    return cached;
+export async function loadAllScheduleData(forceRefresh: boolean = false): Promise<ScheduleCache> {
+  if (!forceRefresh) {
+    const cached = await getCachedSchedules();
+    if (cached && Date.now() - cached.lastUpdated < 6 * 60 * 60 * 1000) {
+      return cached;
+    }
   }
 
   const periods: Record<ScheduleType, SchedulePeriod[]> = {
     fullDays: FALLBACK_FULL_DAY,
     abbreviatedDays: FALLBACK_ABBREVIATED_DAY,
-    delayedOpeningDays: FALLBACK_DELAYED_OPENING
+    delayedOpeningDays: FALLBACK_DELAYED_OPENING,
   };
 
   const csvs: Record<ScheduleType | 'specialDays', string> = {
     fullDays: '',
     abbreviatedDays: '',
     delayedOpeningDays: '',
-    specialDays: ''
+    specialDays: '',
   };
 
   try {
@@ -164,18 +166,12 @@ function parseSpecialDaysCsv(csvText: string): Map<string, string> {
   return map;
 }
 
-export async function getScheduleForDate(date: Date): Promise<DaySchedule> {
-  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-  
-  if (isWeekend) {
-    return { hasSchool: false, scheduleType: null, periods: [] };
-  }
-
-  const cache = await loadAllScheduleData();
+export async function getScheduleForDate(date: Date, forceRefresh: boolean = false): Promise<DaySchedule> {
+  const cache = await loadAllScheduleData(forceRefresh);
   const month = date.getMonth() + 1;
   const day = date.getDate();
 
-  // Check special days first
+  // 1. Check special days first
   const specialDays = parseSpecialDaysCsv(cache.csvs.specialDays);
   const mm = String(month).padStart(2, '0');
   const dd = String(day).padStart(2, '0');
@@ -193,19 +189,31 @@ export async function getScheduleForDate(date: Date): Promise<DaySchedule> {
     }
   }
 
-  // Check abbreviated days
+  // 2. Check abbreviated days
   const abbreviatedMap = parseMonthDayCsv(cache.csvs.abbreviatedDays);
   if (abbreviatedMap.get(month)?.has(day)) {
     return { hasSchool: true, scheduleType: 'abbreviatedDays', periods: cache.periods.abbreviatedDays };
   }
 
-  // Check delayed opening days
+  // 3. Check delayed opening days
   const delayedMap = parseMonthDayCsv(cache.csvs.delayedOpeningDays);
   if (delayedMap.get(month)?.has(day)) {
     return { hasSchool: true, scheduleType: 'delayedOpeningDays', periods: cache.periods.delayedOpeningDays };
   }
 
-  // Default to full days for weekdays
+  // 4. Check full days explicitly from fullDays.csv
+  const fullDaysMap = parseMonthDayCsv(cache.csvs.fullDays);
+  if (fullDaysMap.get(month)?.has(day)) {
+    return { hasSchool: true, scheduleType: 'fullDays', periods: cache.periods.fullDays };
+  }
+
+  // 5. If not listed in ANY of the schedule CSVs:
+  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+  if (isWeekend) {
+    return { hasSchool: false, scheduleType: null, periods: [] };
+  }
+
+  // 6. Default fallback for standard school weekdays
   return { hasSchool: true, scheduleType: 'fullDays', periods: cache.periods.fullDays };
 }
 
