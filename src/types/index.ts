@@ -12,8 +12,8 @@ export interface DaySchedule {
 
 export interface AbsentTeacher {
   id: string;
-  name: string;
-  department?: string;
+  name: string;     // e.g. "Bian", "Gallo", "Majeski"
+  duration: string; // e.g. "All Day", "Periods 1-4", "Periods 5-9"
 }
 
 export interface PeriodWithStatus {

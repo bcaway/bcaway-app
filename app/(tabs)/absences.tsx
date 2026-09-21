@@ -16,7 +16,7 @@ export default function AbsencesScreen() {
     const lowerQuery = searchQuery.toLowerCase();
     return absentTeachers.filter(teacher => 
       teacher.name.toLowerCase().includes(lowerQuery) ||
-      (teacher.department && teacher.department.toLowerCase().includes(lowerQuery))
+      teacher.duration.toLowerCase().includes(lowerQuery)
     );
   }, [absentTeachers, searchQuery]);
 

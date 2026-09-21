@@ -9,19 +9,9 @@ interface AbsenceListItemProps {
 export function AbsenceListItem({ teacher }: AbsenceListItemProps) {
   return (
     <View style={styles.card}>
-      <View style={styles.leftBorder} />
-      <View style={styles.content}>
-        <View style={styles.iconContainer}>
-          <Text style={styles.icon}>👤</Text>
-        </View>
-        <View style={styles.info}>
-          <Text style={styles.name}>{teacher.name}</Text>
-          {teacher.department && (
-            <View style={styles.deptBadge}>
-              <Text style={styles.deptText}>{teacher.department}</Text>
-            </View>
-          )}
-        </View>
+      <Text style={styles.name}>{teacher.name}</Text>
+      <View style={styles.durationBadge}>
+        <Text style={styles.durationText}>{teacher.duration || 'All Day'}</Text>
       </View>
     </View>
   );
@@ -30,60 +20,36 @@ export function AbsenceListItem({ teacher }: AbsenceListItemProps) {
 const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    marginVertical: 5,
-    overflow: 'hidden',
+    borderRadius: 14,
+    marginVertical: 4,
+    paddingVertical: 14,
+    paddingHorizontal: 16,
     borderWidth: 1,
     borderColor: '#E5E7EB',
     shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 8,
-    elevation: 2,
-  },
-  leftBorder: {
-    width: 4,
-    backgroundColor: '#EF4444',
-  },
-  content: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-  },
-  iconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: '#F8F9FA',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-  },
-  icon: {
-    fontSize: 20,
-  },
-  info: {
-    flex: 1,
-    justifyContent: 'center',
+    shadowOpacity: 0.03,
+    shadowOffset: { width: 0, height: 1 },
+    shadowRadius: 4,
+    elevation: 1,
   },
   name: {
     fontSize: 16,
     fontWeight: '600',
     color: '#111827',
-    marginBottom: 4,
+    letterSpacing: -0.2,
   },
-  deptBadge: {
+  durationBadge: {
     backgroundColor: '#F3F4F6',
-    alignSelf: 'flex-start',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 8,
   },
-  deptText: {
-    fontSize: 12,
-    color: '#6B7280',
+  durationText: {
+    fontSize: 13,
     fontWeight: '500',
+    color: '#4B5563',
   },
 });

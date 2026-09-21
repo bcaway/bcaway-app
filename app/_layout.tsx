@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { storageService } from '../src/services/storage';
+import { LoadingScreen } from '../src/components/common/LoadingScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -27,7 +28,7 @@ export default function RootLayout() {
   }, []);
 
   if (!isReady) {
-    return null;
+    return <LoadingScreen />;
   }
 
   return (

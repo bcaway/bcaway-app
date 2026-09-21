@@ -57,7 +57,7 @@ export function PeriodCard({ period, isCurrentPeriod, isPast, absentTeacher, onP
               {formatTimeRange(period.start, period.end)}
             </Text>
             {isAbsent && (
-              <Text style={styles.teacherText}>{absentTeacher.name}</Text>
+              <Text style={styles.teacherText}>{absentTeacher.name} · Away</Text>
             )}
           </View>
           
