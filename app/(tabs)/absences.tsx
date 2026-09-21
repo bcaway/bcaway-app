@@ -136,6 +136,20 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E5E7EB',
   },
+  headerTopRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
+  shareButton: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#EEF4FE',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   title: {
     fontSize: 30,
     fontWeight: '800',
@@ -146,7 +160,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 15,
     color: '#6B7280',
-    marginBottom: 14,
   },
   searchContainer: {
     flexDirection: 'row',
