@@ -18,7 +18,7 @@ export function TodaySchedule({ periods, isLoading, onPeriodPress }: TodaySchedu
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <BCAwayLoading size={56} />
+        <BCAwayLoading />
       </View>
     );
   }

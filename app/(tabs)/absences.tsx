@@ -57,7 +57,7 @@ export default function AbsencesScreen() {
       >
         {isLoading && !refreshing ? (
           <View style={styles.loadingContainer}>
-            <BCAwayLoading size={56} />
+            <BCAwayLoading />
           </View>
         ) : error ? (
           <View style={styles.errorContainer}>
@@ -139,7 +139,9 @@ const styles = StyleSheet.create({
     paddingTop: 60,
   },
   loadingContainer: {
-    paddingTop: 60,
+    paddingVertical: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   errorContainer: {
     paddingTop: 40,

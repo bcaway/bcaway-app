@@ -54,12 +54,19 @@ export function getAbsentTeachersForPeriod(
   return absences.filter(absence => isTeacherAbsentInPeriod(absence.periodsImpacted, periodName));
 }
 
+let cachedAbsences: { data: TeacherAbsence[]; timestamp: number } | null = null;
+const CACHE_TTL_MS = 60 * 1000; // 1 minute
+
 /**
  * Queries teacher absences directly from the Supabase `teacher_absences` table.
  * Rows in this table are guaranteed to be for today (maintained by backend sync).
- * Ordered by teacher ascending.
+ * Ordered by teacher ascending. Uses in-memory cache with 1-minute TTL.
  */
-export async function getTeacherAbsences(): Promise<TeacherAbsence[]> {
+export async function getTeacherAbsences(forceRefresh: boolean = false): Promise<TeacherAbsence[]> {
+  if (!forceRefresh && cachedAbsences && Date.now() - cachedAbsences.timestamp < CACHE_TTL_MS) {
+    return cachedAbsences.data;
+  }
+
   const { data, error } = await supabase
     .from('teacher_absences')
     .select('id, date, synced_at, teacher, periods_impacted')
@@ -67,18 +74,20 @@ export async function getTeacherAbsences(): Promise<TeacherAbsence[]> {
 
   if (error) {
     console.error('Error fetching teacher absences from Supabase:', error);
+    if (cachedAbsences) return cachedAbsences.data;
     throw error;
   }
 
-  if (!data || data.length === 0) {
-    return [];
-  }
+  const absences = (!data || data.length === 0)
+    ? []
+    : (data as SupabaseTeacherAbsenceRow[]).map(row => ({
+        id: row.id,
+        date: row.date,
+        syncedAt: row.synced_at,
+        teacher: row.teacher,
+        periodsImpacted: row.periods_impacted,
+      }));
 
-  return (data as SupabaseTeacherAbsenceRow[]).map(row => ({
-    id: row.id,
-    date: row.date,
-    syncedAt: row.synced_at,
-    teacher: row.teacher,
-    periodsImpacted: row.periods_impacted,
-  }));
+  cachedAbsences = { data: absences, timestamp: Date.now() };
+  return absences;
 }

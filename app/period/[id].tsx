@@ -100,7 +100,7 @@ export default function PeriodDetailScreen() {
 
         {isLoading && !refreshing ? (
           <View style={styles.loadingContainer}>
-            <BCAwayLoading size={56} />
+            <BCAwayLoading />
           </View>
         ) : error ? (
           <View style={styles.emptyContainer}>
@@ -219,6 +219,8 @@ const styles = StyleSheet.create({
     paddingTop: 40,
   },
   loadingContainer: {
-    paddingTop: 40,
+    paddingVertical: 80,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
 });

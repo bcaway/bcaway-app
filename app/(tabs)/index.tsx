@@ -10,6 +10,7 @@ import { TodaySchedule } from '../../src/components/schedule/TodaySchedule';
 import { PeriodWithStatus } from '../../src/types';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { BCAwayLogo } from '../../src/components/common/BCAwayLogo';
+import { LoadingScreen } from '../../src/components/common/LoadingScreen';
 
 export default function TodayScreen() {
   const router = useRouter();
@@ -46,6 +47,10 @@ export default function TodayScreen() {
   const isLoading = scheduleLoading || absencesLoading;
   const firstAbsent = absentTeachers.length > 0 ? absentTeachers[0] : null;
   const otherAbsentTeachers = absentTeachers.slice(1);
+
+  if (isLoading && !refreshing) {
+    return <LoadingScreen />;
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>

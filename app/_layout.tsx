@@ -1,28 +1,13 @@
 import { Stack } from 'expo-router';
-import { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { LoadingScreen } from '../src/components/common/LoadingScreen';
+import { DataProvider, useData } from '../src/context/DataContext';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
-export default function RootLayout() {
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    async function prepare() {
-      try {
-        // App initialization complete
-      } catch (e) {
-        console.warn(e);
-      } finally {
-        setIsReady(true);
-        await SplashScreen.hideAsync();
-      }
-    }
-
-    prepare();
-  }, []);
+function RootLayoutContent() {
+  const { isReady } = useData();
 
   if (!isReady) {
     return <LoadingScreen />;
@@ -37,5 +22,13 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" options={{ presentation: 'modal' }} />
       </Stack>
     </>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <DataProvider>
+      <RootLayoutContent />
+    </DataProvider>
   );
 }
