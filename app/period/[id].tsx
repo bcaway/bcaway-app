@@ -49,22 +49,6 @@ export default function PeriodDetailScreen() {
     return periods.find(p => p.period.toLowerCase() === periodId.toLowerCase());
   }, [periods, periodId]);
 
-  const currentIndex = useMemo(() => {
-    return periods.findIndex(p => p.period.toLowerCase() === periodId.toLowerCase());
-  }, [periods, periodId]);
-
-  const prevPeriod = currentIndex > 0 ? periods[currentIndex - 1] : null;
-  const nextPeriod = currentIndex >= 0 && currentIndex < periods.length - 1 ? periods[currentIndex + 1] : null;
-
-  const navigateToPeriod = (targetPeriod: string) => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    router.replace(`/period/${encodeURIComponent(targetPeriod)}`);
-  };
-
-  const formatShortPeriod = (name: string) => {
-    return name.toUpperCase() === 'IGS' ? 'IGS' : `P${name}`;
-  };
-
   const isCurrentPeriod = useMemo(() => {
     return currentPeriod?.period.toLowerCase() === periodId.toLowerCase();
   }, [currentPeriod, periodId]);
@@ -90,61 +74,11 @@ export default function PeriodDetailScreen() {
           <Text style={styles.backButtonText}>Today</Text>
         </TouchableOpacity>
 
-        <View style={styles.navRight}>
-          {isCurrentPeriod && (
-            <View style={styles.nowBadge}>
-              <Text style={styles.nowText}>In Progress</Text>
-            </View>
-          )}
-
-          <View style={styles.pagingContainer}>
-            <TouchableOpacity
-              style={[styles.pagingButton, !prevPeriod && styles.pagingButtonDisabled]}
-              disabled={!prevPeriod}
-              onPress={() => prevPeriod && navigateToPeriod(prevPeriod.period)}
-              hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
-              activeOpacity={0.7}
-            >
-              <Ionicons
-                name="chevron-back"
-                size={16}
-                color={prevPeriod ? '#4A86E8' : '#D1D5DB'}
-              />
-              <Text
-                style={[
-                  styles.pagingButtonText,
-                  !prevPeriod && styles.pagingButtonTextDisabled,
-                ]}
-              >
-                {prevPeriod ? formatShortPeriod(prevPeriod.period) : '—'}
-              </Text>
-            </TouchableOpacity>
-
-            <View style={styles.pagingDivider} />
-
-            <TouchableOpacity
-              style={[styles.pagingButton, !nextPeriod && styles.pagingButtonDisabled]}
-              disabled={!nextPeriod}
-              onPress={() => nextPeriod && navigateToPeriod(nextPeriod.period)}
-              hitSlop={{ top: 8, bottom: 8, left: 6, right: 6 }}
-              activeOpacity={0.7}
-            >
-              <Text
-                style={[
-                  styles.pagingButtonText,
-                  !nextPeriod && styles.pagingButtonTextDisabled,
-                ]}
-              >
-                {nextPeriod ? formatShortPeriod(nextPeriod.period) : '—'}
-              </Text>
-              <Ionicons
-                name="chevron-forward"
-                size={16}
-                color={nextPeriod ? '#4A86E8' : '#D1D5DB'}
-              />
-            </TouchableOpacity>
+        {isCurrentPeriod && (
+          <View style={styles.nowBadge}>
+            <Text style={styles.nowText}>In Progress</Text>
           </View>
-        </View>
+        )}
       </View>
 
       <ScrollView
@@ -240,42 +174,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
     color: '#4A86E8',
-  },
-  navRight: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  pagingContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#F3F4F6',
-    borderRadius: 16,
-    paddingHorizontal: 4,
-    paddingVertical: 3,
-  },
-  pagingButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 6,
-    paddingVertical: 3,
-  },
-  pagingButtonDisabled: {
-    opacity: 0.35,
-  },
-  pagingButtonText: {
-    fontSize: 12,
-    fontWeight: '700',
-    color: '#4A86E8',
-    marginHorizontal: 2,
-  },
-  pagingButtonTextDisabled: {
-    color: '#9CA3AF',
-  },
-  pagingDivider: {
-    width: 1,
-    height: 12,
-    backgroundColor: '#E5E7EB',
   },
   container: {
     flex: 1,
