@@ -17,7 +17,7 @@ import { getAbsentTeachersForPeriod } from '../../src/services/absenceService';
 import { formatTimeRange } from '../../src/utils/time';
 import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
 import { EmptyState } from '../../src/components/ui/EmptyState';
-import { GlassCard } from '../../src/components/ui/GlassCard';
+import { BCAwayLoading } from '../../src/components/common/BCAwayLoading';
 
 export default function PeriodDetailScreen() {
   const router = useRouter();
@@ -74,7 +74,7 @@ export default function PeriodDetailScreen() {
         style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A86E8" />}
       >
         {/* Period Hero Header */}
         <View style={styles.heroHeader}>
@@ -87,37 +87,6 @@ export default function PeriodDetailScreen() {
           <Text style={styles.dateText}>{todayString}</Text>
         </View>
 
-        {/* Summary Card */}
-        <GlassCard variant="elevated" style={styles.summaryCard}>
-          <View style={styles.summaryRow}>
-            <View
-              style={[
-                styles.summaryIconBox,
-                periodAbsences.length > 0 ? styles.summaryIconBoxActive : styles.summaryIconBoxMuted,
-              ]}
-            >
-              <Ionicons
-                name={periodAbsences.length > 0 ? 'alert-circle' : 'checkmark-circle'}
-                size={22}
-                color={periodAbsences.length > 0 ? '#DC2626' : '#16A34A'}
-              />
-            </View>
-            <View style={styles.summaryTextGroup}>
-              <Text style={styles.summaryTitle}>
-                {periodAbsences.length === 0
-                  ? 'All Teachers Present'
-                  : periodAbsences.length === 1
-                  ? '1 Teacher Absent'
-                  : `${periodAbsences.length} Teachers Absent`}
-              </Text>
-              <Text style={styles.summarySubtitle}>
-                {periodAbsences.length === 0
-                  ? 'No classes affected during this period'
-                  : `Classes impacted during ${displayTitle}`}
-              </Text>
-            </View>
-          </View>
-        </GlassCard>
 
         {/* Teachers List Section */}
         <View style={styles.sectionHeader}>
@@ -129,7 +98,11 @@ export default function PeriodDetailScreen() {
           )}
         </View>
 
-        {error ? (
+        {isLoading && !refreshing ? (
+          <View style={styles.loadingContainer}>
+            <BCAwayLoading size={56} />
+          </View>
+        ) : error ? (
           <View style={styles.emptyContainer}>
             <EmptyState
               icon="⚠️"
@@ -176,12 +149,12 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 16,
-    color: '#2563EB',
+    color: '#4A86E8',
     fontWeight: '600',
     marginLeft: 2,
   },
   nowBadge: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#EEF4FE',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
@@ -189,7 +162,7 @@ const styles = StyleSheet.create({
   nowText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#4A86E8',
   },
   container: {
     flex: 1,
@@ -211,49 +184,11 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 18,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#4A86E8',
     marginTop: 4,
   },
   dateText: {
     fontSize: 14,
-    color: '#6B7280',
-    marginTop: 2,
-  },
-  summaryCard: {
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    marginBottom: 24,
-  },
-  summaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  summaryIconBox: {
-    width: 44,
-    height: 44,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 14,
-  },
-  summaryIconBoxActive: {
-    backgroundColor: '#FEF2F2',
-  },
-  summaryIconBoxMuted: {
-    backgroundColor: '#F0FDF4',
-  },
-  summaryTextGroup: {
-    flex: 1,
-  },
-  summaryTitle: {
-    fontSize: 17,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  summarySubtitle: {
-    fontSize: 13,
     color: '#6B7280',
     marginTop: 2,
   },
@@ -269,7 +204,7 @@ const styles = StyleSheet.create({
     letterSpacing: -0.2,
   },
   countPill: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#EEF4FE',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 10,
@@ -278,9 +213,12 @@ const styles = StyleSheet.create({
   countPillText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#2563EB',
+    color: '#4A86E8',
   },
   emptyContainer: {
+    paddingTop: 40,
+  },
+  loadingContainer: {
     paddingTop: 40,
   },
 });

@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { useAbsences } from '../../src/hooks/useAbsences';
 import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
 import { EmptyState } from '../../src/components/ui/EmptyState';
+import { BCAwayLoading } from '../../src/components/common/BCAwayLoading';
 
 export default function AbsencesScreen() {
   const { absentTeachers, isLoading, error, refresh } = useAbsences();
@@ -52,9 +53,13 @@ export default function AbsencesScreen() {
         style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A86E8" />}
       >
-        {error ? (
+        {isLoading && !refreshing ? (
+          <View style={styles.loadingContainer}>
+            <BCAwayLoading size={56} />
+          </View>
+        ) : error ? (
           <View style={styles.errorContainer}>
             <EmptyState
               icon="⚠️"
@@ -131,6 +136,9 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   emptyContainer: {
+    paddingTop: 60,
+  },
+  loadingContainer: {
     paddingTop: 60,
   },
   errorContainer: {

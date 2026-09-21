@@ -9,7 +9,7 @@ import { formatPeriodsImpacted, getAbsentTeachersForPeriod } from '../../src/ser
 import { TodaySchedule } from '../../src/components/schedule/TodaySchedule';
 import { PeriodWithStatus } from '../../src/types';
 import { GlassCard } from '../../src/components/ui/GlassCard';
-import { BCAwayEmblem } from '../../src/components/common/BCAwayEmblem';
+import { BCAwayLogo } from '../../src/components/common/BCAwayLogo';
 
 export default function TodayScreen() {
   const router = useRouter();
@@ -53,11 +53,11 @@ export default function TodayScreen() {
         style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A86E8" />}
       >
         {/* Brand Header */}
         <View style={styles.header}>
-          <BCAwayEmblem size={24} />
+          <BCAwayLogo width={52} />
           <Text style={styles.greeting}>{greeting}</Text>
         </View>
 
@@ -73,7 +73,7 @@ export default function TodayScreen() {
             activeOpacity={0.7}
           >
             <Text style={styles.pillButtonText}>All Absences</Text>
-            <Ionicons name="arrow-forward" size={13} color="#2563EB" style={{ marginLeft: 4 }} />
+            <Ionicons name="arrow-forward" size={13} color="#4A86E8" style={{ marginLeft: 4 }} />
           </TouchableOpacity>
         </View>
 
@@ -89,10 +89,7 @@ export default function TodayScreen() {
               <View style={styles.heroMain}>
                 <View style={styles.heroTextGroup}>
                   <Text style={styles.heroTitle}>{firstAbsent.teacher}</Text>
-                  <Text style={styles.heroSubtitle}>Away · {formatPeriodsImpacted(firstAbsent.periodsImpacted)}</Text>
-                </View>
-                <View style={styles.heroBadge}>
-                  <Text style={styles.heroBadgeText}>Away</Text>
+                  <Text style={styles.heroSubtitle}>{formatPeriodsImpacted(firstAbsent.periodsImpacted)}</Text>
                 </View>
               </View>
 
@@ -183,7 +180,7 @@ const styles = StyleSheet.create({
   pillButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#EEF4FE',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
@@ -191,7 +188,7 @@ const styles = StyleSheet.create({
   pillButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#4A86E8',
   },
   heroCard: {
     padding: 16,
@@ -219,17 +216,6 @@ const styles = StyleSheet.create({
     marginTop: 4,
     fontWeight: '500',
   },
-  heroBadge: {
-    backgroundColor: '#FEF2F2',
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  heroBadgeText: {
-    color: '#DC2626',
-    fontSize: 12,
-    fontWeight: '600',
-  },
   heroDivider: {
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#E5E7EB',
@@ -256,7 +242,7 @@ const styles = StyleSheet.create({
   },
   heroMoreText: {
     fontSize: 12,
-    color: '#2563EB',
+    color: '#4A86E8',
     marginTop: 6,
     fontWeight: '600',
   },

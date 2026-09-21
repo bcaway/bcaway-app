@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- Clean white background -->
+  <rect width="1024" height="1024" fill="#FFFFFF" />
+
+  <!-- Horizontal Logo Mark centered horizontally -->
+  <g transform="translate(143.9, 232.0) scale(0.90)">
+    <!-- Bottom rod -->
+    <rect x="0" y="229" width="409" height="119" rx="59.5" fill="#4A86E8" />
+    <!-- Middle rod -->
+    <rect x="90" y="106" width="409" height="119" rx="59.5" fill="#4A86E8" />
+    <!-- Tilted rod -->
+    <rect x="425" y="66" width="409" height="119" rx="59.5" fill="#4A86E8" transform="rotate(27, 629.5, 125.3)" />
+  </g>
+
+  <!-- BCAway Wordmark scaled up to match myBCA proportions -->
+  <text 
+    x="512" 
+    y="762" 
+    font-family="-apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Helvetica Neue', 'Segoe UI', Roboto, sans-serif" 
+    font-size="188" 
+    font-weight="800" 
+    letter-spacing="-3" 
+    fill="#4A86E8" 
+    text-anchor="middle">BCAway</text>
+</svg>

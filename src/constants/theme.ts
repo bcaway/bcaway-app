@@ -2,8 +2,8 @@ export const theme = {
   colors: {
     background: '#FFFFFF',
     surface: '#F8F9FA',
-    primary: '#2563EB',
-    accentLight: '#EFF6FF',
+    primary: '#4A86E8',
+    accentLight: '#EEF4FE',
     absent: '#EF4444',
     absentBg: '#FEF2F2',
     present: '#16A34A',

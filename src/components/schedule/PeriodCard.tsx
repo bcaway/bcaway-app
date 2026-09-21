@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     marginRight: 12,
   },
   periodBadgeCurrent: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#4A86E8',
   },
   periodText: {
     fontSize: 13,
@@ -159,13 +159,13 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   nowBadge: {
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#EEF4FE',
     paddingHorizontal: 8,
     paddingVertical: 3,
     borderRadius: 10,
   },
   nowText: {
-    color: '#2563EB',
+    color: '#4A86E8',
     fontSize: 12,
     fontWeight: '600',
   },

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 818 348" width="818" height="348" fill="none">
+  <!-- Bottom rod -->
+  <rect x="0" y="229" width="409" height="119" rx="59.5" fill="#4A86E8" />
+  <!-- Middle rod -->
+  <rect x="90" y="106" width="409" height="119" rx="59.5" fill="#4A86E8" />
+  <!-- Tilted rod -->
+  <rect x="425" y="66" width="409" height="119" rx="59.5" fill="#4A86E8" transform="rotate(27, 629.5, 125.3)" />
+</svg>

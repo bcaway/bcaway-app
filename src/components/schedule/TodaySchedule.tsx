@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import { BCAwayLoading } from '../common/BCAwayLoading';
 import { PeriodCard } from './PeriodCard';
 import { EmptyState } from '../ui/EmptyState';
 import { PeriodWithStatus, SchedulePeriod } from '../../types';
@@ -17,7 +18,7 @@ export function TodaySchedule({ periods, isLoading, onPeriodPress }: TodaySchedu
   if (isLoading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator size="large" color="#2563EB" />
+        <BCAwayLoading size={56} />
       </View>
     );
   }
