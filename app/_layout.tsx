@@ -3,6 +3,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { LoadingScreen } from '../src/components/common/LoadingScreen';
 import { DataProvider, useData } from '../src/context/DataContext';
+import { useNotifications } from '../src/hooks/useNotifications';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
@@ -26,6 +27,8 @@ function RootLayoutContent() {
 }
 
 export default function RootLayout() {
+  useNotifications();
+
   return (
     <DataProvider>
       <RootLayoutContent />
