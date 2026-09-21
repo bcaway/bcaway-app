@@ -11,6 +11,7 @@ import { PeriodWithStatus } from '../../src/types';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { BCAwayLogo } from '../../src/components/common/BCAwayLogo';
 import { LoadingScreen } from '../../src/components/common/LoadingScreen';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TodayScreen() {
   const router = useRouter();
@@ -43,6 +44,7 @@ export default function TodayScreen() {
     });
   }, [periods, currentPeriod, absentTeachers]);
 
+  const insets = useSafeAreaInsets();
   const greeting = getGreeting();
   const isLoading = scheduleLoading || absencesLoading;
   const firstAbsent = absentTeachers.length > 0 ? absentTeachers[0] : null;
@@ -53,16 +55,21 @@ export default function TodayScreen() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={styles.safeArea}>
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingTop: Math.max(insets.top, 16) + 16,
+          },
+        ]}
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A86E8" />}
       >
         {/* Brand Header */}
         <View style={styles.header}>
-          <BCAwayLogo width={52} />
+          <BCAwayLogo width={54} />
           <Text style={styles.greeting}>{greeting}</Text>
         </View>
 
@@ -138,7 +145,7 @@ export default function TodayScreen() {
           isLoading={isLoading}
         />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -152,20 +159,18 @@ const styles = StyleSheet.create({
   },
   content: {
     paddingHorizontal: 20,
-    paddingTop: 12,
     paddingBottom: 100,
   },
   header: {
     alignItems: 'center',
-    marginBottom: 24,
-    marginTop: 6,
+    marginBottom: 34,
   },
   greeting: {
-    fontSize: 26,
+    fontSize: 28,
     fontWeight: '800',
     color: '#111827',
-    marginTop: 10,
-    letterSpacing: -0.5,
+    marginTop: 14,
+    letterSpacing: -0.6,
   },
   sectionHeaderRow: {
     flexDirection: 'row',
