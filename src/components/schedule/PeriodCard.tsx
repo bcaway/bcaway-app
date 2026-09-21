@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { GlassCard } from '../ui/GlassCard';
 import { SchedulePeriod } from '../../types';
 import { formatTimeRange } from '../../utils/time';
@@ -22,9 +23,16 @@ export function PeriodCard({
 }: PeriodCardProps) {
   const hasAbsences = absentCount > 0;
 
+  const handlePress = () => {
+    if (onPress) {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      onPress();
+    }
+  };
+
   return (
     <Pressable
-      onPress={onPress}
+      onPress={handlePress}
       disabled={!onPress}
       style={({ pressed }) => [
         styles.pressable,
@@ -69,28 +77,20 @@ export function PeriodCard({
               </View>
             )}
 
-            {/* Person icon with absent count to the left */}
-            <View
-              style={[
-                styles.absenceBadge,
-                hasAbsences ? styles.absenceBadgeActive : styles.absenceBadgeMuted,
-              ]}
-            >
-              <Text
-                style={[
-                  styles.absenceCountText,
-                  hasAbsences ? styles.absenceCountTextActive : styles.absenceCountTextMuted,
-                ]}
-              >
-                {absentCount}
-              </Text>
-              <Ionicons
-                name="person"
-                size={12}
-                color={hasAbsences ? '#DC2626' : '#9CA3AF'}
-                style={styles.personIcon}
-              />
-            </View>
+            {/* Person icon with absent count to the left - only shown when absentCount > 0 */}
+            {hasAbsences && (
+              <View style={[styles.absenceBadge, styles.absenceBadgeActive]}>
+                <Text style={[styles.absenceCountText, styles.absenceCountTextActive]}>
+                  {absentCount}
+                </Text>
+                <Ionicons
+                  name="person"
+                  size={12}
+                  color="#DC2626"
+                  style={styles.personIcon}
+                />
+              </View>
+            )}
 
             <Ionicons name="chevron-forward" size={14} color="#D1D5DB" style={styles.chevron} />
           </View>

@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { format } from 'date-fns';
 import { useSchedule } from '../../src/hooks/useSchedule';
 import { useAbsences } from '../../src/hooks/useAbsences';
@@ -29,9 +30,19 @@ export default function PeriodDetailScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setRefreshing(true);
     await Promise.all([refreshSchedule(), refreshAbsences()]);
     setRefreshing(false);
+  };
+
+  const handleBack = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace('/(tabs)');
+    }
   };
 
   const periodInfo = useMemo(() => {
@@ -55,7 +66,7 @@ export default function PeriodDetailScreen() {
       <View style={styles.navBar}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => router.back()}
+          onPress={handleBack}
           hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
           activeOpacity={0.7}
         >

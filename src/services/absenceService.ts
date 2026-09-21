@@ -10,6 +10,58 @@ interface SupabaseTeacherAbsenceRow {
 }
 
 /**
+ * Expands period strings into a Set of period tokens (e.g. '1-3, 5, igs' -> '1', '2', '3', '5', 'igs').
+ */
+export function expandPeriods(periodsImpacted?: string): Set<string> {
+  const result = new Set<string>();
+  if (!periodsImpacted) {
+    ['igs', '1', '2', '3', '4', '5', '6', '7', '8', '9'].forEach(p => result.add(p));
+    return result;
+  }
+
+  const lower = periodsImpacted.trim().toLowerCase();
+  if (lower === 'all' || lower === 'all day') {
+    ['igs', '1', '2', '3', '4', '5', '6', '7', '8', '9'].forEach(p => result.add(p));
+    return result;
+  }
+
+  // Strip leading "periods:" or "period:"
+  const cleaned = lower.replace(/^periods?:?\s*/i, '');
+  const rawTokens = cleaned.split(',').map(s => s.trim()).filter(Boolean);
+
+  for (const token of rawTokens) {
+    if (token === 'all' || token === 'all day') {
+      ['igs', '1', '2', '3', '4', '5', '6', '7', '8', '9'].forEach(p => result.add(p));
+      return result;
+    }
+    if (token === 'igs') {
+      result.add('igs');
+      continue;
+    }
+    // Check range: e.g. "1-3" or "7 - 8"
+    const rangeMatch = token.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (rangeMatch) {
+      const start = parseInt(rangeMatch[1], 10);
+      const end = parseInt(rangeMatch[2], 10);
+      if (!isNaN(start) && !isNaN(end)) {
+        const min = Math.min(start, end);
+        const max = Math.max(start, end);
+        for (let i = min; i <= max; i++) {
+          result.add(String(i));
+        }
+      }
+      continue;
+    }
+    // Single numerical period
+    if (/^\d+$/.test(token)) {
+      result.add(token);
+    }
+  }
+
+  return result;
+}
+
+/**
  * Formats periods impacted for display in the UI.
  * e.g. "All Day" for full days, or "Periods: 1, 2, 3"
  */
@@ -17,7 +69,11 @@ export function formatPeriodsImpacted(periodsImpacted?: string): string {
   if (!periodsImpacted) return 'All Day';
   const trimmed = periodsImpacted.trim();
   const lower = trimmed.toLowerCase();
-  if (lower === 'all day' || trimmed === 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9') {
+  if (lower === 'all' || lower === 'all day') {
+    return 'All Day';
+  }
+  const expanded = expandPeriods(periodsImpacted);
+  if (expanded.size >= 10) {
     return 'All Day';
   }
   if (lower.startsWith('period')) {
@@ -31,17 +87,10 @@ export function formatPeriodsImpacted(periodsImpacted?: string): string {
  * e.g. periodName = '1', 'IGS', '2', etc.
  */
 export function isTeacherAbsentInPeriod(periodsImpacted: string, periodName: string): boolean {
-  if (!periodsImpacted || !periodName) return false;
+  if (!periodName) return false;
   const p = periodName.trim().toLowerCase();
-  const lower = periodsImpacted.trim().toLowerCase();
-
-  // "all" or "all day" covers every period
-  if (lower === 'all' || lower === 'all day') {
-    return true;
-  }
-
-  const tokens = lower.split(',').map(s => s.trim());
-  return tokens.includes(p);
+  const expanded = expandPeriods(periodsImpacted);
+  return expanded.has(p);
 }
 
 /**

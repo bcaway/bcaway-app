@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { StyleSheet, View, Text, ScrollView, RefreshControl, SafeAreaView, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { useSchedule } from '../../src/hooks/useSchedule';
 import { useAbsences } from '../../src/hooks/useAbsences';
 import { getGreeting, getCurrentTimeStr, timeToSeconds } from '../../src/utils/time';
@@ -20,6 +21,7 @@ export default function TodayScreen() {
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setRefreshing(true);
     await Promise.all([refreshSchedule(), refreshAbsences()]);
     setRefreshing(false);
@@ -123,6 +125,11 @@ export default function TodayScreen() {
                   )}
                 </View>
               )}
+            </View>
+          ) : schedule && !schedule.hasSchool ? (
+            <View style={styles.heroEmpty}>
+              <Text style={styles.heroTitle}>No School Today</Text>
+              <Text style={styles.heroSubtitle}>Enjoy your day off!</Text>
             </View>
           ) : (
             <View style={styles.heroEmpty}>

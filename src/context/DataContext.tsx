@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { SchedulePeriod, DaySchedule, TeacherAbsence } from '../types';
 import { getScheduleForDate, getCurrentPeriodInfo } from '../services/scheduleService';
@@ -44,6 +45,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
   const [isReady, setIsReady] = useState(false);
   const inFlightRefresh = useRef<Promise<void> | null>(null);
+  const lastFetchedDate = useRef<string>(new Date().toDateString());
+  const lastFetchedTimestamp = useRef<number>(Date.now());
 
   // Global refetch that fetches schedule + absences with forceRefresh = true
   const refreshAll = useCallback(async (): Promise<void> => {
@@ -82,6 +85,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
           console.error('Error refreshing absences:', absResult.reason);
           setAbsencesError(absResult.reason instanceof Error ? absResult.reason : new Error(String(absResult.reason)));
         }
+        lastFetchedDate.current = new Date().toDateString();
+        lastFetchedTimestamp.current = Date.now();
       } catch (err) {
         console.error('Unexpected error during refreshAll:', err);
       } finally {
@@ -143,6 +148,25 @@ export function DataProvider({ children }: { children: ReactNode }) {
     }, 30000);
     return () => clearInterval(interval);
   }, [periods]);
+
+  // Refetch when returning from background if the day rolled over or data is stale
+  useEffect(() => {
+    const handleAppStateChange = (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        const currentDateStr = new Date().toDateString();
+        const isStale = Date.now() - lastFetchedTimestamp.current > 15 * 60 * 1000;
+        const dateChanged = currentDateStr !== lastFetchedDate.current;
+        if (dateChanged || isStale) {
+          lastFetchedDate.current = currentDateStr;
+          lastFetchedTimestamp.current = Date.now();
+          refreshAll();
+        }
+      }
+    };
+
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    return () => subscription.remove();
+  }, [refreshAll]);
 
   return (
     <DataContext.Provider
