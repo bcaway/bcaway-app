@@ -1,41 +1,56 @@
-import { MOCK_TEACHERS } from '../constants/teachers';
-import { AbsentTeacher } from '../types';
+import { supabase } from './supabase';
+import { TeacherAbsence } from '../types';
 
-function seededRandom(seed: number) {
-  const x = Math.sin(seed++) * 10000;
-  return x - Math.floor(x);
+interface SupabaseTeacherAbsenceRow {
+  id: string;
+  date: string;
+  synced_at: string;
+  teacher: string;
+  periods_impacted: string;
 }
 
-function stringToSeed(str: string): number {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    const char = str.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
-    hash = hash & hash;
+/**
+ * Formats periods impacted for display in the UI.
+ * e.g. "All Day" for full days, or "Periods: 1, 2, 3"
+ */
+export function formatPeriodsImpacted(periodsImpacted?: string): string {
+  if (!periodsImpacted) return 'All Day';
+  const trimmed = periodsImpacted.trim();
+  const lower = trimmed.toLowerCase();
+  if (lower === 'all day' || trimmed === 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9') {
+    return 'All Day';
   }
-  return hash;
+  if (lower.startsWith('period')) {
+    return trimmed;
+  }
+  return `Periods: ${trimmed}`;
 }
 
-export const getAbsentTeachers = (dateStr: string): AbsentTeacher[] => {
-  const seed = stringToSeed(dateStr);
-  
-  // Decide how many absent teachers (2 to 4)
-  const numAbsences = Math.floor(seededRandom(seed) * 3) + 2;
-  
-  const absences: AbsentTeacher[] = [];
-  const teachersCopy = [...MOCK_TEACHERS];
-  
-  for (let i = 0; i < numAbsences; i++) {
-    if (teachersCopy.length === 0) break;
-    const index = Math.floor(seededRandom(seed + i + 1) * teachersCopy.length);
-    absences.push(teachersCopy[index]);
-    teachersCopy.splice(index, 1);
-  }
-  
-  return absences;
-};
+/**
+ * Queries teacher absences directly from the Supabase `teacher_absences` table.
+ * Rows in this table are guaranteed to be for today (maintained by backend sync).
+ * Ordered by teacher ascending.
+ */
+export async function getTeacherAbsences(): Promise<TeacherAbsence[]> {
+  const { data, error } = await supabase
+    .from('teacher_absences')
+    .select('id, date, synced_at, teacher, periods_impacted')
+    .order('teacher', { ascending: true });
 
-export const isTeacherAbsent = (teacherId: string, dateStr: string): boolean => {
-  const absences = getAbsentTeachers(dateStr);
-  return absences.some(teacher => teacher.id === teacherId);
-};
+  if (error) {
+    console.error('Error fetching teacher absences from Supabase:', error);
+    throw error;
+  }
+
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  return (data as SupabaseTeacherAbsenceRow[]).map(row => ({
+    id: row.id,
+    date: row.date,
+    syncedAt: row.synced_at,
+    teacher: row.teacher,
+    periodsImpacted: row.periods_impacted,
+  }));
+}

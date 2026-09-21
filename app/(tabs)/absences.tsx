@@ -7,7 +7,7 @@ import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 
 export default function AbsencesScreen() {
-  const { absentTeachers, isLoading, refresh } = useAbsences();
+  const { absentTeachers, isLoading, error, refresh } = useAbsences();
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
@@ -15,8 +15,8 @@ export default function AbsencesScreen() {
     if (!searchQuery.trim()) return absentTeachers;
     const lowerQuery = searchQuery.toLowerCase();
     return absentTeachers.filter(teacher => 
-      teacher.name.toLowerCase().includes(lowerQuery) ||
-      teacher.duration.toLowerCase().includes(lowerQuery)
+      teacher.teacher.toLowerCase().includes(lowerQuery) ||
+      teacher.periodsImpacted.toLowerCase().includes(lowerQuery)
     );
   }, [absentTeachers, searchQuery]);
 
@@ -54,7 +54,15 @@ export default function AbsencesScreen() {
         showsVerticalScrollIndicator={false}
         refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#2563EB" />}
       >
-        {filteredTeachers.length > 0 ? (
+        {error ? (
+          <View style={styles.errorContainer}>
+            <EmptyState
+              icon="⚠️"
+              title="Unable to load absences"
+              subtitle="Could not connect to the database. Pull down to retry."
+            />
+          </View>
+        ) : filteredTeachers.length > 0 ? (
           filteredTeachers.map(teacher => (
             <AbsenceListItem key={teacher.id} teacher={teacher} />
           ))
@@ -124,5 +132,8 @@ const styles = StyleSheet.create({
   },
   emptyContainer: {
     paddingTop: 60,
+  },
+  errorContainer: {
+    paddingTop: 40,
   },
 });

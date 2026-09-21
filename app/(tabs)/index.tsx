@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSchedule } from '../../src/hooks/useSchedule';
 import { useAbsences } from '../../src/hooks/useAbsences';
 import { getGreeting, getCurrentTimeStr, timeToSeconds } from '../../src/utils/time';
+import { formatPeriodsImpacted } from '../../src/services/absenceService';
 import { TodaySchedule } from '../../src/components/schedule/TodaySchedule';
 import { PeriodWithStatus } from '../../src/types';
 import { GlassCard } from '../../src/components/ui/GlassCard';
@@ -13,7 +14,7 @@ import { BCAwayEmblem } from '../../src/components/common/BCAwayEmblem';
 export default function TodayScreen() {
   const router = useRouter();
   const { schedule, periods, currentPeriod, isLoading: scheduleLoading, refresh: refreshSchedule } = useSchedule();
-  const { absentTeachers, isLoading: absencesLoading, refresh: refreshAbsences } = useAbsences();
+  const { absentTeachers, isLoading: absencesLoading, error: absencesError, refresh: refreshAbsences } = useAbsences();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
@@ -76,12 +77,17 @@ export default function TodayScreen() {
 
         {/* Hero Card */}
         <GlassCard variant="elevated" style={styles.heroCard}>
-          {firstAbsent ? (
+          {absencesError ? (
+            <View style={styles.heroEmpty}>
+              <Text style={styles.heroTitle}>Absences Unavailable</Text>
+              <Text style={styles.heroSubtitle}>Could not load today's absence data</Text>
+            </View>
+          ) : firstAbsent ? (
             <View>
               <View style={styles.heroMain}>
                 <View style={styles.heroTextGroup}>
-                  <Text style={styles.heroTitle}>{firstAbsent.name}</Text>
-                  <Text style={styles.heroSubtitle}>Away · {firstAbsent.duration || 'All Day'}</Text>
+                  <Text style={styles.heroTitle}>{firstAbsent.teacher}</Text>
+                  <Text style={styles.heroSubtitle}>Away · {formatPeriodsImpacted(firstAbsent.periodsImpacted)}</Text>
                 </View>
                 <View style={styles.heroBadge}>
                   <Text style={styles.heroBadgeText}>Away</Text>
@@ -93,14 +99,16 @@ export default function TodayScreen() {
                   <View style={styles.heroDivider} />
                   {otherAbsentTeachers.slice(0, 2).map(t => (
                     <View key={t.id} style={styles.heroSecondaryRow}>
-                      <Text style={styles.heroSecondaryName}>{t.name}</Text>
-                      <Text style={styles.heroSecondaryDuration}>{t.duration || 'All Day'}</Text>
+                      <Text style={styles.heroSecondaryName}>{t.teacher}</Text>
+                      <Text style={styles.heroSecondaryDuration}>{formatPeriodsImpacted(t.periodsImpacted)}</Text>
                     </View>
                   ))}
                   {otherAbsentTeachers.length > 2 && (
-                    <Text style={styles.heroMoreText}>
-                      +{otherAbsentTeachers.length - 2} more absent today
-                    </Text>
+                    <TouchableOpacity onPress={() => router.push('/(tabs)/absences')} activeOpacity={0.7}>
+                      <Text style={styles.heroMoreText}>
+                        +{otherAbsentTeachers.length - 2} more absent today
+                      </Text>
+                    </TouchableOpacity>
                   )}
                 </View>
               )}

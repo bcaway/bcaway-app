@@ -1,17 +1,24 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { AbsentTeacher } from '../../types';
+import { TeacherAbsence } from '../../types';
+import { formatPeriodsImpacted } from '../../services/absenceService';
 
 interface AbsenceListItemProps {
-  teacher: AbsentTeacher;
+  teacher: TeacherAbsence;
 }
 
 export function AbsenceListItem({ teacher }: AbsenceListItemProps) {
+  const formattedPeriods = formatPeriodsImpacted(teacher.periodsImpacted);
+
   return (
     <View style={styles.card}>
-      <Text style={styles.name}>{teacher.name}</Text>
+      <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+        {teacher.teacher}
+      </Text>
       <View style={styles.durationBadge}>
-        <Text style={styles.durationText}>{teacher.duration || 'All Day'}</Text>
+        <Text style={styles.durationText} numberOfLines={1} ellipsizeMode="tail">
+          {formattedPeriods}
+        </Text>
       </View>
     </View>
   );
@@ -40,12 +47,16 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#111827',
     letterSpacing: -0.2,
+    flexShrink: 1,
+    marginRight: 12,
   },
   durationBadge: {
     backgroundColor: '#F3F4F6',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
+    flexShrink: 0,
+    maxWidth: '60%',
   },
   durationText: {
     fontSize: 13,

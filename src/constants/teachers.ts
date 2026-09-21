@@ -1,19 +1,19 @@
-import { AbsentTeacher } from '../types';
+import { TeacherAbsence } from '../types';
 
-export const MOCK_TEACHERS: AbsentTeacher[] = [
-  { id: 't1', name: 'Bian', duration: 'All Day' },
-  { id: 't2', name: 'Gallo', duration: 'Periods 1–4' },
-  { id: 't3', name: 'Majeski', duration: 'All Day' },
-  { id: 't4', name: 'Respass', duration: 'Periods 5–9' },
-  { id: 't5', name: 'Pramstaller', duration: 'All Day' },
-  { id: 't6', name: 'Modi', duration: 'Periods 1–3' },
-  { id: 't7', name: 'Weiner', duration: 'All Day' },
-  { id: 't8', name: 'Kopp', duration: 'All Day' },
-  { id: 't9', name: 'Demeter', duration: 'Periods 6–9' },
-  { id: 't10', name: 'Waldron', duration: 'All Day' },
-  { id: 't11', name: 'Spence', duration: 'Morning' },
-  { id: 't12', name: 'Kim', duration: 'All Day' },
-  { id: 't13', name: 'Ochoa', duration: 'All Day' },
-  { id: 't14', name: 'Nardelli', duration: 'Afternoon' },
-  { id: 't15', name: 'Breslow', duration: 'All Day' },
+export const MOCK_TEACHERS: TeacherAbsence[] = [
+  { id: 't1', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Bian', periodsImpacted: 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9' },
+  { id: 't2', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Gallo', periodsImpacted: '1, 2, 3, 4' },
+  { id: 't3', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Majeski', periodsImpacted: 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9' },
+  { id: 't4', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Respass', periodsImpacted: '5, 6, 7, 8, 9' },
+  { id: 't5', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Pramstaller', periodsImpacted: 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9' },
+  { id: 't6', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Modi', periodsImpacted: '1, 2, 3' },
+  { id: 't7', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Weiner', periodsImpacted: 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9' },
+  { id: 't8', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Kopp', periodsImpacted: 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9' },
+  { id: 't9', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Demeter', periodsImpacted: '6, 7, 8, 9' },
+  { id: 't10', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Waldron', periodsImpacted: 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9' },
+  { id: 't11', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Spence', periodsImpacted: 'igs, 1, 2, 3, 4' },
+  { id: 't12', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Kim', periodsImpacted: 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9' },
+  { id: 't13', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Ochoa', periodsImpacted: 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9' },
+  { id: 't14', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Nardelli', periodsImpacted: '5, 6, 7, 8, 9' },
+  { id: 't15', date: '2026-09-21', syncedAt: '2026-09-21T08:00:00.000Z', teacher: 'Breslow', periodsImpacted: 'igs, 1, 2, 3, 4, 5, 6, 7, 8, 9' },
 ];

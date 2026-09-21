@@ -1,20 +1,21 @@
 import { useState, useEffect, useCallback } from 'react';
-import { getAbsentTeachers, isTeacherAbsent as checkTeacherAbsent } from '../services/absenceService';
-import { AbsentTeacher } from '../types';
-import { format } from 'date-fns';
+import { getTeacherAbsences } from '../services/absenceService';
+import { TeacherAbsence } from '../types';
 
 export function useAbsences() {
-  const [absentTeachers, setAbsentTeachers] = useState<AbsentTeacher[]>([]);
+  const [absentTeachers, setAbsentTeachers] = useState<TeacherAbsence[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   const fetchAbsences = useCallback(async () => {
     try {
       setIsLoading(true);
-      const dateStr = format(new Date(), 'yyyy-MM-dd');
-      const teachers = getAbsentTeachers(dateStr);
+      setError(null);
+      const teachers = await getTeacherAbsences();
       setAbsentTeachers(teachers);
-    } catch (error) {
-      console.error('Failed to fetch absences:', error);
+    } catch (err) {
+      console.error('Failed to fetch absences from Supabase:', err);
+      setError(err instanceof Error ? err : new Error(String(err)));
     } finally {
       setIsLoading(false);
     }
@@ -24,14 +25,10 @@ export function useAbsences() {
     fetchAbsences();
   }, [fetchAbsences]);
 
-  const isTeacherAbsent = useCallback((teacherId: string) => {
-    return absentTeachers.some(t => t.id === teacherId);
-  }, [absentTeachers]);
-
   return {
     absentTeachers,
     isLoading,
-    isTeacherAbsent,
+    error,
     refresh: fetchAbsences,
   };
 }

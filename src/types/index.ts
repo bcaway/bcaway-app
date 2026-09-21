@@ -10,11 +10,15 @@ export interface DaySchedule {
   periods: SchedulePeriod[];
 }
 
-export interface AbsentTeacher {
+export interface TeacherAbsence {
   id: string;
-  name: string;     // e.g. "Bian", "Gallo", "Majeski"
-  duration: string; // e.g. "All Day", "Periods 1-4", "Periods 5-9"
+  date: string;
+  syncedAt: string;
+  teacher: string;
+  periodsImpacted: string;
 }
+
+export type AbsentTeacher = TeacherAbsence;
 
 export interface PeriodWithStatus {
   period: SchedulePeriod;
