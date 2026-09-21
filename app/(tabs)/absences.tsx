@@ -1,10 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { StyleSheet, View, Text, ScrollView, TextInput, SafeAreaView, RefreshControl, TouchableOpacity, Share } from 'react-native';
+import { StyleSheet, View, Text, ScrollView, TextInput, SafeAreaView, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { format } from 'date-fns';
 import { useAbsences } from '../../src/hooks/useAbsences';
-import { formatPeriodsImpacted } from '../../src/services/absenceService';
 import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { BCAwayLoading } from '../../src/components/common/BCAwayLoading';
@@ -32,44 +31,11 @@ export default function AbsencesScreen() {
 
   const todayString = format(new Date(), 'EEEE, MMMM d');
 
-  const handleShare = async () => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    try {
-      let message = '';
-      if (absentTeachers.length === 0) {
-        message = `BCAway — All teachers present today! (${todayString})\nhttps://bcaway.com`;
-      } else {
-        const teacherLines = absentTeachers
-          .map(t => `• ${t.teacher} (${formatPeriodsImpacted(t.periodsImpacted)})`)
-          .join('\n');
-        message = `BCAway — Absent Today (${todayString}):\n${teacherLines}\n\nCheck full schedule at https://bcaway.com`;
-      }
-      await Share.share({
-        message,
-        title: 'BCAway Teacher Absences',
-      });
-    } catch (err) {
-      console.error('Error sharing absences:', err);
-    }
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <View style={styles.headerTopRow}>
-          <View>
-            <Text style={styles.title}>Absent Today</Text>
-            <Text style={styles.subtitle}>{todayString}</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.shareButton}
-            onPress={handleShare}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="share-outline" size={20} color="#4A86E8" />
-          </TouchableOpacity>
-        </View>
+        <Text style={styles.title}>Absent Today</Text>
+        <Text style={styles.subtitle}>{todayString}</Text>
         
         <View style={styles.searchContainer}>
           <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
