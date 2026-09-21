@@ -13,7 +13,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.savera.bcaway"
+      "bundleIdentifier": "com.savera.bcaway",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -44,6 +47,12 @@
           "color": "#ffffff"
         }
       ]
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "490de3b5-8df8-4a4d-912a-9b1b62de8049"
+      }
+    }
   }
 }
