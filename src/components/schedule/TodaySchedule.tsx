@@ -1,15 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { useRouter } from 'expo-router';
 import { PeriodCard } from './PeriodCard';
 import { EmptyState } from '../ui/EmptyState';
-import { PeriodWithStatus } from '../../types';
+import { PeriodWithStatus, SchedulePeriod } from '../../types';
 
 interface TodayScheduleProps {
   periods: PeriodWithStatus[];
   isLoading: boolean;
+  onPeriodPress?: (period: SchedulePeriod) => void;
 }
 
-export function TodaySchedule({ periods, isLoading }: TodayScheduleProps) {
+export function TodaySchedule({ periods, isLoading, onPeriodPress }: TodayScheduleProps) {
+  const router = useRouter();
+
   if (isLoading) {
     return (
       <View style={styles.center}>
@@ -22,6 +26,14 @@ export function TodaySchedule({ periods, isLoading }: TodayScheduleProps) {
     return <EmptyState icon="🎉" title="No School Today" subtitle="Enjoy your day off!" />;
   }
 
+  const handlePeriodPress = (period: SchedulePeriod) => {
+    if (onPeriodPress) {
+      onPeriodPress(period);
+    } else {
+      router.push(`/period/${encodeURIComponent(period.period)}`);
+    }
+  };
+
   return (
     <View style={styles.list}>
       {periods.map((item) => (
@@ -30,6 +42,8 @@ export function TodaySchedule({ periods, isLoading }: TodayScheduleProps) {
           period={item.period}
           isCurrentPeriod={item.isCurrentPeriod}
           isPast={item.isPast}
+          absentCount={item.absentCount ?? 0}
+          onPress={() => handlePeriodPress(item.period)}
         />
       ))}
     </View>

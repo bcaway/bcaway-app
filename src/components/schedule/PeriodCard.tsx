@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { GlassCard } from '../ui/GlassCard';
 import { SchedulePeriod } from '../../types';
 import { formatTimeRange } from '../../utils/time';
@@ -8,10 +9,19 @@ interface PeriodCardProps {
   period: SchedulePeriod;
   isCurrentPeriod: boolean;
   isPast: boolean;
+  absentCount?: number;
   onPress?: () => void;
 }
 
-export function PeriodCard({ period, isCurrentPeriod, isPast, onPress }: PeriodCardProps) {
+export function PeriodCard({
+  period,
+  isCurrentPeriod,
+  isPast,
+  absentCount = 0,
+  onPress,
+}: PeriodCardProps) {
+  const hasAbsences = absentCount > 0;
+
   return (
     <Pressable
       onPress={onPress}
@@ -52,11 +62,38 @@ export function PeriodCard({ period, isCurrentPeriod, isPast, onPress }: PeriodC
             </Text>
           </View>
 
-          {isCurrentPeriod && (
-            <View style={styles.nowBadge}>
-              <Text style={styles.nowText}>Now</Text>
+          <View style={styles.rightContainer}>
+            {isCurrentPeriod && (
+              <View style={styles.nowBadge}>
+                <Text style={styles.nowText}>Now</Text>
+              </View>
+            )}
+
+            {/* Person icon with absent count to the left */}
+            <View
+              style={[
+                styles.absenceBadge,
+                hasAbsences ? styles.absenceBadgeActive : styles.absenceBadgeMuted,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.absenceCountText,
+                  hasAbsences ? styles.absenceCountTextActive : styles.absenceCountTextMuted,
+                ]}
+              >
+                {absentCount}
+              </Text>
+              <Ionicons
+                name="person"
+                size={12}
+                color={hasAbsences ? '#DC2626' : '#9CA3AF'}
+                style={styles.personIcon}
+              />
             </View>
-          )}
+
+            <Ionicons name="chevron-forward" size={14} color="#D1D5DB" style={styles.chevron} />
+          </View>
         </View>
       </GlassCard>
     </Pressable>
@@ -116,15 +153,50 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#111827',
   },
+  rightContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   nowBadge: {
     backgroundColor: '#EFF6FF',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+    borderRadius: 10,
   },
   nowText: {
     color: '#2563EB',
     fontSize: 12,
     fontWeight: '600',
+  },
+  absenceBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 10,
+  },
+  absenceBadgeActive: {
+    backgroundColor: '#FEF2F2',
+  },
+  absenceBadgeMuted: {
+    backgroundColor: '#F3F4F6',
+  },
+  absenceCountText: {
+    fontSize: 13,
+    fontWeight: '700',
+    marginRight: 4,
+  },
+  absenceCountTextActive: {
+    color: '#DC2626',
+  },
+  absenceCountTextMuted: {
+    color: '#6B7280',
+  },
+  personIcon: {
+    marginTop: 1,
+  },
+  chevron: {
+    marginLeft: 2,
   },
 });

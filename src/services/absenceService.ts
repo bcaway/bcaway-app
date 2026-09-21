@@ -27,6 +27,34 @@ export function formatPeriodsImpacted(periodsImpacted?: string): string {
 }
 
 /**
+ * Checks whether a teacher's absence includes the specified period.
+ * e.g. periodName = '1', 'IGS', '2', etc.
+ */
+export function isTeacherAbsentInPeriod(periodsImpacted: string, periodName: string): boolean {
+  if (!periodsImpacted || !periodName) return false;
+  const p = periodName.trim().toLowerCase();
+  const lower = periodsImpacted.trim().toLowerCase();
+
+  // "all" or "all day" covers every period
+  if (lower === 'all' || lower === 'all day') {
+    return true;
+  }
+
+  const tokens = lower.split(',').map(s => s.trim());
+  return tokens.includes(p);
+}
+
+/**
+ * Filters a list of absences to only those that impact the given period.
+ */
+export function getAbsentTeachersForPeriod(
+  absences: TeacherAbsence[],
+  periodName: string
+): TeacherAbsence[] {
+  return absences.filter(absence => isTeacherAbsentInPeriod(absence.periodsImpacted, periodName));
+}
+
+/**
  * Queries teacher absences directly from the Supabase `teacher_absences` table.
  * Rows in this table are guaranteed to be for today (maintained by backend sync).
  * Ordered by teacher ascending.

@@ -5,7 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSchedule } from '../../src/hooks/useSchedule';
 import { useAbsences } from '../../src/hooks/useAbsences';
 import { getGreeting, getCurrentTimeStr, timeToSeconds } from '../../src/utils/time';
-import { formatPeriodsImpacted } from '../../src/services/absenceService';
+import { formatPeriodsImpacted, getAbsentTeachersForPeriod } from '../../src/services/absenceService';
 import { TodaySchedule } from '../../src/components/schedule/TodaySchedule';
 import { PeriodWithStatus } from '../../src/types';
 import { GlassCard } from '../../src/components/ui/GlassCard';
@@ -31,14 +31,16 @@ export default function TodayScreen() {
       const endSec = timeToSeconds(period.end);
       const isCurrent = currentPeriod?.period === period.period;
       const isPast = nowSec > endSec;
+      const absentCount = getAbsentTeachersForPeriod(absentTeachers, period.period).length;
 
       return {
         period,
         isCurrentPeriod: isCurrent,
         isPast,
+        absentCount,
       };
     });
-  }, [periods, currentPeriod]);
+  }, [periods, currentPeriod, absentTeachers]);
 
   const greeting = getGreeting();
   const isLoading = scheduleLoading || absencesLoading;

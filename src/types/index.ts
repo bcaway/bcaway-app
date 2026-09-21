@@ -24,4 +24,6 @@ export interface PeriodWithStatus {
   period: SchedulePeriod;
   isCurrentPeriod: boolean;
   isPast: boolean;
+  absentCount?: number;
 }
+

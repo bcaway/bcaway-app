@@ -36,6 +36,7 @@ export default function RootLayout() {
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="period/[id]" options={{ headerShown: false }} />
         <Stack.Screen name="onboarding" />
         <Stack.Screen name="+not-found" options={{ presentation: 'modal' }} />
       </Stack>
