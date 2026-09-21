@@ -2,20 +2,17 @@ import { Stack } from 'expo-router';
 import { useEffect, useState } from 'react';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { storageService } from '../src/services/storage';
 import { LoadingScreen } from '../src/components/common/LoadingScreen';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
   const [isReady, setIsReady] = useState(false);
-  const [initialRoute, setInitialRoute] = useState<'(tabs)' | 'onboarding'>('onboarding');
 
   useEffect(() => {
     async function prepare() {
       try {
-        const hasOnboarded = await storageService.getHasOnboarded();
-        setInitialRoute(hasOnboarded ? '(tabs)' : 'onboarding');
+        // App initialization complete
       } catch (e) {
         console.warn(e);
       } finally {
@@ -34,10 +31,9 @@ export default function RootLayout() {
   return (
     <>
       <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
+      <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="period/[id]" options={{ headerShown: false }} />
-        <Stack.Screen name="onboarding" />
         <Stack.Screen name="+not-found" options={{ presentation: 'modal' }} />
       </Stack>
     </>

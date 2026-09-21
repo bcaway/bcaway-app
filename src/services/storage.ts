@@ -1,26 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const KEYS = {
-  ONBOARDING_COMPLETE: 'onboarding_complete',
   NOTIFICATION_PREFS: 'notification_preferences',
   CACHED_SCHEDULE_DATA: 'cached_schedule_data',
-};
-
-export const getOnboardingComplete = async (): Promise<boolean> => {
-  try {
-    const value = await AsyncStorage.getItem(KEYS.ONBOARDING_COMPLETE);
-    return value === 'true';
-  } catch (error) {
-    return false;
-  }
-};
-
-export const setOnboardingComplete = async (value: boolean): Promise<void> => {
-  try {
-    await AsyncStorage.setItem(KEYS.ONBOARDING_COMPLETE, value.toString());
-  } catch (error) {
-    console.error('Error setting onboarding complete', error);
-  }
 };
 
 export const getNotificationPrefs = async (): Promise<any> => {
@@ -59,8 +41,6 @@ export const setCachedSchedules = async (data: any): Promise<void> => {
 
 // Object-style export for consumers that import as `storageService`
 export const storageService = {
-  getHasOnboarded: getOnboardingComplete,
-  setHasOnboarded: setOnboardingComplete,
   getNotificationPrefs,
   setNotificationPrefs,
   getCachedSchedules,
