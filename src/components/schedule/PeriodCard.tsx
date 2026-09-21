@@ -1,24 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { GlassCard } from '../ui/GlassCard';
-import { StatusBadge } from '../ui/StatusBadge';
-import { SchedulePeriod, AbsentTeacher } from '../../types';
+import { SchedulePeriod } from '../../types';
 import { formatTimeRange } from '../../utils/time';
 
 interface PeriodCardProps {
   period: SchedulePeriod;
   isCurrentPeriod: boolean;
   isPast: boolean;
-  absentTeacher: AbsentTeacher | null;
   onPress?: () => void;
 }
 
-export function PeriodCard({ period, isCurrentPeriod, isPast, absentTeacher, onPress }: PeriodCardProps) {
-  const isAbsent = absentTeacher !== null;
-
+export function PeriodCard({ period, isCurrentPeriod, isPast, onPress }: PeriodCardProps) {
   return (
-    <Pressable 
-      onPress={onPress} 
+    <Pressable
+      onPress={onPress}
       disabled={!onPress}
       style={({ pressed }) => [
         styles.pressable,
@@ -26,49 +22,41 @@ export function PeriodCard({ period, isCurrentPeriod, isPast, absentTeacher, onP
         pressed && styles.pressed,
       ]}
     >
-      <GlassCard 
-        variant={isCurrentPeriod ? 'elevated' : 'default'} 
+      <GlassCard
+        variant={isCurrentPeriod ? 'elevated' : 'default'}
         style={[
           styles.card,
           isCurrentPeriod && styles.currentBg,
-          isAbsent && styles.absentBg,
         ]}
       >
-        <View style={[
-          styles.leftBorder,
-          isCurrentPeriod && styles.borderCurrent,
-          isAbsent && !isCurrentPeriod && styles.borderAbsent,
-        ]} />
-        
         <View style={styles.content}>
-          <View style={[
-            styles.periodBadge,
-            isCurrentPeriod && styles.periodBadgeCurrent,
-            isAbsent && !isCurrentPeriod && styles.periodBadgeAbsent,
-          ]}>
-            <Text style={[
-              styles.periodText,
-              isCurrentPeriod && styles.periodTextCurrent,
-            ]}>{period.period}</Text>
+          <View
+            style={[
+              styles.periodBadge,
+              isCurrentPeriod && styles.periodBadgeCurrent,
+            ]}
+          >
+            <Text
+              style={[
+                styles.periodText,
+                isCurrentPeriod && styles.periodTextCurrent,
+              ]}
+            >
+              {period.period}
+            </Text>
           </View>
-          
+
           <View style={styles.middle}>
             <Text style={styles.timeText}>
               {formatTimeRange(period.start, period.end)}
             </Text>
-            {isAbsent && (
-              <Text style={styles.teacherText}>{absentTeacher.name} · Away</Text>
-            )}
           </View>
-          
-          <View style={styles.right}>
-            {isAbsent && <StatusBadge status="away" size="sm" />}
-            {isCurrentPeriod && !isAbsent && (
-              <View style={styles.nowBadge}>
-                <Text style={styles.nowText}>Now</Text>
-              </View>
-            )}
-          </View>
+
+          {isCurrentPeriod && (
+            <View style={styles.nowBadge}>
+              <Text style={styles.nowText}>Now</Text>
+            </View>
+          )}
         </View>
       </GlassCard>
     </Pressable>
@@ -77,7 +65,7 @@ export function PeriodCard({ period, isCurrentPeriod, isPast, absentTeacher, onP
 
 const styles = StyleSheet.create({
   pressable: {
-    marginVertical: 5,
+    marginVertical: 4,
   },
   pastPeriod: {
     opacity: 0.45,
@@ -86,31 +74,19 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   card: {
-    flexDirection: 'row',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
   },
   currentBg: {
     backgroundColor: '#F0F4FF',
-  },
-  absentBg: {
-    backgroundColor: '#FFFBFB',
-  },
-  leftBorder: {
-    width: 4,
-    borderTopLeftRadius: 16,
-    borderBottomLeftRadius: 16,
-    backgroundColor: '#E5E7EB',
-  },
-  borderCurrent: {
-    backgroundColor: '#2563EB',
-  },
-  borderAbsent: {
-    backgroundColor: '#EF4444',
+    borderColor: '#BFDBFE',
   },
   content: {
-    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 14,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
   },
   periodBadge: {
     width: 36,
@@ -123,9 +99,6 @@ const styles = StyleSheet.create({
   },
   periodBadgeCurrent: {
     backgroundColor: '#2563EB',
-  },
-  periodBadgeAbsent: {
-    backgroundColor: '#FEF2F2',
   },
   periodText: {
     fontSize: 13,
@@ -142,15 +115,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     color: '#111827',
-  },
-  teacherText: {
-    fontSize: 13,
-    color: '#EF4444',
-    marginTop: 2,
-    fontWeight: '500',
-  },
-  right: {
-    marginLeft: 8,
   },
   nowBadge: {
     backgroundColor: '#EFF6FF',

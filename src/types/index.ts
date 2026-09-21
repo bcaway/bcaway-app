@@ -20,5 +20,4 @@ export interface PeriodWithStatus {
   period: SchedulePeriod;
   isCurrentPeriod: boolean;
   isPast: boolean;
-  absentTeacher: AbsentTeacher | null;
 }

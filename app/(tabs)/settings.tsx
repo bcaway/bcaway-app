@@ -8,43 +8,10 @@ export default function SettingsScreen() {
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
   };
 
-  const openPhoneSettings = () => {
-    Linking.openSettings().catch(err => console.error("Couldn't open settings", err));
-  };
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Settings</Text>
-
-        {/* Notifications Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>NOTIFICATIONS</Text>
-          <GlassCard style={styles.card}>
-            <View style={[styles.row, styles.borderBottom]}>
-              <View style={styles.rowContent}>
-                <Text style={styles.rowLabel}>Morning Alerts</Text>
-                <Text style={styles.rowDescription}>
-                  Sent automatically at 7:30 AM with the day's teacher absences.
-                </Text>
-              </View>
-              <View style={styles.statusPill}>
-                <Text style={styles.statusPillText}>Always On</Text>
-              </View>
-            </View>
-            <TouchableOpacity style={styles.row} onPress={openPhoneSettings}>
-              <View style={styles.rowContent}>
-                <Text style={styles.rowLabel}>Phone Settings</Text>
-                <Text style={styles.rowDescription}>
-                  Manage system notification permissions for BCAway
-                </Text>
-              </View>
-              <View style={styles.rowAccessory}>
-                <Ionicons name="open-outline" size={18} color="#9CA3AF" />
-              </View>
-            </TouchableOpacity>
-          </GlassCard>
-        </View>
 
         {/* Info and Support Section */}
         <View style={styles.section}>
@@ -58,10 +25,10 @@ export default function SettingsScreen() {
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://instagram.com/bcaway')}>
+            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://instagram.com/getbcaway')}>
               <Text style={styles.rowLabel}>Instagram</Text>
               <View style={styles.rowAccessory}>
-                <Text style={styles.linkText}>@bcaway</Text>
+                <Text style={styles.linkText}>@getbcaway</Text>
                 <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
               </View>
             </TouchableOpacity>
@@ -161,10 +128,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E5E7EB',
   },
-  rowContent: {
-    flex: 1,
-    paddingRight: 16,
-  },
   rowLabel: {
     fontSize: 16,
     fontWeight: '500',
@@ -174,23 +137,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#6B7280',
     fontWeight: '500',
-  },
-  rowDescription: {
-    fontSize: 13,
-    color: '#6B7280',
-    marginTop: 3,
-    lineHeight: 18,
-  },
-  statusPill: {
-    backgroundColor: '#F0FDF4',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
-  },
-  statusPillText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#16A34A',
   },
   rowAccessory: {
     flexDirection: 'row',

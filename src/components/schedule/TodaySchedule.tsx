@@ -30,7 +30,6 @@ export function TodaySchedule({ periods, isLoading }: TodayScheduleProps) {
           period={item.period}
           isCurrentPeriod={item.isCurrentPeriod}
           isPast={item.isPast}
-          absentTeacher={item.absentTeacher}
         />
       ))}
     </View>

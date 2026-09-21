@@ -31,18 +31,13 @@ export default function TodayScreen() {
       const isCurrent = currentPeriod?.period === period.period;
       const isPast = nowSec > endSec;
 
-      // Associate absent teachers with periods
-      const periodIndex = periods.indexOf(period);
-      const absentTeacher = periodIndex < absentTeachers.length ? absentTeachers[periodIndex] : null;
-
       return {
         period,
         isCurrentPeriod: isCurrent,
         isPast,
-        absentTeacher,
       };
     });
-  }, [periods, currentPeriod, absentTeachers]);
+  }, [periods, currentPeriod]);
 
   const greeting = getGreeting();
   const isLoading = scheduleLoading || absencesLoading;
