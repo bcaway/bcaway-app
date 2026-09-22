@@ -17,10 +17,10 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>INFO AND SUPPORT</Text>
           <GlassCard style={styles.card}>
-            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://bcaway.com')}>
+            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://bcaway.app')}>
               <Text style={styles.rowLabel}>Website</Text>
               <View style={styles.rowAccessory}>
-                <Text style={styles.linkText}>bcaway.com</Text>
+                <Text style={styles.linkText}>bcaway.app</Text>
                 <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
               </View>
             </TouchableOpacity>
@@ -33,16 +33,23 @@ export default function SettingsScreen() {
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('mailto:contact@bcaway.com')}>
+            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('mailto:kabsek30@bergen.org')}>
               <Text style={styles.rowLabel}>Contact</Text>
               <View style={styles.rowAccessory}>
-                <Text style={styles.linkText}>contact@bcaway.com</Text>
+                <Text style={styles.linkText}>kabsek30@bergen.org</Text>
                 <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
               </View>
             </TouchableOpacity>
 
-            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://bcaway.com/privacy')}>
+            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://bcaway.app/privacy')}>
               <Text style={styles.rowLabel}>Privacy Policy</Text>
+              <View style={styles.rowAccessory}>
+                <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
+              </View>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://bcaway.app/terms')}>
+              <Text style={styles.rowLabel}>Terms & Disclaimers</Text>
               <View style={styles.rowAccessory}>
                 <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
               </View>
