@@ -62,78 +62,98 @@ export default function PeriodDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Top Navigation Bar */}
+      {/* Navigation Bar */}
       <View style={styles.navBar}>
-        <TouchableOpacity
-          style={styles.backButton}
-          onPress={handleBack}
-          hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
-          activeOpacity={0.7}
-        >
-          <Ionicons name="chevron-back" size={24} color="#111827" />
-          <Text style={styles.backButtonText}>Today</Text>
-        </TouchableOpacity>
+        <View style={styles.wrapper}>
+          <View style={styles.navBarInner}>
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={handleBack}
+              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="arrow-back" size={18} color="#2563EB" />
+              <Text style={styles.backButtonText}>Today</Text>
+            </TouchableOpacity>
 
-        {isCurrentPeriod && (
-          <View style={styles.nowBadge}>
-            <Text style={styles.nowText}>In Progress</Text>
+            {isCurrentPeriod && (
+              <Text style={styles.nowText}>In progress</Text>
+            )}
           </View>
-        )}
+        </View>
       </View>
 
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A86E8" />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#2563EB"
+          />
+        }
       >
-        {/* Period Hero Header */}
-        <View style={styles.heroHeader}>
-          <Text style={styles.title}>{displayTitle}</Text>
-          {periodInfo && (
-            <Text style={styles.timeText}>
-              {formatTimeRange(periodInfo.start, periodInfo.end)}
-            </Text>
-          )}
-          <Text style={styles.dateText}>{todayString}</Text>
-        </View>
-
-
-        {/* Teachers List Section */}
-        <View style={styles.sectionHeader}>
-          <Text style={styles.sectionTitle}>Absent Teachers</Text>
-          {periodAbsences.length > 0 && (
-            <View style={styles.countPill}>
-              <Text style={styles.countPillText}>{periodAbsences.length}</Text>
+        <View style={styles.wrapper}>
+          {/* Period Header */}
+          <View style={styles.heroHeader}>
+            <Text style={styles.title}>{displayTitle}</Text>
+            <View style={styles.metaRow}>
+              {periodInfo && (
+                <Text style={styles.timeText}>
+                  {formatTimeRange(periodInfo.start, periodInfo.end)}
+                </Text>
+              )}
+              <Text style={styles.bullet}>•</Text>
+              <Text style={styles.dateText}>{todayString}</Text>
             </View>
-          )}
-        </View>
+          </View>
 
-        {isLoading && !refreshing ? (
-          <View style={styles.loadingContainer}>
-            <BCAwayLoading />
+          {/* Section: Absent Teachers */}
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>ABSENT THIS PERIOD</Text>
+              {periodAbsences.length > 0 && (
+                <Text style={styles.countText}>
+                  {periodAbsences.length} {periodAbsences.length === 1 ? 'teacher' : 'teachers'}
+                </Text>
+              )}
+            </View>
+
+            {isLoading && !refreshing ? (
+              <View style={styles.loadingContainer}>
+                <BCAwayLoading />
+              </View>
+            ) : error ? (
+              <View style={styles.emptyBox}>
+                <EmptyState
+                  icon="⚠️"
+                  title="Unable to load absences"
+                  subtitle="Could not retrieve database records. Pull down to retry."
+                />
+              </View>
+            ) : periodAbsences.length > 0 ? (
+              <View style={styles.ledger}>
+                {periodAbsences.map((teacher, index) => (
+                  <AbsenceListItem
+                    key={teacher.id}
+                    teacher={teacher}
+                    showDivider={index < periodAbsences.length - 1}
+                  />
+                ))}
+              </View>
+            ) : (
+              <View style={styles.emptyBox}>
+                <EmptyState
+                  icon="🎉"
+                  title="No teachers absent"
+                  subtitle={`All teachers are present for ${displayTitle} today.`}
+                />
+              </View>
+            )}
           </View>
-        ) : error ? (
-          <View style={styles.emptyContainer}>
-            <EmptyState
-              icon="⚠️"
-              title="Unable to load absences"
-              subtitle="Could not retrieve database records. Pull down to retry."
-            />
-          </View>
-        ) : periodAbsences.length > 0 ? (
-          periodAbsences.map(teacher => (
-            <AbsenceListItem key={teacher.id} teacher={teacher} />
-          ))
-        ) : (
-          <View style={styles.emptyContainer}>
-            <EmptyState
-              icon="🎉"
-              title="No Absences"
-              subtitle={`Every teacher is present for ${displayTitle} today.`}
-            />
-          </View>
-        )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -145,89 +165,112 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   navBar: {
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+  },
+  wrapper: {
+    width: '100%',
+  },
+  navBarInner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
   },
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
   },
   backButtonText: {
-    fontSize: 16,
-    color: '#4A86E8',
+    fontSize: 14,
+    color: '#2563EB',
     fontWeight: '600',
-    marginLeft: 2,
-  },
-  nowBadge: {
-    backgroundColor: '#EEF4FE',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
   },
   nowText: {
-    fontSize: 12,
+    fontSize: 13,
     fontWeight: '600',
-    color: '#4A86E8',
+    color: '#2563EB',
   },
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#FFFFFF',
   },
   content: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
     paddingBottom: 60,
   },
   heroHeader: {
     marginBottom: 20,
+    paddingBottom: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
   },
   title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#111827',
-    letterSpacing: -0.5,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.4,
+  },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 4,
+    flexWrap: 'wrap',
   },
   timeText: {
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: '600',
-    color: '#4A86E8',
-    marginTop: 4,
+    color: '#2563EB',
+    fontVariant: ['tabular-nums'],
+  },
+  bullet: {
+    color: '#94A3B8',
+    fontSize: 12,
   },
   dateText: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginTop: 2,
+    fontSize: 13,
+    color: '#64748B',
+  },
+  section: {
+    marginBottom: 20,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 12,
+    justifyContent: 'space-between',
+    marginBottom: 8,
   },
   sectionTitle: {
-    fontSize: 16,
+    fontSize: 11,
     fontWeight: '700',
-    color: '#374151',
-    letterSpacing: -0.2,
+    color: '#64748B',
+    letterSpacing: 0.6,
   },
-  countPill: {
-    backgroundColor: '#EEF4FE',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 10,
-    marginLeft: 8,
-  },
-  countPillText: {
+  countText: {
     fontSize: 12,
-    fontWeight: '700',
-    color: '#4A86E8',
+    color: '#64748B',
+    fontWeight: '500',
   },
-  emptyContainer: {
-    paddingTop: 40,
+  ledger: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
+    width: '100%',
+  },
+  emptyBox: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    paddingVertical: 20,
+    width: '100%',
   },
   loadingContainer: {
     paddingVertical: 80,

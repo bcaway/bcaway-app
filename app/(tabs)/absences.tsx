@@ -1,5 +1,14 @@
 import React, { useState, useMemo } from 'react';
-import { StyleSheet, View, Text, ScrollView, TextInput, SafeAreaView, RefreshControl } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  TextInput,
+  SafeAreaView,
+  RefreshControl,
+  TouchableOpacity,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { format } from 'date-fns';
@@ -15,8 +24,8 @@ export default function AbsencesScreen() {
 
   const filteredTeachers = useMemo(() => {
     if (!searchQuery.trim()) return absentTeachers;
-    const lowerQuery = searchQuery.toLowerCase();
-    return absentTeachers.filter(teacher => 
+    const lowerQuery = searchQuery.toLowerCase().trim();
+    return absentTeachers.filter(teacher =>
       teacher.teacher.toLowerCase().includes(lowerQuery) ||
       teacher.periodsImpacted.toLowerCase().includes(lowerQuery)
     );
@@ -34,20 +43,44 @@ export default function AbsencesScreen() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.header}>
-        <Text style={styles.title}>Absent Today</Text>
-        <Text style={styles.subtitle}>{todayString}</Text>
-        
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={18} color="#9CA3AF" style={styles.searchIcon} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search teachers..."
-            placeholderTextColor="#9CA3AF"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-            clearButtonMode="while-editing"
-            returnKeyType="search"
-          />
+        <View style={styles.wrapper}>
+          <Text style={styles.title}>Teacher Absences</Text>
+          <Text style={styles.subtitle}>
+            {todayString}
+            {absentTeachers.length > 0 ? ` • ${absentTeachers.length} absent` : ''}
+          </Text>
+
+          <View style={styles.searchRow}>
+            <View style={styles.searchInputContainer}>
+              <Ionicons name="search" size={16} color="#64748B" style={styles.searchIcon} />
+              <TextInput
+                style={styles.searchInput}
+                placeholder="Search by teacher name or period..."
+                placeholderTextColor="#94A3B8"
+                value={searchQuery}
+                onChangeText={setSearchQuery}
+                clearButtonMode="never"
+                returnKeyType="search"
+                autoCorrect={false}
+                autoCapitalize="none"
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity
+                  onPress={() => setSearchQuery('')}
+                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                  style={styles.clearButton}
+                >
+                  <Ionicons name="close-circle" size={16} color="#94A3B8" />
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          {searchQuery.trim().length > 0 && (
+            <Text style={styles.searchMeta}>
+              Showing {filteredTeachers.length} of {absentTeachers.length} {absentTeachers.length === 1 ? 'teacher' : 'teachers'}
+            </Text>
+          )}
         </View>
       </View>
 
@@ -57,33 +90,51 @@ export default function AbsencesScreen() {
         showsVerticalScrollIndicator={false}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A86E8" />}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor="#2563EB"
+          />
+        }
       >
-        {isLoading && !refreshing ? (
-          <View style={styles.loadingContainer}>
-            <BCAwayLoading />
-          </View>
-        ) : error ? (
-          <View style={styles.errorContainer}>
-            <EmptyState
-              icon="⚠️"
-              title="Unable to load absences"
-              subtitle="Could not connect to the database. Pull down to retry."
-            />
-          </View>
-        ) : filteredTeachers.length > 0 ? (
-          filteredTeachers.map(teacher => (
-            <AbsenceListItem key={teacher.id} teacher={teacher} />
-          ))
-        ) : (
-          <View style={styles.emptyContainer}>
-            <EmptyState
-              icon={searchQuery ? '🔍' : '🎉'}
-              title={searchQuery ? 'No results found' : 'All teachers present today'}
-              subtitle={searchQuery ? 'Try a different search term.' : 'No absences reported — it\'s a full house!'}
-            />
-          </View>
-        )}
+        <View style={styles.wrapper}>
+          {isLoading && !refreshing ? (
+            <View style={styles.loadingContainer}>
+              <BCAwayLoading />
+            </View>
+          ) : error ? (
+            <View style={styles.emptyCard}>
+              <EmptyState
+                icon="⚠️"
+                title="Unable to load absences"
+                subtitle="Could not connect to the database. Pull down to retry."
+              />
+            </View>
+          ) : filteredTeachers.length > 0 ? (
+            <View style={styles.ledger}>
+              {filteredTeachers.map((teacher, index) => (
+                <AbsenceListItem
+                  key={teacher.id}
+                  teacher={teacher}
+                  showDivider={index < filteredTeachers.length - 1}
+                />
+              ))}
+            </View>
+          ) : (
+            <View style={styles.emptyCard}>
+              <EmptyState
+                icon={searchQuery ? '🔍' : '🎉'}
+                title={searchQuery ? 'No matching teachers' : 'No absences today!'}
+                subtitle={
+                  searchQuery
+                    ? `No teacher absences match "${searchQuery}".`
+                    : 'All teachers are reported present.'
+                }
+              />
+            </View>
+          )}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );
@@ -96,58 +147,86 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 16,
-    paddingBottom: 12,
+    paddingTop: 14,
+    paddingBottom: 14,
     backgroundColor: '#FFFFFF',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  wrapper: {
+    width: '100%',
   },
   title: {
-    fontSize: 30,
-    fontWeight: '800',
-    color: '#111827',
-    marginBottom: 4,
-    letterSpacing: -0.5,
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.4,
   },
   subtitle: {
-    fontSize: 15,
-    color: '#6B7280',
-    marginBottom: 14,
+    fontSize: 13,
+    color: '#64748B',
+    marginTop: 2,
+    marginBottom: 10,
   },
-  searchContainer: {
+  searchRow: {
+    marginTop: 2,
+  },
+  searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F3F4F6',
-    borderRadius: 12,
+    backgroundColor: '#F8FAFC',
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
     paddingHorizontal: 12,
-    height: 42,
+    height: 40,
   },
   searchIcon: {
     marginRight: 8,
   },
   searchInput: {
     flex: 1,
-    fontSize: 16,
-    color: '#111827',
+    fontSize: 14,
+    color: '#0F172A',
     height: '100%',
+    padding: 0,
+  },
+  clearButton: {
+    padding: 2,
+  },
+  searchMeta: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 6,
   },
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#FFFFFF',
   },
   content: {
-    padding: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
     paddingBottom: 100,
   },
-  emptyContainer: {
-    paddingTop: 60,
+  ledger: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
+    width: '100%',
+  },
+  emptyCard: {
+    backgroundColor: '#F8FAFC',
+    borderRadius: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    paddingVertical: 20,
+    width: '100%',
   },
   loadingContainer: {
     paddingVertical: 80,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  errorContainer: {
-    paddingTop: 40,
   },
 });

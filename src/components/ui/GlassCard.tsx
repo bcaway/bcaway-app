@@ -1,12 +1,15 @@
 import React from 'react';
-import { View, StyleSheet, Platform, ViewProps, StyleProp, ViewStyle } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { View, StyleSheet, ViewProps, StyleProp, ViewStyle } from 'react-native';
 
 interface GlassCardProps extends ViewProps {
   variant?: 'default' | 'elevated' | 'accent';
   children: React.ReactNode;
 }
 
+/**
+ * Clean surface container with a crisp border and subtle background.
+ * Replaces blur/glassmorphism with clean, utilitarian structure.
+ */
 export function GlassCard({ variant = 'default', children, style, ...props }: GlassCardProps) {
   const baseStyle: StyleProp<ViewStyle> = [
     styles.container,
@@ -15,20 +18,8 @@ export function GlassCard({ variant = 'default', children, style, ...props }: Gl
     style,
   ];
 
-  if (Platform.OS === 'ios') {
-    return (
-      <View style={baseStyle} {...props}>
-        <View style={[StyleSheet.absoluteFill, styles.iosBg]}>
-          <BlurView intensity={80} tint="light" style={StyleSheet.absoluteFill} />
-          <View style={[StyleSheet.absoluteFill, styles.iosOverlay]} />
-        </View>
-        {children}
-      </View>
-    );
-  }
-
   return (
-    <View style={[baseStyle, styles.androidContainer]} {...props}>
+    <View style={baseStyle} {...props}>
       {children}
     </View>
   );
@@ -36,30 +27,19 @@ export function GlassCard({ variant = 'default', children, style, ...props }: Gl
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 16,
-    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
   },
   elevated: {
-    shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 12,
-    elevation: 3,
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#CBD5E1',
   },
   accent: {
-    borderColor: '#EFF6FF',
+    backgroundColor: '#F8FAFC',
     borderWidth: 1,
-  },
-  iosBg: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  iosOverlay: {
-    backgroundColor: 'rgba(255, 255, 255, 0.85)',
-  },
-  androidContainer: {
-    backgroundColor: '#FFFFFF',
-    borderColor: '#E5E7EB',
-    borderWidth: 1,
+    borderColor: '#BFDBFE',
   },
 });

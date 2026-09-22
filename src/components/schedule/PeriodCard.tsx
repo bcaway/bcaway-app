@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { GlassCard } from '../ui/GlassCard';
 import { SchedulePeriod } from '../../types';
 import { formatTimeRange } from '../../utils/time';
 
@@ -12,6 +11,7 @@ interface PeriodCardProps {
   isPast: boolean;
   absentCount?: number;
   onPress?: () => void;
+  showDivider?: boolean;
 }
 
 export function PeriodCard({
@@ -20,6 +20,7 @@ export function PeriodCard({
   isPast,
   absentCount = 0,
   onPress,
+  showDivider = true,
 }: PeriodCardProps) {
   const hasAbsences = absentCount > 0;
 
@@ -30,171 +31,126 @@ export function PeriodCard({
     }
   };
 
+  const periodLabel = period.period.toUpperCase() === 'IGS' ? 'IGS' : period.period;
+
   return (
     <Pressable
       onPress={handlePress}
       disabled={!onPress}
       style={({ pressed }) => [
-        styles.pressable,
-        isPast && styles.pastPeriod,
-        pressed && styles.pressed,
+        styles.row,
+        isCurrentPeriod && styles.rowCurrent,
+        isPast && styles.rowPast,
+        pressed && styles.rowPressed,
+        showDivider && styles.divider,
       ]}
     >
-      <GlassCard
-        variant={isCurrentPeriod ? 'elevated' : 'default'}
-        style={[
-          styles.card,
-          isCurrentPeriod && styles.currentBg,
-        ]}
-      >
-        <View style={styles.content}>
-          <View
-            style={[
-              styles.periodBadge,
-              isCurrentPeriod && styles.periodBadgeCurrent,
-            ]}
-          >
-            <Text
-              style={[
-                styles.periodText,
-                isCurrentPeriod && styles.periodTextCurrent,
-              ]}
-            >
-              {period.period}
-            </Text>
-          </View>
+      {/* Active period left indicator bar */}
+      {isCurrentPeriod && <View style={styles.activeIndicatorBar} />}
 
-          <View style={styles.middle}>
-            <Text style={styles.timeText}>
-              {formatTimeRange(period.start, period.end)}
-            </Text>
-          </View>
+      {/* Period Identifier Column */}
+      <View style={styles.periodCol}>
+        <Text style={[styles.periodText, isCurrentPeriod && styles.periodTextCurrent]}>
+          {periodLabel}
+        </Text>
+      </View>
 
-          <View style={styles.rightContainer}>
-            {isCurrentPeriod && (
-              <View style={styles.nowBadge}>
-                <Text style={styles.nowText}>Now</Text>
-              </View>
-            )}
+      {/* Bell Time Range Column */}
+      <View style={styles.timeCol}>
+        <Text style={[styles.timeText, isCurrentPeriod && styles.timeTextCurrent]}>
+          {formatTimeRange(period.start, period.end)}
+        </Text>
+      </View>
 
-            {/* Person icon with absent count to the left - only shown when absentCount > 0 */}
-            {hasAbsences && (
-              <View style={[styles.absenceBadge, styles.absenceBadgeActive]}>
-                <Text style={[styles.absenceCountText, styles.absenceCountTextActive]}>
-                  {absentCount}
-                </Text>
-                <Ionicons
-                  name="person"
-                  size={12}
-                  color="#DC2626"
-                  style={styles.personIcon}
-                />
-              </View>
-            )}
+      {/* Status & Absences Column */}
+      <View style={styles.statusCol}>
+        {isCurrentPeriod && (
+          <Text style={styles.nowText}>Now</Text>
+        )}
 
-            <Ionicons name="chevron-forward" size={14} color="#D1D5DB" style={styles.chevron} />
-          </View>
-        </View>
-      </GlassCard>
+        {hasAbsences ? (
+          <Text style={styles.absenceCountText}>
+            {absentCount} absent
+          </Text>
+        ) : null}
+
+        <Ionicons name="chevron-forward" size={14} color="#CBD5E1" style={styles.chevron} />
+      </View>
     </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  pressable: {
-    marginVertical: 4,
-  },
-  pastPeriod: {
-    opacity: 0.45,
-  },
-  pressed: {
-    opacity: 0.8,
-  },
-  card: {
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-  },
-  currentBg: {
-    backgroundColor: '#F0F4FF',
-    borderColor: '#BFDBFE',
-  },
-  content: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+    position: 'relative',
   },
-  periodBadge: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: '#F3F4F6',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
+  rowCurrent: {
+    backgroundColor: '#F8FAFC',
   },
-  periodBadgeCurrent: {
-    backgroundColor: '#4A86E8',
+  rowPast: {
+    opacity: 0.5,
+  },
+  rowPressed: {
+    backgroundColor: '#F1F5F9',
+  },
+  divider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E2E8F0',
+  },
+  activeIndicatorBar: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
+    width: 3,
+    backgroundColor: '#2563EB',
+  },
+  periodCol: {
+    width: 34,
+    marginRight: 8,
   },
   periodText: {
     fontSize: 13,
-    fontWeight: '700',
-    color: '#374151',
+    fontWeight: '600',
+    color: '#64748B',
+    fontVariant: ['tabular-nums'],
   },
   periodTextCurrent: {
-    color: '#FFFFFF',
+    color: '#2563EB',
+    fontWeight: '700',
   },
-  middle: {
+  timeCol: {
     flex: 1,
   },
   timeText: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#111827',
+    color: '#0F172A',
+    fontVariant: ['tabular-nums'],
   },
-  rightContainer: {
+  timeTextCurrent: {
+    fontWeight: '600',
+    color: '#0F172A',
+  },
+  statusCol: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
   },
-  nowBadge: {
-    backgroundColor: '#EEF4FE',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 10,
-  },
   nowText: {
-    color: '#4A86E8',
     fontSize: 12,
     fontWeight: '600',
-  },
-  absenceBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 10,
-  },
-  absenceBadgeActive: {
-    backgroundColor: '#FEF2F2',
-  },
-  absenceBadgeMuted: {
-    backgroundColor: '#F3F4F6',
+    color: '#2563EB',
   },
   absenceCountText: {
     fontSize: 13,
-    fontWeight: '700',
-    marginRight: 4,
-  },
-  absenceCountTextActive: {
+    fontWeight: '500',
     color: '#DC2626',
-  },
-  absenceCountTextMuted: {
-    color: '#6B7280',
-  },
-  personIcon: {
-    marginTop: 1,
   },
   chevron: {
     marginLeft: 2,

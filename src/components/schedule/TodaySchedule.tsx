@@ -25,11 +25,27 @@ export function TodaySchedule({ periods, isLoading, error, onPeriodPress }: Toda
   }
 
   if (error && periods.length === 0) {
-    return <EmptyState icon="⚠️" title="Schedule Unavailable" subtitle="Could not load schedule from GitHub" />;
+    return (
+      <View style={styles.emptyBox}>
+        <EmptyState
+          icon="⚠️"
+          title="Schedule Unavailable"
+          subtitle="Could not load schedule data. Pull down to retry."
+        />
+      </View>
+    );
   }
 
   if (periods.length === 0) {
-    return <EmptyState icon="🎉" title="No School Today" subtitle="Enjoy your day off!" />;
+    return (
+      <View style={styles.emptyBox}>
+        <EmptyState
+          icon="🎉"
+          title="No School Today"
+          subtitle="No periods scheduled for today. Enjoy your day off!"
+        />
+      </View>
+    );
   }
 
   const handlePeriodPress = (period: SchedulePeriod) => {
@@ -41,8 +57,8 @@ export function TodaySchedule({ periods, isLoading, error, onPeriodPress }: Toda
   };
 
   return (
-    <View style={styles.list}>
-      {periods.map((item) => (
+    <View style={styles.ledgerContainer}>
+      {periods.map((item, index) => (
         <PeriodCard
           key={item.period.period}
           period={item.period}
@@ -50,6 +66,7 @@ export function TodaySchedule({ periods, isLoading, error, onPeriodPress }: Toda
           isPast={item.isPast}
           absentCount={item.absentCount ?? 0}
           onPress={() => handlePeriodPress(item.period)}
+          showDivider={index < periods.length - 1}
         />
       ))}
     </View>
@@ -58,12 +75,23 @@ export function TodaySchedule({ periods, isLoading, error, onPeriodPress }: Toda
 
 const styles = StyleSheet.create({
   center: {
-    flex: 1,
-    justifyContent: 'center',
+    paddingVertical: 36,
     alignItems: 'center',
-    paddingVertical: 60,
+    justifyContent: 'center',
   },
-  list: {
-    gap: 0,
+  emptyBox: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    width: '100%',
+  },
+  ledgerContainer: {
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#FFFFFF',
+    width: '100%',
   },
 });

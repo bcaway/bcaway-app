@@ -2,17 +2,17 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 interface EmptyStateProps {
-  icon: string;
+  icon?: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
 }
 
 export function EmptyState({ icon, title, subtitle }: EmptyStateProps) {
   return (
     <View style={styles.container}>
-      <Text style={styles.icon}>{icon}</Text>
+      {icon ? <Text style={styles.icon}>{icon}</Text> : null}
       <Text style={styles.title}>{title}</Text>
-      <Text style={styles.subtitle}>{subtitle}</Text>
+      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
     </View>
   );
 }
@@ -21,23 +21,26 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 40,
-    paddingHorizontal: 20,
+    paddingVertical: 28,
+    paddingHorizontal: 16,
   },
   icon: {
-    fontSize: 48,
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#111827',
+    fontSize: 28,
     marginBottom: 8,
     textAlign: 'center',
   },
-  subtitle: {
-    fontSize: 14,
-    color: '#6B7280',
+  title: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#1E293B',
     textAlign: 'center',
+    letterSpacing: -0.2,
+  },
+  subtitle: {
+    fontSize: 13,
+    color: '#64748B',
+    textAlign: 'center',
+    marginTop: 3,
+    lineHeight: 18,
   },
 });

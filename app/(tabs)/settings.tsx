@@ -1,7 +1,14 @@
 import React from 'react';
-import { StyleSheet, View, Text, SafeAreaView, ScrollView, TouchableOpacity, Linking } from 'react-native';
+import {
+  StyleSheet,
+  View,
+  Text,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+  Linking,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { GlassCard } from '../../src/components/ui/GlassCard';
 
 export default function SettingsScreen() {
   const openLink = (url: string) => {
@@ -10,78 +17,129 @@ export default function SettingsScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <ScrollView style={styles.container} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        <Text style={styles.title}>Settings</Text>
-
-        {/* Info and Support Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>INFO AND SUPPORT</Text>
-          <GlassCard style={styles.card}>
-            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://bcaway.app')}>
-              <Text style={styles.rowLabel}>Website</Text>
-              <View style={styles.rowAccessory}>
-                <Text style={styles.linkText}>bcaway.app</Text>
-                <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://instagram.com/getbcaway')}>
-              <Text style={styles.rowLabel}>Instagram</Text>
-              <View style={styles.rowAccessory}>
-                <Text style={styles.linkText}>@getbcaway</Text>
-                <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('mailto:kabsek30@bergen.org')}>
-              <Text style={styles.rowLabel}>Contact</Text>
-              <View style={styles.rowAccessory}>
-                <Text style={styles.linkText}>kabsek30@bergen.org</Text>
-                <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://bcaway.app/privacy')}>
-              <Text style={styles.rowLabel}>Privacy Policy</Text>
-              <View style={styles.rowAccessory}>
-                <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={[styles.row, styles.borderBottom]} onPress={() => openLink('https://bcaway.app/terms')}>
-              <Text style={styles.rowLabel}>Terms & Disclaimers</Text>
-              <View style={styles.rowAccessory}>
-                <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
-              </View>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.row} onPress={() => openLink('https://github.com/bcaway')}>
-              <Text style={styles.rowLabel}>GitHub</Text>
-              <View style={styles.rowAccessory}>
-                <Ionicons name="logo-github" size={18} color="#6B7280" style={{ marginRight: 4 }} />
-                <Ionicons name="chevron-forward" size={16} color="#9CA3AF" />
-              </View>
-            </TouchableOpacity>
-          </GlassCard>
+      <View style={styles.header}>
+        <View style={styles.wrapper}>
+          <Text style={styles.headerTitle}>About & Links</Text>
+          <Text style={styles.headerSub}>Project information, links, and contact</Text>
         </View>
+      </View>
 
-        {/* Info Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>INFO</Text>
-          <GlassCard style={styles.card}>
-            <View style={[styles.row, styles.borderBottom]}>
-              <Text style={styles.rowLabel}>Developer</Text>
-              <Text style={styles.rowValue}>Kabir Sekhon</Text>
+      <ScrollView
+        style={styles.container}
+        contentContainerStyle={styles.content}
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.wrapper}>
+          {/* Section: Links & Community */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeading}>ONLINE & COMMUNITY</Text>
+            <View style={styles.cardGroup}>
+              <TouchableOpacity
+                style={[styles.linkRow, styles.divider]}
+                onPress={() => openLink('https://bcaway.app')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.linkLeft}>
+                  <Text style={styles.linkLabel}>Website</Text>
+                  <Text style={styles.linkTarget}>bcaway.app</Text>
+                </View>
+                <Ionicons name="open-outline" size={15} color="#64748B" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[styles.linkRow, styles.divider]}
+                onPress={() => openLink('https://instagram.com/getbcaway')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.linkLeft}>
+                  <Text style={styles.linkLabel}>Instagram</Text>
+                  <Text style={styles.linkTarget}>@getbcaway</Text>
+                </View>
+                <Ionicons name="open-outline" size={15} color="#64748B" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.linkRow}
+                onPress={() => openLink('https://github.com/bcaway')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.linkLeft}>
+                  <Text style={styles.linkLabel}>GitHub</Text>
+                  <Text style={styles.linkTarget}>github.com/bcaway</Text>
+                </View>
+                <Ionicons name="logo-github" size={16} color="#64748B" />
+              </TouchableOpacity>
             </View>
-            <View style={[styles.row, styles.borderBottom]}>
-              <Text style={styles.rowLabel}>License</Text>
-              <Text style={styles.rowValue}>AGPL v3.0</Text>
+          </View>
+
+          {/* Section: Feedback & Contact */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeading}>FEEDBACK & CONTACT</Text>
+            <View style={styles.cardGroup}>
+              <TouchableOpacity
+                style={styles.linkRow}
+                onPress={() => openLink('mailto:kabsek30@bergen.org')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.linkLeft}>
+                  <Text style={styles.linkLabel}>Contact Developer</Text>
+                  <Text style={styles.linkTarget}>kabsek30@bergen.org</Text>
+                </View>
+                <Ionicons name="mail-outline" size={16} color="#64748B" />
+              </TouchableOpacity>
             </View>
-            <View style={styles.row}>
-              <Text style={styles.rowLabel}>Version</Text>
-              <Text style={styles.rowValue}>1.0</Text>
+          </View>
+
+          {/* Section: Legal */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeading}>LEGAL & TERMS</Text>
+            <View style={styles.cardGroup}>
+              <TouchableOpacity
+                style={[styles.linkRow, styles.divider]}
+                onPress={() => openLink('https://bcaway.app/privacy')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.linkLeft}>
+                  <Text style={styles.linkLabel}>Privacy Policy</Text>
+                  <Text style={styles.linkTarget}>bcaway.app/privacy</Text>
+                </View>
+                <Ionicons name="open-outline" size={15} color="#64748B" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.linkRow}
+                onPress={() => openLink('https://bcaway.app/terms')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.linkLeft}>
+                  <Text style={styles.linkLabel}>Terms & Disclaimers</Text>
+                  <Text style={styles.linkTarget}>bcaway.app/terms</Text>
+                </View>
+                <Ionicons name="open-outline" size={15} color="#64748B" />
+              </TouchableOpacity>
             </View>
-          </GlassCard>
+          </View>
+
+          {/* Section: App Information */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeading}>APP INFORMATION</Text>
+            <View style={styles.cardGroup}>
+              <View style={[styles.metaRow, styles.divider]}>
+                <Text style={styles.metaLabel}>Developer</Text>
+                <Text style={styles.metaValue}>Kabir Sekhon</Text>
+              </View>
+
+              <View style={[styles.metaRow, styles.divider]}>
+                <Text style={styles.metaLabel}>License</Text>
+                <Text style={styles.metaValue}>AGPL v3.0</Text>
+              </View>
+
+              <View style={styles.metaRow}>
+                <Text style={styles.metaLabel}>Version</Text>
+                <Text style={styles.metaValue}>1.0</Text>
+              </View>
+            </View>
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -91,67 +149,99 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: '#FFFFFF',
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 14,
+    paddingBottom: 14,
+    backgroundColor: '#FFFFFF',
+    borderBottomWidth: 1,
+    borderBottomColor: '#E2E8F0',
+  },
+  wrapper: {
+    width: '100%',
+  },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#0F172A',
+    letterSpacing: -0.4,
+  },
+  headerSub: {
+    fontSize: 13,
+    color: '#64748B',
+    marginTop: 2,
   },
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   content: {
-    padding: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 18,
     paddingBottom: 100,
   },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#111827',
-    marginBottom: 24,
-    letterSpacing: -0.5,
-  },
   section: {
-    marginBottom: 24,
+    marginBottom: 20,
   },
-  sectionTitle: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#6B7280',
+  sectionHeading: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+    letterSpacing: 0.6,
     marginBottom: 8,
-    marginLeft: 4,
-    letterSpacing: 0.5,
   },
-  card: {
-    padding: 0,
-    overflow: 'hidden',
+  cardGroup: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: '#E2E8F0',
+    overflow: 'hidden',
+    width: '100%',
   },
-  row: {
+  linkRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 14,
+    paddingVertical: 13,
     paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
   },
-  borderBottom: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E5E7EB',
+  linkLeft: {
+    flex: 1,
+    paddingRight: 12,
   },
-  rowLabel: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: '#111827',
+  linkLabel: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0F172A',
   },
-  rowValue: {
-    fontSize: 16,
-    color: '#6B7280',
-    fontWeight: '500',
+  linkTarget: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 1,
   },
-  rowAccessory: {
+  metaRow: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
   },
-  linkText: {
-    fontSize: 15,
-    color: '#4A86E8',
-    marginRight: 4,
+  metaLabel: {
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#475569',
+  },
+  metaValue: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#0F172A',
+  },
+  divider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E2E8F0',
   },
 });

@@ -5,18 +5,26 @@ import { formatPeriodsImpacted } from '../../services/absenceService';
 
 interface AbsenceListItemProps {
   teacher: TeacherAbsence;
+  showDivider?: boolean;
 }
 
-export function AbsenceListItem({ teacher }: AbsenceListItemProps) {
+export function AbsenceListItem({ teacher, showDivider = true }: AbsenceListItemProps) {
   const formattedPeriods = formatPeriodsImpacted(teacher.periodsImpacted);
+  const isAllDay = formattedPeriods.toLowerCase() === 'all day';
 
   return (
-    <View style={styles.card}>
-      <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
-        {teacher.teacher}
-      </Text>
-      <View style={styles.durationBadge}>
-        <Text style={styles.durationText} numberOfLines={1} ellipsizeMode="tail">
+    <View style={[styles.row, showDivider && styles.divider]}>
+      <View style={styles.left}>
+        <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+          {teacher.teacher}
+        </Text>
+      </View>
+
+      <View style={styles.right}>
+        <Text
+          style={[styles.periodsText, isAllDay ? styles.periodsAllDay : styles.periodsPartial]}
+          numberOfLines={1}
+        >
           {formattedPeriods}
         </Text>
       </View>
@@ -25,42 +33,40 @@ export function AbsenceListItem({ teacher }: AbsenceListItemProps) {
 }
 
 const styles = StyleSheet.create({
-  card: {
+  row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    marginVertical: 4,
-    paddingVertical: 14,
+    paddingVertical: 13,
     paddingHorizontal: 16,
-    borderWidth: 1,
-    borderColor: '#E5E7EB',
-    shadowColor: '#000',
-    shadowOpacity: 0.03,
-    shadowOffset: { width: 0, height: 1 },
-    shadowRadius: 4,
-    elevation: 1,
+    backgroundColor: '#FFFFFF',
+  },
+  divider: {
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#E2E8F0',
+  },
+  left: {
+    flex: 1,
+    paddingRight: 12,
   },
   name: {
-    fontSize: 16,
+    fontSize: 15,
     fontWeight: '600',
-    color: '#111827',
+    color: '#0F172A',
     letterSpacing: -0.2,
-    flexShrink: 1,
-    marginRight: 12,
   },
-  durationBadge: {
-    backgroundColor: '#F3F4F6',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 8,
+  right: {
     flexShrink: 0,
-    maxWidth: '60%',
+    alignItems: 'flex-end',
   },
-  durationText: {
+  periodsText: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#4B5563',
+  },
+  periodsAllDay: {
+    color: '#DC2626',
+  },
+  periodsPartial: {
+    color: '#64748B',
   },
 });

@@ -1,50 +1,42 @@
+import React from 'react';
 import { Tabs } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
-import { Platform, StyleSheet, View } from 'react-native';
-import { BlurView } from 'expo-blur';
+import { Platform, StyleSheet } from 'react-native';
 
 export default function TabLayout() {
-  const isIOS = Platform.OS === 'ios';
-
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-        tabBarBackground: () =>
-          isIOS ? (
-            <View style={StyleSheet.absoluteFill}>
-              <BlurView intensity={90} tint="light" style={StyleSheet.absoluteFill} />
-              <View style={[StyleSheet.absoluteFill, styles.glassOverlay]} />
-            </View>
-          ) : undefined,
-        tabBarStyle: isIOS
-          ? {
-              position: 'absolute',
-              backgroundColor: 'transparent',
-              borderTopWidth: StyleSheet.hairlineWidth,
-              borderTopColor: 'rgba(229, 231, 235, 0.8)',
-              elevation: 0,
-            }
-          : {
-              backgroundColor: '#FFFFFF',
-              borderTopColor: '#E5E7EB',
-              borderTopWidth: StyleSheet.hairlineWidth,
-              elevation: 0,
-              shadowOpacity: 0,
-            },
-        tabBarActiveTintColor: '#4A86E8',
-        tabBarInactiveTintColor: '#9CA3AF',
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',
+          borderTopColor: '#E2E8F0',
+          borderTopWidth: StyleSheet.hairlineWidth,
+          elevation: 0,
+          shadowOpacity: 0,
+          height: Platform.OS === 'ios' ? 84 : 58,
+          paddingTop: 6,
+          paddingBottom: Platform.OS === 'ios' ? 24 : 6,
+        },
+        tabBarActiveTintColor: '#2563EB',
+        tabBarInactiveTintColor: '#64748B',
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',
+          letterSpacing: -0.2,
+          marginTop: 2,
         },
       }}>
       <Tabs.Screen
         name="index"
         options={{
           title: 'Today',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="calendar" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? 'calendar' : 'calendar-outline'}
+              size={size - 2}
+              color={color}
+            />
           ),
         }}
       />
@@ -52,8 +44,12 @@ export default function TabLayout() {
         name="absences"
         options={{
           title: 'Absences',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="people" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? 'people' : 'people-outline'}
+              size={size - 2}
+              color={color}
+            />
           ),
         }}
       />
@@ -61,18 +57,15 @@ export default function TabLayout() {
         name="settings"
         options={{
           title: 'Settings',
-          tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings" size={size} color={color} />
+          tabBarIcon: ({ color, size, focused }) => (
+            <Ionicons
+              name={focused ? 'information-circle' : 'information-circle-outline'}
+              size={size - 1}
+              color={color}
+            />
           ),
         }}
       />
     </Tabs>
   );
 }
-
-const styles = StyleSheet.create({
-  glassOverlay: {
-    backgroundColor: 'rgba(255, 255, 255, 0.78)',
-  },
-});
-
