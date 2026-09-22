@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function TodayScreen() {
   const router = useRouter();
-  const { schedule, periods, currentPeriod, isLoading: scheduleLoading, refresh: refreshSchedule } = useSchedule();
+  const { schedule, periods, currentPeriod, isLoading: scheduleLoading, error: scheduleError, refresh: refreshSchedule } = useSchedule();
   const { absentTeachers, isLoading: absencesLoading, error: absencesError, refresh: refreshAbsences } = useAbsences();
   const [refreshing, setRefreshing] = useState(false);
 
@@ -150,6 +150,7 @@ export default function TodayScreen() {
         <TodaySchedule
           periods={periodsWithStatus}
           isLoading={isLoading}
+          error={scheduleError}
         />
       </ScrollView>
     </View>

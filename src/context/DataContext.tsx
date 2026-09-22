@@ -133,8 +133,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    initialLoad();
-  }, []);
+    initialLoad().then(() => {
+      // Silently revalidate against GitHub in background to ensure latest commits are synced
+      refreshAll().catch(() => {});
+    });
+  }, [refreshAll]);
 
   // Update current period every 30 seconds centrally
   useEffect(() => {

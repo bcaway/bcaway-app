@@ -1,9 +1,11 @@
-import { GITHUB_RAW_BASE, FALLBACK_FULL_DAY, FALLBACK_ABBREVIATED_DAY, FALLBACK_DELAYED_OPENING } from '../constants/schedule';
+import { GITHUB_RAW_BASE } from '../constants/schedule';
 import { SchedulePeriod, DaySchedule } from '../types';
 import { getCachedSchedules, setCachedSchedules } from './storage';
 import { timeToSeconds } from '../utils/time';
 
 export type ScheduleType = 'fullDays' | 'abbreviatedDays' | 'delayedOpeningDays';
+
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes fresh cache TTL
 
 interface ScheduleCache {
   periods: Record<ScheduleType, SchedulePeriod[]>;
@@ -11,10 +13,43 @@ interface ScheduleCache {
   lastUpdated: number;
 }
 
+/**
+ * Normalizes period time strings like "9:56:00" or "9:56" to "09:56:00"
+ */
+function normalizePeriodTime(timeStr: string): string {
+  if (!timeStr) return '00:00:00';
+  const parts = timeStr.trim().split(':');
+  const hh = parts[0].padStart(2, '0');
+  const mm = (parts[1] || '00').padStart(2, '0');
+  const ss = (parts[2] || '00').padStart(2, '0');
+  return `${hh}:${mm}:${ss}`;
+}
+
+/**
+ * Generates candidate URLs for GitHub raw data with CDN fallbacks and optional cache buster
+ */
+function getCandidateUrls(relPath: string, forceRefresh: boolean = false): string[] {
+  const cacheBuster = forceRefresh ? `?_t=${Date.now()}` : '';
+  return [
+    `https://raw.githubusercontent.com/bcaway/school-schedules/main/data/${relPath}${cacheBuster}`,
+    `https://raw.githubusercontent.com/bcaway/school-schedules/refs/heads/main/data/${relPath}${cacheBuster}`,
+    `https://cdn.jsdelivr.net/gh/bcaway/school-schedules@main/data/${relPath}${cacheBuster}`,
+  ];
+}
+
 async function fetchWithFallback(urls: string[]): Promise<Response | null> {
   for (const url of urls) {
     try {
-      const response = await fetch(url);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          'Cache-Control': 'no-cache, no-store, must-revalidate',
+          'Pragma': 'no-cache',
+        },
+      });
+      clearTimeout(timeoutId);
       if (response.ok) return response;
     } catch {
       // try next candidate url
@@ -23,84 +58,73 @@ async function fetchWithFallback(urls: string[]): Promise<Response | null> {
   return null;
 }
 
-export async function fetchScheduleJSON(type: ScheduleType): Promise<SchedulePeriod[]> {
-  try {
-    const candidateUrls = [
-      `${GITHUB_RAW_BASE}/schedules/${type}.json`,
-      `https://raw.githubusercontent.com/bcaway/school-schedules/refs/heads/main/src/data/schedules/${type}.json`,
-    ];
-    const response = await fetchWithFallback(candidateUrls);
-    if (!response) throw new Error(`Failed to fetch ${type}.json from GitHub`);
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching ${type}.json:`, error);
-    if (type === 'fullDays') return FALLBACK_FULL_DAY;
-    if (type === 'abbreviatedDays') return FALLBACK_ABBREVIATED_DAY;
-    return FALLBACK_DELAYED_OPENING;
+export async function fetchScheduleJSON(type: ScheduleType, forceRefresh: boolean = false): Promise<SchedulePeriod[]> {
+  const candidateUrls = getCandidateUrls(`schedules/${type}.json`, forceRefresh);
+  const response = await fetchWithFallback(candidateUrls);
+  if (!response) {
+    throw new Error(`Failed to fetch ${type}.json from GitHub`);
   }
+  const rawData = await response.json();
+  if (Array.isArray(rawData)) {
+    return rawData.map(item => ({
+      period: String(item.period),
+      start: normalizePeriodTime(item.start),
+      end: normalizePeriodTime(item.end),
+    }));
+  }
+  throw new Error(`Invalid schedule array returned for ${type} from GitHub`);
 }
 
-export async function fetchCalendarCSV(type: string): Promise<string> {
-  try {
-    const candidateUrls = [
-      `${GITHUB_RAW_BASE}/csv/${type}.csv`,
-      `https://raw.githubusercontent.com/bcaway/school-schedules/refs/heads/main/src/data/csv/${type}.csv`,
-    ];
-    const response = await fetchWithFallback(candidateUrls);
-    if (!response) throw new Error(`Failed to fetch ${type}.csv from GitHub`);
-    return await response.text();
-  } catch (error) {
-    console.error(`Error fetching ${type}.csv:`, error);
-    return '';
+export async function fetchCalendarCSV(type: string, forceRefresh: boolean = false): Promise<string> {
+  const candidateUrls = getCandidateUrls(`csv/${type}.csv`, forceRefresh);
+  const response = await fetchWithFallback(candidateUrls);
+  if (!response) {
+    throw new Error(`Failed to fetch ${type}.csv from GitHub`);
   }
+  return await response.text();
 }
 
 export async function loadAllScheduleData(forceRefresh: boolean = false): Promise<ScheduleCache> {
-  if (!forceRefresh) {
-    const cached = await getCachedSchedules();
-    if (cached && Date.now() - cached.lastUpdated < 6 * 60 * 60 * 1000) {
+  const cached = await getCachedSchedules();
+
+  if (!forceRefresh && cached && cached.lastUpdated) {
+    if (Date.now() - cached.lastUpdated < CACHE_TTL_MS) {
       return cached;
     }
   }
 
-  const periods: Record<ScheduleType, SchedulePeriod[]> = {
-    fullDays: FALLBACK_FULL_DAY,
-    abbreviatedDays: FALLBACK_ABBREVIATED_DAY,
-    delayedOpeningDays: FALLBACK_DELAYED_OPENING,
-  };
-
-  const csvs: Record<ScheduleType | 'specialDays', string> = {
-    fullDays: '',
-    abbreviatedDays: '',
-    delayedOpeningDays: '',
-    specialDays: '',
-  };
-
   try {
     const [fullP, abbrP, delayP, fullC, abbrC, delayC, specC] = await Promise.all([
-      fetchScheduleJSON('fullDays'),
-      fetchScheduleJSON('abbreviatedDays'),
-      fetchScheduleJSON('delayedOpeningDays'),
-      fetchCalendarCSV('fullDays'),
-      fetchCalendarCSV('abbreviatedDays'),
-      fetchCalendarCSV('delayedOpeningDays'),
-      fetchCalendarCSV('specialDays'),
+      fetchScheduleJSON('fullDays', forceRefresh),
+      fetchScheduleJSON('abbreviatedDays', forceRefresh),
+      fetchScheduleJSON('delayedOpeningDays', forceRefresh),
+      fetchCalendarCSV('fullDays', forceRefresh),
+      fetchCalendarCSV('abbreviatedDays', forceRefresh),
+      fetchCalendarCSV('delayedOpeningDays', forceRefresh),
+      fetchCalendarCSV('specialDays', forceRefresh),
     ]);
 
-    periods.fullDays = fullP;
-    periods.abbreviatedDays = abbrP;
-    periods.delayedOpeningDays = delayP;
-    csvs.fullDays = fullC;
-    csvs.abbreviatedDays = abbrC;
-    csvs.delayedOpeningDays = delayC;
-    csvs.specialDays = specC;
+    const periods: Record<ScheduleType, SchedulePeriod[]> = {
+      fullDays: fullP,
+      abbreviatedDays: abbrP,
+      delayedOpeningDays: delayP,
+    };
+
+    const csvs: Record<ScheduleType | 'specialDays', string> = {
+      fullDays: fullC,
+      abbreviatedDays: abbrC,
+      delayedOpeningDays: delayC,
+      specialDays: specC,
+    };
 
     const cacheData: ScheduleCache = { periods, csvs, lastUpdated: Date.now() };
     await setCachedSchedules(cacheData);
     return cacheData;
   } catch (error) {
-    console.error('Error loading schedule data, using fallbacks:', error);
-    return { periods, csvs, lastUpdated: Date.now() };
+    console.error('Error loading schedule data from GitHub:', error);
+    // If previously saved GitHub cache exists, reuse it on network failure
+    if (cached) return cached;
+    throw error;
   }
 }
 
@@ -108,7 +132,7 @@ export async function loadAllScheduleData(forceRefresh: boolean = false): Promis
  * Parse BCA CSV format: each line is `month,"[day1, day2, ...]"` 
  * Returns a Map of month -> Set of days
  */
-function parseMonthDayCsv(csvText: string): Map<number, Set<number>> {
+export function parseMonthDayCsv(csvText: string): Map<number, Set<number>> {
   const map = new Map<number, Set<number>>();
   if (!csvText) return map;
 
@@ -145,10 +169,35 @@ function parseMonthDayCsv(csvText: string): Map<number, Set<number>> {
 }
 
 /**
- * Parse special days CSV: each line is `date,scheduleType`
- * where date is in MM-DD-YYYY format
+ * Normalizes date string variations to canonical lookup keys
  */
-function parseSpecialDaysCsv(csvText: string): Map<string, string> {
+function normalizeDateKeys(rawStr: string): string[] {
+  const cleaned = rawStr.trim();
+  const mdy = cleaned.match(/^(\d{1,2})[-\/](\d{1,2})[-\/](\d{4})$/);
+  if (mdy) {
+    const m = parseInt(mdy[1], 10);
+    const d = parseInt(mdy[2], 10);
+    const y = parseInt(mdy[3], 10);
+    const mm = String(m).padStart(2, '0');
+    const dd = String(d).padStart(2, '0');
+    return [`${y}-${mm}-${dd}`, `${mm}-${dd}-${y}`, `${m}-${d}-${y}`];
+  }
+  const ymd = cleaned.match(/^(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})$/);
+  if (ymd) {
+    const y = parseInt(ymd[1], 10);
+    const m = parseInt(ymd[2], 10);
+    const d = parseInt(ymd[3], 10);
+    const mm = String(m).padStart(2, '0');
+    const dd = String(d).padStart(2, '0');
+    return [`${y}-${mm}-${dd}`, `${mm}-${dd}-${y}`, `${m}-${d}-${y}`];
+  }
+  return [cleaned];
+}
+
+/**
+ * Parse special days CSV: each line is `date,scheduleType`
+ */
+export function parseSpecialDaysCsv(csvText: string): Map<string, string> {
   const map = new Map<string, string>();
   if (!csvText) return map;
 
@@ -159,62 +208,68 @@ function parseSpecialDaysCsv(csvText: string): Map<string, string> {
 
     const parts = trimmed.split(',').map(s => s.trim());
     if (parts.length >= 2) {
-      map.set(parts[0], parts[1]);
+      const dateStr = parts[0];
+      const schedType = parts[1];
+      const keys = normalizeDateKeys(dateStr);
+      for (const k of keys) {
+        map.set(k, schedType);
+      }
     }
   }
 
   return map;
 }
 
+const NO_SCHOOL_VALUES = new Set(['noschool', 'no_school', 'none', 'closed', 'holiday', 'off', 'false']);
+
 export async function getScheduleForDate(date: Date, forceRefresh: boolean = false): Promise<DaySchedule> {
   const cache = await loadAllScheduleData(forceRefresh);
   const month = date.getMonth() + 1;
   const day = date.getDate();
+  const year = date.getFullYear();
+
+  const mm = String(month).padStart(2, '0');
+  const dd = String(day).padStart(2, '0');
+  const lookupKeys = [`${year}-${mm}-${dd}`, `${mm}-${dd}-${year}`, `${month}-${day}-${year}`];
 
   // 1. Check special days first
   const specialDays = parseSpecialDaysCsv(cache.csvs.specialDays);
-  const mm = String(month).padStart(2, '0');
-  const dd = String(day).padStart(2, '0');
-  const year = date.getFullYear();
-  const formattedDate = `${mm}-${dd}-${year}`;
-  
-  if (specialDays.has(formattedDate)) {
-    const schedType = specialDays.get(formattedDate)!;
-    if (schedType === 'noSchool') {
-      return { hasSchool: false, scheduleType: null, periods: [] };
-    }
-    const typeKey = schedType as ScheduleType;
-    if (cache.periods[typeKey]) {
-      return { hasSchool: true, scheduleType: typeKey, periods: cache.periods[typeKey] };
+  for (const key of lookupKeys) {
+    if (specialDays.has(key)) {
+      const schedType = specialDays.get(key)!;
+      const lowerType = schedType.toLowerCase();
+
+      if (NO_SCHOOL_VALUES.has(lowerType)) {
+        return { hasSchool: false, scheduleType: null, periods: [] };
+      }
+
+      const typeKey = schedType as ScheduleType;
+      if (cache.periods[typeKey]) {
+        return { hasSchool: true, scheduleType: typeKey, periods: cache.periods[typeKey] };
+      }
     }
   }
 
   // 2. Check abbreviated days
   const abbreviatedMap = parseMonthDayCsv(cache.csvs.abbreviatedDays);
   if (abbreviatedMap.get(month)?.has(day)) {
-    return { hasSchool: true, scheduleType: 'abbreviatedDays', periods: cache.periods.abbreviatedDays };
+    return { hasSchool: true, scheduleType: 'abbreviatedDays', periods: cache.periods.abbreviatedDays || [] };
   }
 
   // 3. Check delayed opening days
   const delayedMap = parseMonthDayCsv(cache.csvs.delayedOpeningDays);
   if (delayedMap.get(month)?.has(day)) {
-    return { hasSchool: true, scheduleType: 'delayedOpeningDays', periods: cache.periods.delayedOpeningDays };
+    return { hasSchool: true, scheduleType: 'delayedOpeningDays', periods: cache.periods.delayedOpeningDays || [] };
   }
 
   // 4. Check full days explicitly from fullDays.csv
   const fullDaysMap = parseMonthDayCsv(cache.csvs.fullDays);
   if (fullDaysMap.get(month)?.has(day)) {
-    return { hasSchool: true, scheduleType: 'fullDays', periods: cache.periods.fullDays };
+    return { hasSchool: true, scheduleType: 'fullDays', periods: cache.periods.fullDays || [] };
   }
 
-  // 5. If not listed in ANY of the schedule CSVs:
-  const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-  if (isWeekend) {
-    return { hasSchool: false, scheduleType: null, periods: [] };
-  }
-
-  // 6. Default fallback for standard school weekdays
-  return { hasSchool: true, scheduleType: 'fullDays', periods: cache.periods.fullDays };
+  // 5. If not listed in ANY GitHub calendar CSV, there is NO school
+  return { hasSchool: false, scheduleType: null, periods: [] };
 }
 
 export function getCurrentPeriodInfo(schedule: SchedulePeriod[], currentTimeStr: string) {

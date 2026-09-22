@@ -9,10 +9,11 @@ import { PeriodWithStatus, SchedulePeriod } from '../../types';
 interface TodayScheduleProps {
   periods: PeriodWithStatus[];
   isLoading: boolean;
+  error?: Error | null;
   onPeriodPress?: (period: SchedulePeriod) => void;
 }
 
-export function TodaySchedule({ periods, isLoading, onPeriodPress }: TodayScheduleProps) {
+export function TodaySchedule({ periods, isLoading, error, onPeriodPress }: TodayScheduleProps) {
   const router = useRouter();
 
   if (isLoading) {
@@ -21,6 +22,10 @@ export function TodaySchedule({ periods, isLoading, onPeriodPress }: TodaySchedu
         <BCAwayLoading />
       </View>
     );
+  }
+
+  if (error && periods.length === 0) {
+    return <EmptyState icon="⚠️" title="Schedule Unavailable" subtitle="Could not load schedule from GitHub" />;
   }
 
   if (periods.length === 0) {
