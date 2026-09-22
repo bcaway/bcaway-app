@@ -44,10 +44,6 @@ async function fetchWithFallback(urls: string[]): Promise<Response | null> {
       const timeoutId = setTimeout(() => controller.abort(), 4000);
       const response = await fetch(url, {
         signal: controller.signal,
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-        },
       });
       clearTimeout(timeoutId);
       if (response.ok) return response;
