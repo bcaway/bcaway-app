@@ -140,3 +140,10 @@ export async function getTeacherAbsences(forceRefresh: boolean = false): Promise
   cachedAbsences = { data: absences, timestamp: Date.now() };
   return absences;
 }
+
+/**
+ * Clears the in-memory absence cache (e.g. on logout).
+ */
+export function clearAbsenceCache(): void {
+  cachedAbsences = null;
+}

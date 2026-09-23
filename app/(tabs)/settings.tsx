@@ -7,12 +7,40 @@ import {
   ScrollView,
   TouchableOpacity,
   Linking,
+  Alert,
+  Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import { useAuth } from '../../src/context/AuthContext';
 
 export default function SettingsScreen() {
+  const { user, signOut } = useAuth();
+
   const openLink = (url: string) => {
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
+  };
+
+  const handleSignOut = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    if (Platform.OS === 'web') {
+      if (typeof window !== 'undefined' && window.confirm('Are you sure you want to sign out of BCAway?')) {
+        signOut();
+      }
+    } else {
+      Alert.alert(
+        'Sign Out',
+        'Are you sure you want to sign out of BCAway?',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          {
+            text: 'Sign Out',
+            style: 'destructive',
+            onPress: () => signOut(),
+          },
+        ]
+      );
+    }
   };
 
   return (
@@ -30,6 +58,28 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.wrapper}>
+          {/* Section: Account */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeading}>ACCOUNT</Text>
+            <View style={styles.cardGroup}>
+              <View style={[styles.metaRow, styles.divider]}>
+                <Text style={styles.metaLabel}>Student Email</Text>
+                <Text style={styles.metaValue} numberOfLines={1}>
+                  {user?.email || 'student@bergen.org'}
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={styles.signOutRow}
+                onPress={handleSignOut}
+                activeOpacity={0.7}
+              >
+                <Ionicons name="log-out-outline" size={16} color="#DC2626" style={{ marginRight: 8 }} />
+                <Text style={styles.signOutText}>Sign Out</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
           {/* Section: Links & Community */}
           <View style={styles.section}>
             <Text style={styles.sectionHeading}>ONLINE & COMMUNITY</Text>
@@ -243,5 +293,17 @@ const styles = StyleSheet.create({
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E2E8F0',
+  },
+  signOutRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 13,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+  },
+  signOutText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#DC2626',
   },
 });

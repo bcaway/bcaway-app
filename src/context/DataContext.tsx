@@ -3,8 +3,9 @@ import { AppState, AppStateStatus } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
 import { SchedulePeriod, DaySchedule, TeacherAbsence } from '../types';
 import { getScheduleForDate, getCurrentPeriodInfo } from '../services/scheduleService';
-import { getTeacherAbsences } from '../services/absenceService';
+import { getTeacherAbsences, clearAbsenceCache } from '../services/absenceService';
 import { getCurrentTimeStr } from '../utils/time';
+import { useAuth } from './AuthContext';
 
 export interface DataContextValue {
   // Schedule state
@@ -31,6 +32,7 @@ export interface DataContextValue {
 const DataContext = createContext<DataContextValue | null>(null);
 
 export function DataProvider({ children }: { children: ReactNode }) {
+  const { session } = useAuth();
   const [schedule, setSchedule] = useState<DaySchedule | null>(null);
   const [scheduleType, setScheduleType] = useState<string | null>(null);
   const [periods, setPeriods] = useState<SchedulePeriod[]>([]);
@@ -138,6 +140,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
       refreshAll().catch(() => {});
     });
   }, [refreshAll]);
+
+  // React to auth session changes: fetch absences when authenticated, clear cache when logged out
+  useEffect(() => {
+    if (session) {
+      refreshAll().catch(() => {});
+    } else {
+      clearAbsenceCache();
+      setAbsentTeachers([]);
+      setAbsencesError(null);
+    }
+  }, [session, refreshAll]);
 
   // Update current period every 30 seconds centrally
   useEffect(() => {
