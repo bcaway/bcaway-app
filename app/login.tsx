@@ -17,6 +17,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth, isBergenEmail } from '../src/context/AuthContext';
 import { BCAwayLogo } from '../src/components/common/BCAwayLogo';
 
+const RESEND_COOLDOWN_SECONDS = 60;
+
 export default function LoginScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
@@ -72,7 +74,7 @@ export default function LoginScreen() {
     } else {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setStep('sent');
-      setResendCooldown(30);
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
     }
   };
 
@@ -89,7 +91,7 @@ export default function LoginScreen() {
       setErrorMessage(error.message || 'Failed to resend confirmation link.');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } else {
-      setResendCooldown(30);
+      setResendCooldown(RESEND_COOLDOWN_SECONDS);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
   };
