@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
-import { User, Session, AuthError } from '@supabase/supabase-js';
+import { User, Session } from '@supabase/supabase-js';
+import * as Linking from 'expo-linking';
 import { supabase } from '../services/supabase';
 
 /**
@@ -11,12 +12,36 @@ export function isBergenEmail(email: string): boolean {
   return /^[a-zA-Z0-9._%+-]+@bergen\.org$/.test(clean);
 }
 
+/**
+ * Extracts and sets the Supabase session from an incoming confirmation link URL.
+ */
+async function handleAuthUrl(url: string) {
+  try {
+    const parsed = Linking.parse(url);
+    if (parsed.queryParams?.code) {
+      await supabase.auth.exchangeCodeForSession(String(parsed.queryParams.code));
+      return;
+    }
+
+    if (url.includes('#') || url.includes('access_token')) {
+      const hash = url.split('#')[1] || url.split('?')[1] || '';
+      const params = new URLSearchParams(hash);
+      const access_token = params.get('access_token');
+      const refresh_token = params.get('refresh_token');
+      if (access_token && refresh_token) {
+        await supabase.auth.setSession({ access_token, refresh_token });
+      }
+    }
+  } catch (err) {
+    console.warn('Error processing auth URL:', err);
+  }
+}
+
 export interface AuthContextValue {
   user: User | null;
   session: Session | null;
   isLoading: boolean;
-  sendOtp: (email: string) => Promise<{ error: Error | null }>;
-  verifyOtp: (email: string, token: string) => Promise<{ error: Error | null }>;
+  sendMagicLink: (email: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -66,6 +91,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     initSession();
 
+    // Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       async (_event, newSession) => {
         if (!isMounted) return;
@@ -88,13 +114,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     );
 
+    // Listen for incoming deep link confirmation URLs
+    const linkingSub = Linking.addEventListener('url', ({ url }) => {
+      handleAuthUrl(url);
+    });
+
+    Linking.getInitialURL().then(initialUrl => {
+      if (initialUrl) {
+        handleAuthUrl(initialUrl);
+      }
+    });
+
     return () => {
       isMounted = false;
       authListener.subscription.unsubscribe();
+      linkingSub.remove();
     };
   }, []);
 
-  const sendOtp = useCallback(async (email: string): Promise<{ error: Error | null }> => {
+  const sendMagicLink = useCallback(async (email: string): Promise<{ error: Error | null }> => {
     const cleanEmail = email.trim().toLowerCase();
 
     // Client-side domain check
@@ -105,9 +143,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
+      const redirectUrl = Linking.createURL('/');
+
       const { error } = await supabase.auth.signInWithOtp({
         email: cleanEmail,
         options: {
+          emailRedirectTo: redirectUrl,
           shouldCreateUser: true,
         },
       });
@@ -123,43 +164,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       };
     }
   }, []);
-
-  const verifyOtp = useCallback(
-    async (email: string, token: string): Promise<{ error: Error | null }> => {
-      const cleanEmail = email.trim().toLowerCase();
-      const cleanToken = token.trim();
-
-      if (!isBergenEmail(cleanEmail)) {
-        return {
-          error: new Error('Only @bergen.org email addresses are authorized for BCAway.'),
-        };
-      }
-
-      try {
-        const { data, error } = await supabase.auth.verifyOtp({
-          email: cleanEmail,
-          token: cleanToken,
-          type: 'email',
-        });
-
-        if (error) {
-          return { error };
-        }
-
-        if (data.session) {
-          setSession(data.session);
-          setUser(data.session.user);
-        }
-
-        return { error: null };
-      } catch (err) {
-        return {
-          error: err instanceof Error ? err : new Error(String(err)),
-        };
-      }
-    },
-    []
-  );
 
   const signOut = useCallback(async (): Promise<void> => {
     try {
@@ -178,8 +182,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         session,
         isLoading,
-        sendOtp,
-        verifyOtp,
+        sendMagicLink,
         signOut,
       }}
     >

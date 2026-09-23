@@ -20,11 +20,10 @@ import { BCAwayLogo } from '../src/components/common/BCAwayLogo';
 export default function LoginScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { session, sendOtp, verifyOtp } = useAuth();
+  const { session, sendMagicLink } = useAuth();
 
-  const [step, setStep] = useState<'email' | 'otp'>('email');
+  const [step, setStep] = useState<'email' | 'sent'>('email');
   const [email, setEmail] = useState('');
-  const [token, setToken] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
@@ -45,7 +44,7 @@ export default function LoginScreen() {
     return () => clearInterval(timer);
   }, [resendCooldown]);
 
-  const handleSendCode = async () => {
+  const handleSendLink = async () => {
     setErrorMessage(null);
     const cleanEmail = email.trim().toLowerCase();
 
@@ -64,41 +63,16 @@ export default function LoginScreen() {
     setIsSubmitting(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    const { error } = await sendOtp(cleanEmail);
+    const { error } = await sendMagicLink(cleanEmail);
     setIsSubmitting(false);
 
     if (error) {
-      setErrorMessage(error.message || 'Failed to send verification code. Please try again.');
+      setErrorMessage(error.message || 'Failed to send confirmation link. Please try again.');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } else {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      setStep('otp');
+      setStep('sent');
       setResendCooldown(30);
-    }
-  };
-
-  const handleVerifyCode = async () => {
-    setErrorMessage(null);
-    const cleanToken = token.trim();
-
-    if (!cleanToken || cleanToken.length < 6) {
-      setErrorMessage('Please enter the complete 6-digit code.');
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-      return;
-    }
-
-    setIsSubmitting(true);
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-
-    const { error } = await verifyOtp(email, cleanToken);
-    setIsSubmitting(false);
-
-    if (error) {
-      setErrorMessage(error.message || 'Invalid or expired code. Please try again.');
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-    } else {
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      router.replace('/(tabs)');
     }
   };
 
@@ -108,11 +82,12 @@ export default function LoginScreen() {
     setIsSubmitting(true);
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
 
-    const { error } = await sendOtp(email);
+    const { error } = await sendMagicLink(email.trim().toLowerCase());
     setIsSubmitting(false);
 
     if (error) {
-      setErrorMessage(error.message || 'Failed to resend code.');
+      setErrorMessage(error.message || 'Failed to resend confirmation link.');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
     } else {
       setResendCooldown(30);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
@@ -122,7 +97,6 @@ export default function LoginScreen() {
   const handleBackToEmail = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setErrorMessage(null);
-    setToken('');
     setStep('email');
   };
 
@@ -151,9 +125,9 @@ export default function LoginScreen() {
             <Text style={styles.title}>
               {step === 'email' ? 'Sign in to BCAway' : 'Check your email'}
             </Text>
-            {step === 'otp' && (
+            {step === 'sent' && (
               <Text style={styles.subtitle}>
-                Code sent to {email}
+                Tap the confirmation link sent to {email} to sign in to BCAway.
               </Text>
             )}
           </View>
@@ -185,14 +159,14 @@ export default function LoginScreen() {
                   autoCorrect={false}
                   keyboardType="email-address"
                   returnKeyType="go"
-                  onSubmitEditing={handleSendCode}
+                  onSubmitEditing={handleSendLink}
                   editable={!isSubmitting}
                 />
               </View>
 
               <TouchableOpacity
                 style={[styles.primaryButton, isSubmitting && styles.buttonDisabled]}
-                onPress={handleSendCode}
+                onPress={handleSendLink}
                 disabled={isSubmitting}
                 activeOpacity={0.8}
               >
@@ -208,62 +182,29 @@ export default function LoginScreen() {
             </View>
           ) : (
             <View style={styles.form}>
-              <Text style={styles.inputLabel}>6-DIGIT VERIFICATION CODE</Text>
-              <View style={styles.inputWrapper}>
-                <Ionicons name="key-outline" size={18} color="#64748B" style={styles.inputIcon} />
-                <TextInput
-                  style={[styles.input, styles.otpInput]}
-                  placeholder="123456"
-                  placeholderTextColor="#94A3B8"
-                  value={token}
-                  onChangeText={text => {
-                    const cleaned = text.replace(/[^0-9]/g, '').slice(0, 6);
-                    setToken(cleaned);
-                    if (errorMessage) setErrorMessage(null);
-                  }}
-                  keyboardType="number-pad"
-                  maxLength={6}
-                  returnKeyType="done"
-                  onSubmitEditing={handleVerifyCode}
-                  editable={!isSubmitting}
-                  autoFocus
-                />
-              </View>
-
               <TouchableOpacity
-                style={[styles.primaryButton, (isSubmitting || token.length < 6) && styles.buttonDisabled]}
-                onPress={handleVerifyCode}
-                disabled={isSubmitting || token.length < 6}
+                onPress={handleResend}
+                disabled={resendCooldown > 0 || isSubmitting}
+                style={[styles.secondaryButton, (resendCooldown > 0 || isSubmitting) && styles.buttonDisabled]}
                 activeOpacity={0.8}
               >
                 {isSubmitting ? (
-                  <ActivityIndicator color="#FFFFFF" size="small" />
+                  <ActivityIndicator color="#0F172A" size="small" />
                 ) : (
-                  <Text style={styles.primaryButtonText}>Verify code</Text>
+                  <Text style={styles.secondaryButtonText}>
+                    {resendCooldown > 0 ? `Resend link (${resendCooldown}s)` : 'Resend link'}
+                  </Text>
                 )}
               </TouchableOpacity>
 
-              <View style={styles.otpActionsRow}>
-                <TouchableOpacity
-                  onPress={handleResend}
-                  disabled={resendCooldown > 0 || isSubmitting}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <Text style={[styles.actionLinkText, resendCooldown > 0 && styles.actionLinkDisabled]}>
-                    {resendCooldown > 0 ? `Resend code in ${resendCooldown}s` : 'Resend code'}
-                  </Text>
-                </TouchableOpacity>
-
-                <Text style={styles.actionSep}>•</Text>
-
-                <TouchableOpacity
-                  onPress={handleBackToEmail}
-                  disabled={isSubmitting}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                >
-                  <Text style={styles.actionLinkText}>Use a different email</Text>
-                </TouchableOpacity>
-              </View>
+              <TouchableOpacity
+                onPress={handleBackToEmail}
+                disabled={isSubmitting}
+                style={styles.textButton}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              >
+                <Text style={styles.actionLinkText}>Use a different email</Text>
+              </TouchableOpacity>
             </View>
           )}
         </View>
@@ -358,12 +299,6 @@ const styles = StyleSheet.create({
     color: '#0F172A',
     height: '100%',
   },
-  otpInput: {
-    fontSize: 20,
-    fontWeight: '700',
-    letterSpacing: 8,
-    fontVariant: ['tabular-nums'],
-  },
   primaryButton: {
     backgroundColor: '#2563EB',
     height: 44,
@@ -372,6 +307,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 4,
+  },
+  secondaryButton: {
+    backgroundColor: '#F8FAFC',
+    height: 44,
+    borderRadius: 8,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    marginBottom: 12,
+  },
+  secondaryButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#0F172A',
   },
   buttonDisabled: {
     opacity: 0.55,
@@ -382,23 +333,13 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     letterSpacing: -0.2,
   },
-  otpActionsRow: {
-    flexDirection: 'row',
+  textButton: {
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 20,
-    gap: 8,
+    paddingVertical: 8,
   },
   actionLinkText: {
     fontSize: 13,
     fontWeight: '600',
     color: '#2563EB',
-  },
-  actionLinkDisabled: {
-    color: '#94A3B8',
-  },
-  actionSep: {
-    color: '#CBD5E1',
-    fontSize: 12,
   },
 });
