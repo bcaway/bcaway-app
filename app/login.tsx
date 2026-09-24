@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   ScrollView,
+  Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -102,6 +103,10 @@ export default function LoginScreen() {
     setStep('email');
   };
 
+  const openLink = (url: string) => {
+    Linking.openURL(url).catch(err => console.error("Couldn't open URL", err));
+  };
+
   return (
     <KeyboardAvoidingView
       style={styles.screen}
@@ -181,6 +186,24 @@ export default function LoginScreen() {
                   </>
                 )}
               </TouchableOpacity>
+
+              <Text style={styles.legalNotice}>
+                By signing in, you agree to our{' '}
+                <Text
+                  style={styles.legalLink}
+                  onPress={() => openLink('https://bcaway.app/terms')}
+                >
+                  Terms of Service
+                </Text>
+                {' '}and{' '}
+                <Text
+                  style={styles.legalLink}
+                  onPress={() => openLink('https://bcaway.app/privacy')}
+                >
+                  Privacy Policy
+                </Text>
+                .
+              </Text>
             </View>
           ) : (
             <View style={styles.form}>
@@ -343,5 +366,18 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: '#2563EB',
+  },
+  legalNotice: {
+    marginTop: 18,
+    fontSize: 12,
+    lineHeight: 18,
+    color: '#94A3B8',
+    textAlign: 'center',
+    paddingHorizontal: 8,
+  },
+  legalLink: {
+    color: '#64748B',
+    textDecorationLine: 'underline',
+    fontWeight: '500',
   },
 });
