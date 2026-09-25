@@ -13,6 +13,22 @@ export function isBergenEmail(email: string): boolean {
 }
 
 /**
+ * Validates that an email address ends with @bcaway.app (case-insensitive).
+ */
+export function isBcawayEmail(email: string): boolean {
+  if (!email) return false;
+  const clean = email.trim().toLowerCase();
+  return /^[a-zA-Z0-9._%+-]+@bcaway\.app$/.test(clean);
+}
+
+/**
+ * Checks if an email is an authorized BCAway account domain (@bergen.org or @bcaway.app).
+ */
+export function isAuthorizedEmail(email: string): boolean {
+  return isBergenEmail(email) || isBcawayEmail(email);
+}
+
+/**
  * Extracts and sets the Supabase session from an incoming confirmation link URL.
  */
 async function handleAuthUrl(url: string) {
@@ -42,6 +58,7 @@ export interface AuthContextValue {
   session: Session | null;
   isLoading: boolean;
   sendMagicLink: (email: string) => Promise<{ error: Error | null }>;
+  signInWithPassword: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -64,13 +81,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
         if (isMounted) {
           if (data.session) {
-            // Ensure persisted session has a valid @bergen.org email
+            // Ensure persisted session has a valid authorized email (@bergen.org or @bcaway.app)
             const email = data.session.user?.email || '';
-            if (isBergenEmail(email)) {
+            if (isAuthorizedEmail(email)) {
               setSession(data.session);
               setUser(data.session.user);
             } else {
-              // Non-bergen.org user somehow persisted; sign out
+              // Unauthorized domain user somehow persisted; sign out
               await supabase.auth.signOut();
               setSession(null);
               setUser(null);
@@ -98,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         if (newSession) {
           const email = newSession.user?.email || '';
-          if (isBergenEmail(email)) {
+          if (isAuthorizedEmail(email)) {
             setSession(newSession);
             setUser(newSession.user);
           } else {
@@ -135,10 +152,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const sendMagicLink = useCallback(async (email: string): Promise<{ error: Error | null }> => {
     const cleanEmail = email.trim().toLowerCase();
 
-    // Client-side domain check
+    // @bcaway.app accounts MUST sign in using passwords, not magic links
+    if (isBcawayEmail(cleanEmail)) {
+      return {
+        error: new Error('@bcaway.app accounts must sign in using their administrator-assigned password.'),
+      };
+    }
+
+    // Client-side domain check for students
     if (!isBergenEmail(cleanEmail)) {
       return {
-        error: new Error('Only @bergen.org email addresses are authorized for BCAway.'),
+        error: new Error('Only @bergen.org email addresses are authorized for student sign-in.'),
       };
     }
 
@@ -165,6 +189,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
+  const signInWithPassword = useCallback(
+    async (email: string, password: string): Promise<{ error: Error | null }> => {
+      const cleanEmail = email.trim().toLowerCase();
+
+      // Only @bcaway.app email addresses are permitted to use password sign-in
+      if (!isBcawayEmail(cleanEmail)) {
+        return {
+          error: new Error('Password sign-in is only permitted for @bcaway.app accounts.'),
+        };
+      }
+
+      if (!password) {
+        return {
+          error: new Error('Please enter your password.'),
+        };
+      }
+
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: cleanEmail,
+          password,
+        });
+
+        if (error) {
+          return { error };
+        }
+
+        if (data.session) {
+          setSession(data.session);
+          setUser(data.session.user);
+        }
+
+        return { error: null };
+      } catch (err) {
+        return {
+          error: err instanceof Error ? err : new Error(String(err)),
+        };
+      }
+    },
+    []
+  );
+
   const signOut = useCallback(async (): Promise<void> => {
     try {
       await supabase.auth.signOut();
@@ -183,6 +249,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         session,
         isLoading,
         sendMagicLink,
+        signInWithPassword,
         signOut,
       }}
     >

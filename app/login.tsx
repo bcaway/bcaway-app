@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -15,7 +15,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAuth, isBergenEmail } from '../src/context/AuthContext';
+import { useAuth, isBergenEmail, isBcawayEmail } from '../src/context/AuthContext';
 import { BCAwayLogo } from '../src/components/common/BCAwayLogo';
 
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -23,13 +23,20 @@ const RESEND_COOLDOWN_SECONDS = 60;
 export default function LoginScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { session, sendMagicLink } = useAuth();
+  const { session, sendMagicLink, signInWithPassword } = useAuth();
 
   const [step, setStep] = useState<'email' | 'sent'>('email');
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [resendCooldown, setResendCooldown] = useState(0);
+
+  const passwordInputRef = useRef<TextInput>(null);
+
+  // Check if current input email is a @bcaway.app password user
+  const isStaffAccount = isBcawayEmail(email);
 
   // If already authenticated, redirect to tabs
   useEffect(() => {
@@ -57,6 +64,12 @@ export default function LoginScreen() {
       return;
     }
 
+    // If an authorized @bcaway.app email was entered, redirect to password flow
+    if (isBcawayEmail(cleanEmail)) {
+      handlePasswordSignIn();
+      return;
+    }
+
     if (!isBergenEmail(cleanEmail)) {
       setErrorMessage('Only @bergen.org email addresses are authorized to access BCAway.');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
@@ -76,6 +89,45 @@ export default function LoginScreen() {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setStep('sent');
       setResendCooldown(RESEND_COOLDOWN_SECONDS);
+    }
+  };
+
+  const handlePasswordSignIn = async () => {
+    setErrorMessage(null);
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanPassword = password;
+
+    if (!cleanEmail) {
+      setErrorMessage('Please enter your @bcaway.app email address.');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      return;
+    }
+
+    if (!isBcawayEmail(cleanEmail)) {
+      setErrorMessage('Password sign-in is only available for @bcaway.app accounts.');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      return;
+    }
+
+    if (!cleanPassword) {
+      setErrorMessage('Please enter your account password.');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+      passwordInputRef.current?.focus();
+      return;
+    }
+
+    setIsSubmitting(true);
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+
+    const { error } = await signInWithPassword(cleanEmail, cleanPassword);
+    setIsSubmitting(false);
+
+    if (error) {
+      setErrorMessage(error.message || 'Invalid email or password. Please verify your credentials.');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      router.replace('/(tabs)');
     }
   };
 
@@ -100,6 +152,7 @@ export default function LoginScreen() {
   const handleBackToEmail = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setErrorMessage(null);
+    setPassword('');
     setStep('email');
   };
 
@@ -150,7 +203,9 @@ export default function LoginScreen() {
           {/* Form Content */}
           {step === 'email' ? (
             <View style={styles.form}>
-              <Text style={styles.inputLabel}>SCHOOL EMAIL</Text>
+              <Text style={styles.inputLabel}>
+                {isStaffAccount ? 'ACCOUNT EMAIL' : 'SCHOOL EMAIL'}
+              </Text>
               <View style={styles.inputWrapper}>
                 <Ionicons name="mail-outline" size={18} color="#64748B" style={styles.inputIcon} />
                 <TextInput
@@ -165,20 +220,73 @@ export default function LoginScreen() {
                   autoCapitalize="none"
                   autoCorrect={false}
                   keyboardType="email-address"
-                  returnKeyType="go"
-                  onSubmitEditing={handleSendLink}
+                  returnKeyType={isStaffAccount ? 'next' : 'go'}
+                  onSubmitEditing={() => {
+                    if (isStaffAccount) {
+                      passwordInputRef.current?.focus();
+                    } else {
+                      handleSendLink();
+                    }
+                  }}
                   editable={!isSubmitting}
                 />
               </View>
 
+              {/* Password Field: ONLY appears for @bcaway.app accounts */}
+              {isStaffAccount && (
+                <>
+                  <Text style={styles.inputLabel}>PASSWORD</Text>
+                  <View style={styles.inputWrapper}>
+                    <Ionicons name="lock-closed-outline" size={18} color="#64748B" style={styles.inputIcon} />
+                    <TextInput
+                      ref={passwordInputRef}
+                      style={styles.input}
+                      placeholder="Account password"
+                      placeholderTextColor="#94A3B8"
+                      value={password}
+                      onChangeText={text => {
+                        setPassword(text);
+                        if (errorMessage) setErrorMessage(null);
+                      }}
+                      secureTextEntry={!showPassword}
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      returnKeyType="go"
+                      onSubmitEditing={handlePasswordSignIn}
+                      editable={!isSubmitting}
+                    />
+                    <TouchableOpacity
+                      onPress={() => setShowPassword(prev => !prev)}
+                      hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                      style={styles.eyeButton}
+                      accessibilityLabel={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      <Ionicons
+                        name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                        size={18}
+                        color="#64748B"
+                      />
+                    </TouchableOpacity>
+                  </View>
+                </>
+              )}
+
               <TouchableOpacity
-                style={[styles.primaryButton, isSubmitting && styles.buttonDisabled]}
-                onPress={handleSendLink}
-                disabled={isSubmitting}
+                style={[
+                  styles.primaryButton,
+                  (isSubmitting || (isStaffAccount && !password.trim())) && styles.buttonDisabled,
+                ]}
+                onPress={isStaffAccount ? handlePasswordSignIn : handleSendLink}
+                disabled={isSubmitting || (isStaffAccount && !password.trim())}
                 activeOpacity={0.8}
               >
                 {isSubmitting ? (
                   <ActivityIndicator color="#FFFFFF" size="small" />
+                ) : isStaffAccount ? (
+                  <>
+                    <Text style={styles.primaryButtonText}>Sign In</Text>
+                    <Ionicons name="arrow-forward" size={16} color="#FFFFFF" style={{ marginLeft: 6 }} />
+                  </>
                 ) : (
                   <>
                     <Text style={styles.primaryButtonText}>Continue</Text>
@@ -323,6 +431,11 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: '#0F172A',
     height: '100%',
+  },
+  eyeButton: {
+    padding: 4,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   primaryButton: {
     backgroundColor: '#2563EB',

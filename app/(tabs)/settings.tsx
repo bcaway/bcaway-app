@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { useAuth } from '../../src/context/AuthContext';
+import { useAuth, isBcawayEmail } from '../../src/context/AuthContext';
 
 export default function SettingsScreen() {
   const { user, signOut } = useAuth();
@@ -63,7 +63,9 @@ export default function SettingsScreen() {
             <Text style={styles.sectionHeading}>ACCOUNT</Text>
             <View style={styles.cardGroup}>
               <View style={[styles.metaRow, styles.divider]}>
-                <Text style={styles.metaLabel}>Student Email</Text>
+                <Text style={styles.metaLabel}>
+                  {isBcawayEmail(user?.email || '') ? 'Account Email' : 'Student Email'}
+                </Text>
                 <Text style={styles.metaValue} numberOfLines={1}>
                   {user?.email || 'student@bergen.org'}
                 </Text>
