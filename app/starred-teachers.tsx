@@ -77,7 +77,6 @@ export default function StarredTeachersScreen() {
           </TouchableOpacity>
           <View style={styles.headerTitles}>
             <Text style={styles.headerTitle}>Starred Teachers</Text>
-            <Text style={styles.headerSub}>Customize your daily free periods</Text>
           </View>
         </View>
 
@@ -102,19 +101,6 @@ export default function StarredTeachersScreen() {
               <Ionicons name="close-circle" size={16} color="#94A3B8" />
             </TouchableOpacity>
           )}
-        </View>
-
-        {/* Quick status summary chip */}
-        <View style={styles.summaryBar}>
-          <View style={styles.summaryBadge}>
-            <Ionicons name="star" size={13} color="#F59E0B" />
-            <Text style={styles.summaryBadgeText}>
-              {starredTeacherIds.length} {starredTeacherIds.length === 1 ? 'teacher' : 'teachers'} starred
-            </Text>
-          </View>
-          <Text style={styles.summaryHint}>
-            Absences for starred teachers appear right on your home screen.
-          </Text>
         </View>
       </View>
 
@@ -224,11 +210,6 @@ const styles = StyleSheet.create({
     color: '#0F172A',
     letterSpacing: -0.3,
   },
-  headerSub: {
-    fontSize: 13,
-    color: '#64748B',
-    marginTop: 2,
-  },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -245,30 +226,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#0F172A',
     paddingVertical: 0,
-  },
-  summaryBar: {
-    marginTop: 12,
-  },
-  summaryBadge: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 8,
-    paddingVertical: 3,
-    borderRadius: 6,
-    marginBottom: 4,
-  },
-  summaryBadgeText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#92400E',
-    marginLeft: 5,
-  },
-  summaryHint: {
-    fontSize: 12,
-    color: '#64748B',
-    lineHeight: 16,
   },
   container: {
     flex: 1,

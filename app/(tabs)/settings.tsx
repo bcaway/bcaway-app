@@ -14,12 +14,10 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useAuth, isBcawayEmail } from '../../src/context/AuthContext';
-import { useData } from '../../src/context/DataContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const { user, signOut } = useAuth();
-  const { starredTeacherIds } = useData();
 
   const openLink = (url: string) => {
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
@@ -80,11 +78,6 @@ export default function SettingsScreen() {
                   </View>
                   <View style={styles.starredTextContainer}>
                     <Text style={styles.starredTitle}>Starred Teachers</Text>
-                    <Text style={styles.starredSub}>
-                      {starredTeacherIds.length > 0
-                        ? `${starredTeacherIds.length} teacher${starredTeacherIds.length === 1 ? '' : 's'} tracked for free periods`
-                        : 'Choose your teachers to customize alerts'}
-                    </Text>
                   </View>
                 </View>
                 <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
@@ -372,10 +365,5 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '600',
     color: '#0F172A',
-  },
-  starredSub: {
-    fontSize: 12,
-    color: '#64748B',
-    marginTop: 2,
   },
 });

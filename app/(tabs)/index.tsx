@@ -141,9 +141,6 @@ export default function TodayScreen() {
                   <Ionicons name="star" size={26} color="#94A3B8" />
                 </View>
                 <Text style={styles.starPromptTitle}>Track Your Teachers</Text>
-                <Text style={styles.starPromptSubtitle}>
-                  Star your teachers to see your free periods and customized absence updates right here.
-                </Text>
                 <View style={styles.starPromptButton}>
                   <Text style={styles.starPromptButtonText}>Choose Starred Teachers</Text>
                   <Ionicons name="arrow-forward" size={13} color="#2563EB" style={{ marginLeft: 4 }} />
@@ -323,14 +320,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '700',
     color: '#0F172A',
-    marginBottom: 4,
-  },
-  starPromptSubtitle: {
-    fontSize: 13,
-    color: '#64748B',
-    textAlign: 'center',
-    lineHeight: 18,
-    paddingHorizontal: 16,
     marginBottom: 12,
   },
   starPromptButton: {
