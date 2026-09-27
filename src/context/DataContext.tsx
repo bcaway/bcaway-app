@@ -1,9 +1,17 @@
-import React, { createContext, useContext, useState, useEffect, useCallback, useRef, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, useRef, useMemo, ReactNode } from 'react';
 import { AppState, AppStateStatus } from 'react-native';
 import * as SplashScreen from 'expo-splash-screen';
-import { SchedulePeriod, DaySchedule, TeacherAbsence } from '../types';
+import { SchedulePeriod, DaySchedule, TeacherAbsence, Teacher } from '../types';
 import { getScheduleForDate, getCurrentPeriodInfo } from '../services/scheduleService';
 import { getTeacherAbsences, clearAbsenceCache } from '../services/absenceService';
+import {
+  getAllTeachers,
+  getUserStarredTeacherIds,
+  starTeacher,
+  unstarTeacher,
+} from '../services/teacherService';
+import { checkAndNotifyStarredAbsences } from '../services/starredAlertService';
+import { supabase } from '../services/supabase';
 import { getCurrentTimeStr } from '../utils/time';
 import { useAuth } from './AuthContext';
 
@@ -22,6 +30,16 @@ export interface DataContextValue {
   absencesLoading: boolean;
   absencesError: Error | null;
 
+  // Teachers & Stars state
+  teachers: Teacher[];
+  starredTeacherIds: string[];
+  starredTeachers: Teacher[];
+  starredAbsences: TeacherAbsence[];
+  teachersLoading: boolean;
+  isTeacherStarred: (teacherId: string) => boolean;
+  toggleStarTeacher: (teacherId: string) => Promise<boolean>;
+  refreshTeachersAndStars: () => Promise<void>;
+
   // Readiness for initial app display
   isReady: boolean;
 
@@ -33,6 +51,8 @@ const DataContext = createContext<DataContextValue | null>(null);
 
 export function DataProvider({ children }: { children: ReactNode }) {
   const { session } = useAuth();
+  const userId = session?.user?.id;
+
   const [schedule, setSchedule] = useState<DaySchedule | null>(null);
   const [scheduleType, setScheduleType] = useState<string | null>(null);
   const [periods, setPeriods] = useState<SchedulePeriod[]>([]);
@@ -45,12 +65,92 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const [absencesLoading, setAbsencesLoading] = useState(true);
   const [absencesError, setAbsencesError] = useState<Error | null>(null);
 
+  const [teachers, setTeachers] = useState<Teacher[]>([]);
+  const [starredTeacherIds, setStarredTeacherIds] = useState<string[]>([]);
+  const [teachersLoading, setTeachersLoading] = useState(true);
+
   const [isReady, setIsReady] = useState(false);
   const inFlightRefresh = useRef<Promise<void> | null>(null);
   const lastFetchedDate = useRef<string>(new Date().toDateString());
   const lastFetchedTimestamp = useRef<number>(Date.now());
+  const isInitialLaunch = useRef<boolean>(true);
 
-  // Global refetch that fetches schedule + absences with forceRefresh = true
+  // Derived: Teachers that the user has starred
+  const starredTeachers = useMemo(() => {
+    if (starredTeacherIds.length === 0 || teachers.length === 0) return [];
+    const starredSet = new Set(starredTeacherIds);
+    return teachers.filter(t => starredSet.has(t.id));
+  }, [teachers, starredTeacherIds]);
+
+  // Derived: Today's absences that match any of the user's starred teachers
+  const starredAbsences = useMemo(() => {
+    if (starredTeachers.length === 0 || absentTeachers.length === 0) return [];
+
+    const normalizedStarredNames = new Set(
+      starredTeachers.flatMap(t => [
+        t.name.trim().toLowerCase(),
+        ...(Array.isArray(t.aliases) ? t.aliases.map(a => a.trim().toLowerCase()) : []),
+      ])
+    );
+
+    return absentTeachers.filter(absence =>
+      normalizedStarredNames.has(absence.teacher.trim().toLowerCase())
+    );
+  }, [absentTeachers, starredTeachers]);
+
+  // Helper: check if a teacher is starred
+  const isTeacherStarred = useCallback(
+    (teacherId: string) => {
+      return starredTeacherIds.includes(teacherId);
+    },
+    [starredTeacherIds]
+  );
+
+  // Helper: toggle star for a teacher
+  const toggleStarTeacher = useCallback(
+    async (teacherId: string): Promise<boolean> => {
+      if (!userId) return false;
+
+      const currentlyStarred = starredTeacherIds.includes(teacherId);
+      // Optimistic update
+      if (currentlyStarred) {
+        setStarredTeacherIds(prev => prev.filter(id => id !== teacherId));
+        const ok = await unstarTeacher(userId, teacherId);
+        if (!ok) {
+          // Revert on failure
+          setStarredTeacherIds(prev => [...prev, teacherId]);
+          return false;
+        }
+        return true;
+      } else {
+        setStarredTeacherIds(prev => [...prev, teacherId]);
+        const ok = await starTeacher(userId, teacherId);
+        if (!ok) {
+          // Revert on failure
+          setStarredTeacherIds(prev => prev.filter(id => id !== teacherId));
+          return false;
+        }
+        return true;
+      }
+    },
+    [userId, starredTeacherIds]
+  );
+
+  // Refresh teachers and stars specifically
+  const refreshTeachersAndStars = useCallback(async (): Promise<void> => {
+    try {
+      const [tList, sIds] = await Promise.all([
+        getAllTeachers(true),
+        userId ? getUserStarredTeacherIds(userId, true) : Promise.resolve([]),
+      ]);
+      setTeachers(tList);
+      if (userId) setStarredTeacherIds(sIds);
+    } catch (e) {
+      console.warn('[DataContext] Error refreshing teachers/stars:', e);
+    }
+  }, [userId]);
+
+  // Global refetch that fetches schedule + absences + teachers + stars
   const refreshAll = useCallback(async (): Promise<void> => {
     if (inFlightRefresh.current) {
       return inFlightRefresh.current;
@@ -59,9 +159,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
     const task = (async () => {
       try {
         const today = new Date();
-        const [schedResult, absResult] = await Promise.allSettled([
+        const [schedResult, absResult, teachersResult, starsResult] = await Promise.allSettled([
           getScheduleForDate(today, true),
           getTeacherAbsences(true),
+          getAllTeachers(true),
+          userId ? getUserStarredTeacherIds(userId, true) : Promise.resolve([]),
         ]);
 
         if (schedResult.status === 'fulfilled') {
@@ -77,7 +179,17 @@ export function DataProvider({ children }: { children: ReactNode }) {
           setScheduleError(null);
         } else {
           console.error('Error refreshing schedule:', schedResult.reason);
-          setScheduleError(schedResult.reason instanceof Error ? schedResult.reason : new Error(String(schedResult.reason)));
+          setScheduleError(
+            schedResult.reason instanceof Error ? schedResult.reason : new Error(String(schedResult.reason))
+          );
+        }
+
+        if (teachersResult.status === 'fulfilled') {
+          setTeachers(teachersResult.value);
+        }
+
+        if (starsResult.status === 'fulfilled' && userId) {
+          setStarredTeacherIds(starsResult.value);
         }
 
         if (absResult.status === 'fulfilled') {
@@ -85,8 +197,11 @@ export function DataProvider({ children }: { children: ReactNode }) {
           setAbsencesError(null);
         } else {
           console.error('Error refreshing absences:', absResult.reason);
-          setAbsencesError(absResult.reason instanceof Error ? absResult.reason : new Error(String(absResult.reason)));
+          setAbsencesError(
+            absResult.reason instanceof Error ? absResult.reason : new Error(String(absResult.reason))
+          );
         }
+
         lastFetchedDate.current = new Date().toDateString();
         lastFetchedTimestamp.current = Date.now();
       } catch (err) {
@@ -98,7 +213,20 @@ export function DataProvider({ children }: { children: ReactNode }) {
 
     inFlightRefresh.current = task;
     return task;
-  }, []);
+  }, [userId]);
+
+  // Check and trigger notifications whenever starred absences update
+  useEffect(() => {
+    if (!isReady || starredAbsences.length === 0) return;
+
+    checkAndNotifyStarredAbsences(starredAbsences, isInitialLaunch.current).catch(err => {
+      console.warn('[DataContext] Error in checkAndNotifyStarredAbsences:', err);
+    });
+
+    if (isInitialLaunch.current) {
+      isInitialLaunch.current = false;
+    }
+  }, [isReady, starredAbsences]);
 
   // Initial load on first app open
   useEffect(() => {
@@ -118,8 +246,16 @@ export function DataProvider({ children }: { children: ReactNode }) {
               setNextPeriod(periodInfo.nextPeriod);
               setScheduleError(null);
             }),
-            getTeacherAbsences(false).then(teachers => {
-              setAbsentTeachers(teachers);
+            getAllTeachers(false).then(loadedTeachers => {
+              setTeachers(loadedTeachers);
+            }),
+            userId
+              ? getUserStarredTeacherIds(userId, false).then(loadedStars => {
+                  setStarredTeacherIds(loadedStars);
+                })
+              : Promise.resolve(),
+            getTeacherAbsences(false).then(loadedAbsences => {
+              setAbsentTeachers(loadedAbsences);
               setAbsencesError(null);
             }),
           ]),
@@ -130,27 +266,58 @@ export function DataProvider({ children }: { children: ReactNode }) {
       } finally {
         setScheduleLoading(false);
         setAbsencesLoading(false);
+        setTeachersLoading(false);
         setIsReady(true);
         await SplashScreen.hideAsync().catch(() => {});
       }
     }
 
     initialLoad().then(() => {
-      // Silently revalidate against GitHub in background to ensure latest commits are synced
+      // Revalidate in background to ensure latest sync is loaded
       refreshAll().catch(() => {});
     });
-  }, [refreshAll]);
+  }, [userId, refreshAll]);
 
-  // React to auth session changes: fetch absences when authenticated, clear cache when logged out
+  // React to auth session changes
   useEffect(() => {
     if (session) {
       refreshAll().catch(() => {});
     } else {
       clearAbsenceCache();
       setAbsentTeachers([]);
+      setStarredTeacherIds([]);
       setAbsencesError(null);
     }
   }, [session, refreshAll]);
+
+  // Listen to Supabase Realtime changes on teacher_absences & teachers
+  useEffect(() => {
+    const channel = supabase
+      .channel('schema_changes_feed')
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'teacher_absences' },
+        payload => {
+          console.log('[Realtime] teacher_absences changed:', payload.eventType);
+          refreshAll().catch(() => {});
+        }
+      )
+      .on(
+        'postgres_changes',
+        { event: '*', schema: 'public', table: 'teachers' },
+        payload => {
+          console.log('[Realtime] teachers changed:', payload.eventType);
+          getAllTeachers(true)
+            .then(updated => setTeachers(updated))
+            .catch(() => {});
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refreshAll]);
 
   // Update current period every 30 seconds centrally
   useEffect(() => {
@@ -197,6 +364,14 @@ export function DataProvider({ children }: { children: ReactNode }) {
         absentTeachers,
         absencesLoading,
         absencesError,
+        teachers,
+        starredTeacherIds,
+        starredTeachers,
+        starredAbsences,
+        teachersLoading,
+        isTeacherStarred,
+        toggleStarTeacher,
+        refreshTeachersAndStars,
         isReady,
         refreshAll,
       }}

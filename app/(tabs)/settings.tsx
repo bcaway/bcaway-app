@@ -12,10 +12,14 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import { useRouter } from 'expo-router';
 import { useAuth, isBcawayEmail } from '../../src/context/AuthContext';
+import { useData } from '../../src/context/DataContext';
 
 export default function SettingsScreen() {
+  const router = useRouter();
   const { user, signOut } = useAuth();
+  const { starredTeacherIds } = useData();
 
   const openLink = (url: string) => {
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
@@ -58,6 +62,36 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.wrapper}>
+          {/* Section: Starred Teachers */}
+          <View style={styles.section}>
+            <Text style={styles.sectionHeading}>MY TEACHERS</Text>
+            <View style={styles.cardGroup}>
+              <TouchableOpacity
+                style={styles.starredRow}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/starred-teachers' as any);
+                }}
+                activeOpacity={0.7}
+              >
+                <View style={styles.starredLeft}>
+                  <View style={styles.starBadge}>
+                    <Ionicons name="star" size={16} color="#F59E0B" />
+                  </View>
+                  <View style={styles.starredTextContainer}>
+                    <Text style={styles.starredTitle}>Starred Teachers</Text>
+                    <Text style={styles.starredSub}>
+                      {starredTeacherIds.length > 0
+                        ? `${starredTeacherIds.length} teacher${starredTeacherIds.length === 1 ? '' : 's'} tracked for free periods`
+                        : 'Choose your teachers to customize alerts'}
+                    </Text>
+                  </View>
+                </View>
+                <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+              </TouchableOpacity>
+            </View>
+          </View>
+
           {/* Section: Account */}
           <View style={styles.section}>
             <Text style={styles.sectionHeading}>ACCOUNT</Text>
@@ -307,5 +341,41 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#DC2626',
+  },
+  starredRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingVertical: 14,
+    paddingHorizontal: 16,
+    backgroundColor: '#FFFFFF',
+  },
+  starredLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    paddingRight: 12,
+  },
+  starBadge: {
+    width: 32,
+    height: 32,
+    borderRadius: 8,
+    backgroundColor: '#FEF3C7',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+  },
+  starredTextContainer: {
+    flex: 1,
+  },
+  starredTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#0F172A',
+  },
+  starredSub: {
+    fontSize: 12,
+    color: '#64748B',
+    marginTop: 2,
   },
 });

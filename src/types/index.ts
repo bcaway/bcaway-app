@@ -26,4 +26,10 @@ export interface PeriodWithStatus {
   isPast: boolean;
   absentCount?: number;
 }
-
+export interface Teacher {
+  id: string;
+  name: string;
+  aliases: string[];
+  createdAt?: string;
+  updatedAt?: string;
+}

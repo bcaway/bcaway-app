@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import { TeacherAbsence } from '../types';
+import { getAllTeachers, normalizeAbsencesWithTeachers } from './teacherService';
 
 interface SupabaseTeacherAbsenceRow {
   id: string;
@@ -126,8 +127,7 @@ export async function getTeacherAbsences(forceRefresh: boolean = false): Promise
     if (cachedAbsences) return cachedAbsences.data;
     throw error;
   }
-
-  const absences = (!data || data.length === 0)
+  const rawAbsences = (!data || data.length === 0)
     ? []
     : (data as SupabaseTeacherAbsenceRow[]).map(row => ({
         id: row.id,
@@ -137,8 +137,16 @@ export async function getTeacherAbsences(forceRefresh: boolean = false): Promise
         periodsImpacted: row.periods_impacted,
       }));
 
-  cachedAbsences = { data: absences, timestamp: Date.now() };
-  return absences;
+  try {
+    const teachers = await getAllTeachers();
+    const normalized = normalizeAbsencesWithTeachers(rawAbsences, teachers);
+    cachedAbsences = { data: normalized, timestamp: Date.now() };
+    return normalized;
+  } catch (err) {
+    console.warn('[AbsenceService] Could not normalize with teachers:', err);
+    cachedAbsences = { data: rawAbsences, timestamp: Date.now() };
+    return rawAbsences;
+  }
 }
 
 /**
