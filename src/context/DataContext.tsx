@@ -11,6 +11,7 @@ import {
   unstarTeacher,
 } from '../services/teacherService';
 import { checkAndNotifyStarredAbsences } from '../services/starredAlertService';
+import { syncStarredTeachersWithBackend } from '../services/notificationService';
 import { supabase } from '../services/supabase';
 import { getCurrentTimeStr } from '../utils/time';
 import { useAuth } from './AuthContext';
@@ -227,6 +228,19 @@ export function DataProvider({ children }: { children: ReactNode }) {
       isInitialLaunch.current = false;
     }
   }, [isReady, starredAbsences]);
+
+  // Keep starred teachers synchronized with remote push notification backend
+  useEffect(() => {
+    if (!isReady || teachersLoading) return;
+
+    const starredNames = teachers
+      .filter(t => starredTeacherIds.includes(t.id))
+      .map(t => t.name);
+
+    syncStarredTeachersWithBackend(starredNames).catch(err => {
+      console.warn('[DataContext] Failed to sync starred teachers with push backend:', err);
+    });
+  }, [isReady, teachersLoading, starredTeacherIds, teachers]);
 
   // Initial load on first app open
   useEffect(() => {

@@ -2,8 +2,10 @@ import { Platform } from 'react-native';
 import * as Device from 'expo-device';
 import * as Notifications from 'expo-notifications';
 import Constants from 'expo-constants';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const NOTIFICATION_BACKEND_URL = 'https://bcaway-notifications.tjaynj.workers.dev';
+const TOKEN_STORAGE_KEY = 'bcaway_expo_push_token';
 
 // Register the notification handler so normal notifications can be displayed while app is in foreground
 Notifications.setNotificationHandler({
@@ -16,10 +18,25 @@ Notifications.setNotificationHandler({
   }),
 });
 
+let cachedExpoToken: string | null = null;
+
+export function getCachedPushToken(): string | null {
+  return cachedExpoToken;
+}
+
 /**
- * Sends the registered Expo Push Token to the Cloudflare Worker backend.
+ * Sends the registered Expo Push Token and optional starred teachers to the Cloudflare Worker backend.
  */
-export async function syncPushTokenWithBackend(token: string): Promise<boolean> {
+export async function syncPushTokenWithBackend(
+  token: string,
+  starredTeachers?: string[]
+): Promise<boolean> {
+  cachedExpoToken = token;
+  try {
+    await AsyncStorage.setItem(TOKEN_STORAGE_KEY, token);
+  } catch (e) {
+    // ignore
+  }
   try {
     const response = await fetch(`${NOTIFICATION_BACKEND_URL}/register`, {
       method: 'POST',
@@ -29,6 +46,7 @@ export async function syncPushTokenWithBackend(token: string): Promise<boolean> 
       body: JSON.stringify({
         token,
         platform: Platform.OS,
+        starredTeachers: starredTeachers || [],
       }),
     });
 
@@ -42,6 +60,55 @@ export async function syncPushTokenWithBackend(token: string): Promise<boolean> 
     }
   } catch (error) {
     console.warn('[Push Notification] Could not sync token with backend (network/offline):', error);
+    return false;
+  }
+}
+
+/**
+ * Syncs the user's currently starred teachers with the notification backend
+ * so remote push alerts fire even when the app is closed.
+ */
+export async function syncStarredTeachersWithBackend(
+  starredTeacherNames: string[]
+): Promise<boolean> {
+  let token = cachedExpoToken;
+  if (!token) {
+    try {
+      token = await AsyncStorage.getItem(TOKEN_STORAGE_KEY);
+      if (token) {
+        cachedExpoToken = token;
+      }
+    } catch (e) {
+      // ignore
+    }
+  }
+
+  if (!token) {
+    return false;
+  }
+
+  try {
+    const response = await fetch(`${NOTIFICATION_BACKEND_URL}/sync-starred`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        token,
+        starredTeachers: starredTeacherNames,
+      }),
+    });
+
+    if (response.ok) {
+      console.log(`[Push Notification] Synced ${starredTeacherNames.length} starred teacher(s) with backend.`);
+      return true;
+    } else {
+      const errText = await response.text();
+      console.warn('[Push Notification] Error syncing starred teachers with backend:', response.status, errText);
+      return false;
+    }
+  } catch (error) {
+    console.warn('[Push Notification] Could not sync starred teachers with backend:', error);
     return false;
   }
 }
