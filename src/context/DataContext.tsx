@@ -10,7 +10,6 @@ import {
   starTeacher,
   unstarTeacher,
 } from '../services/teacherService';
-import { checkAndNotifyStarredAbsences } from '../services/starredAlertService';
 import { syncStarredTeachersWithBackend } from '../services/notificationService';
 import { supabase } from '../services/supabase';
 import { getCurrentTimeStr } from '../utils/time';
@@ -74,7 +73,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const inFlightRefresh = useRef<Promise<void> | null>(null);
   const lastFetchedDate = useRef<string>(new Date().toDateString());
   const lastFetchedTimestamp = useRef<number>(Date.now());
-  const isInitialLaunch = useRef<boolean>(true);
 
   // Derived: Teachers that the user has starred
   const starredTeachers = useMemo(() => {
@@ -215,19 +213,6 @@ export function DataProvider({ children }: { children: ReactNode }) {
     inFlightRefresh.current = task;
     return task;
   }, [userId]);
-
-  // Check and trigger notifications whenever starred absences update
-  useEffect(() => {
-    if (!isReady || starredAbsences.length === 0) return;
-
-    checkAndNotifyStarredAbsences(starredAbsences, isInitialLaunch.current).catch(err => {
-      console.warn('[DataContext] Error in checkAndNotifyStarredAbsences:', err);
-    });
-
-    if (isInitialLaunch.current) {
-      isInitialLaunch.current = false;
-    }
-  }, [isReady, starredAbsences]);
 
   // Keep starred teachers synchronized with remote push notification backend
   useEffect(() => {
