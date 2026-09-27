@@ -55,11 +55,7 @@ export default function StarredTeachersScreen() {
   const filteredTeachers = useMemo(() => {
     if (!searchQuery.trim()) return teachers;
     const q = searchQuery.toLowerCase().trim();
-    return teachers.filter(t => {
-      if (t.name.toLowerCase().includes(q)) return true;
-      if (t.aliases && t.aliases.some(a => a.toLowerCase().includes(q))) return true;
-      return false;
-    });
+    return teachers.filter(t => t.name.toLowerCase().includes(q));
   }, [teachers, searchQuery]);
 
   return (
@@ -85,7 +81,7 @@ export default function StarredTeachersScreen() {
           <Ionicons name="search" size={16} color="#64748B" style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search by teacher name or alias..."
+            placeholder="Search teachers..."
             placeholderTextColor="#94A3B8"
             value={searchQuery}
             onChangeText={setSearchQuery}
@@ -149,11 +145,6 @@ export default function StarredTeachersScreen() {
                     <Text style={[styles.teacherName, starred && styles.teacherNameStarred]}>
                       {teacher.name}
                     </Text>
-                    {teacher.aliases && teacher.aliases.length > 0 && (
-                      <Text style={styles.teacherAliases} numberOfLines={1}>
-                        Aliases: {teacher.aliases.join(', ')}
-                      </Text>
-                    )}
                   </View>
 
                   <View style={styles.starAction}>
@@ -263,11 +254,6 @@ const styles = StyleSheet.create({
   teacherNameStarred: {
     color: '#0F172A',
     fontWeight: '700',
-  },
-  teacherAliases: {
-    fontSize: 12,
-    color: '#64748B',
-    marginTop: 2,
   },
   starAction: {
     padding: 4,
