@@ -67,6 +67,8 @@ export default function TodayScreen() {
 
   const greeting = getGreeting();
   const isLoading = scheduleLoading || absencesLoading;
+  const firstAbsent = starredAbsences.length > 0 ? starredAbsences[0] : null;
+  const otherAbsentTeachers = starredAbsences.slice(1);
 
   if (isLoading && !refreshing) {
     return <LoadingScreen />;
@@ -104,9 +106,7 @@ export default function TodayScreen() {
           <View style={styles.sectionHeaderRow}>
             <View style={styles.sectionTitleGroup}>
               <Ionicons name="people-outline" size={16} color="#64748B" style={{ marginRight: 6 }} />
-              <Text style={styles.sectionTitle}>
-                {starredTeacherIds.length > 0 ? 'My Starred Absences' : 'Teacher Absences'}
-              </Text>
+              <Text style={styles.sectionTitle}>Teacher Absences</Text>
             </View>
             <TouchableOpacity
               style={styles.allAbsencesButton}
@@ -128,7 +128,6 @@ export default function TodayScreen() {
                 <Text style={styles.heroSubtitle}>Could not load today's absence data</Text>
               </View>
             ) : starredTeacherIds.length === 0 ? (
-              /* State 1: User has NO teachers starred yet */
               <TouchableOpacity
                 style={styles.starPromptContainer}
                 onPress={() => {
@@ -146,72 +145,49 @@ export default function TodayScreen() {
                   <Ionicons name="arrow-forward" size={13} color="#2563EB" style={{ marginLeft: 4 }} />
                 </View>
               </TouchableOpacity>
-            ) : starredAbsences.length > 0 ? (
-              /* State 2: User has starred teachers, and 1+ are absent today */
+            ) : firstAbsent ? (
               <View>
                 <View style={styles.heroMain}>
                   <View style={styles.heroTextGroup}>
-                    <View style={styles.starredBadgeRow}>
-                      <Ionicons name="star" size={13} color="#F59E0B" />
-                      <Text style={styles.starredBadgeText}>Free Period Today</Text>
-                    </View>
-                    <Text style={styles.heroTitle}>{starredAbsences[0].teacher}</Text>
-                    <Text style={styles.heroSubtitle}>
-                      {formatPeriodsImpacted(starredAbsences[0].periodsImpacted)}
-                    </Text>
+                    <Text style={styles.heroTitle}>{firstAbsent.teacher}</Text>
+                    <Text style={styles.heroSubtitle}>{formatPeriodsImpacted(firstAbsent.periodsImpacted)}</Text>
                   </View>
                 </View>
 
-                {starredAbsences.length > 1 && (
+                {otherAbsentTeachers.length > 0 && (
                   <View style={styles.heroSecondaryList}>
                     <View style={styles.heroDivider} />
-                    {starredAbsences.slice(1).map(t => (
+                    {otherAbsentTeachers.slice(0, 2).map(t => (
                       <View key={t.id} style={styles.heroSecondaryRow}>
                         <Text style={styles.heroSecondaryName}>{t.teacher}</Text>
-                        <Text style={styles.heroSecondaryDuration}>
-                          {formatPeriodsImpacted(t.periodsImpacted)}
-                        </Text>
+                        <Text style={styles.heroSecondaryDuration}>{formatPeriodsImpacted(t.periodsImpacted)}</Text>
                       </View>
                     ))}
+                    {otherAbsentTeachers.length > 2 && (
+                      <TouchableOpacity
+                        onPress={() => router.push('/(tabs)/absences')}
+                        activeOpacity={0.7}
+                        style={{ marginTop: 8 }}
+                      >
+                        <Text style={styles.heroMoreText}>
+                          +{otherAbsentTeachers.length - 2} more absent today
+                        </Text>
+                      </TouchableOpacity>
+                    )}
                   </View>
                 )}
-
-                <TouchableOpacity
-                  style={styles.manageStarredFooter}
-                  onPress={() => router.push('/starred-teachers' as any)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.manageStarredText}>
-                    Tracking {starredTeacherIds.length} starred {starredTeacherIds.length === 1 ? 'teacher' : 'teachers'}
-                  </Text>
-                  <Ionicons name="chevron-forward" size={13} color="#64748B" />
-                </TouchableOpacity>
               </View>
             ) : schedule && !schedule.hasSchool ? (
-              /* State 3: No school today */
               <View style={styles.heroEmpty}>
                 <Text style={styles.heroEmoji}>🎉</Text>
                 <Text style={styles.heroTitle}>No School Today</Text>
                 <Text style={styles.heroSubtitle}>Enjoy your day off!</Text>
               </View>
             ) : (
-              /* State 4: User has starred teachers, and ALL are in session */
               <View style={styles.heroEmpty}>
-                <View style={styles.allPresentIconBadge}>
-                  <Ionicons name="checkmark-circle" size={26} color="#10B981" />
-                </View>
-                <Text style={styles.heroTitle}>All Your Teachers Are Present</Text>
-                <Text style={styles.heroSubtitle}>
-                  None of your {starredTeacherIds.length} starred teachers are reported absent today.
-                </Text>
-                <TouchableOpacity
-                  style={[styles.manageStarredFooter, { marginTop: 12 }]}
-                  onPress={() => router.push('/starred-teachers' as any)}
-                  activeOpacity={0.7}
-                >
-                  <Text style={styles.manageStarredText}>Edit Starred Teachers</Text>
-                  <Ionicons name="chevron-forward" size={13} color="#64748B" />
-                </TouchableOpacity>
+                <Text style={styles.heroEmoji}>🎉</Text>
+                <Text style={styles.heroTitle}>All Teachers Present</Text>
+                <Text style={styles.heroSubtitle}>No absences reported for today</Text>
               </View>
             )}
           </View>
@@ -335,31 +311,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#2563EB',
   },
-  starredBadgeRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    alignSelf: 'flex-start',
-    backgroundColor: '#FEF3C7',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-    marginBottom: 6,
-  },
-  starredBadgeText: {
-    fontSize: 11,
-    fontWeight: '700',
-    color: '#92400E',
-    marginLeft: 4,
-  },
-  allPresentIconBadge: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#ECFDF5',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 8,
-  },
   heroMain: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -404,20 +355,10 @@ const styles = StyleSheet.create({
     color: '#64748B',
     fontWeight: '500',
   },
-  manageStarredFooter: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-    paddingTop: 8,
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#F1F5F9',
-  },
-  manageStarredText: {
-    fontSize: 12,
-    color: '#64748B',
-    fontWeight: '500',
-    marginRight: 4,
+  heroMoreText: {
+    fontSize: 13,
+    color: '#2563EB',
+    fontWeight: '600',
   },
   heroEmpty: {
     paddingVertical: 12,
