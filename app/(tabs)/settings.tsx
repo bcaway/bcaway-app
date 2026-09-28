@@ -156,6 +156,18 @@ export default function SettingsScreen() {
             <Text style={styles.sectionHeading}>FEEDBACK & CONTACT</Text>
             <View style={styles.cardGroup}>
               <TouchableOpacity
+                style={[styles.linkRow, styles.divider]}
+                onPress={() => openLink('https://www.bcaway.app/requestteacher')}
+                activeOpacity={0.7}
+              >
+                <View style={styles.linkLeft}>
+                  <Text style={styles.linkLabel}>Request a Teacher</Text>
+                  <Text style={styles.linkTarget}>bcaway.app/requestteacher</Text>
+                </View>
+                <Ionicons name="person-add-outline" size={16} color="#64748B" />
+              </TouchableOpacity>
+
+              <TouchableOpacity
                 style={styles.linkRow}
                 onPress={() => openLink('mailto:kabsek30@bergen.org')}
                 activeOpacity={0.7}

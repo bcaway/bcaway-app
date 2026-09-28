@@ -9,12 +9,15 @@ import {
   TouchableOpacity,
   RefreshControl,
   ActivityIndicator,
+  Linking,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useData } from '../src/context/DataContext';
 import { Teacher } from '../src/types';
+
+const REQUEST_TEACHER_URL = 'https://www.bcaway.app/requestteacher';
 
 export default function StarredTeachersScreen() {
   const router = useRouter();
@@ -50,6 +53,13 @@ export default function StarredTeachersScreen() {
         return next;
       });
     }
+  };
+
+  const handleRequestTeacher = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    Linking.openURL(REQUEST_TEACHER_URL).catch(err => {
+      console.error("Couldn't open URL", err);
+    });
   };
 
   const filteredTeachers = useMemo(() => {
@@ -126,41 +136,66 @@ export default function StarredTeachersScreen() {
             <Text style={styles.emptySub}>
               {searchQuery ? `No results matching "${searchQuery}"` : 'No faculty records available'}
             </Text>
+            <TouchableOpacity
+              style={styles.requestLinkEmpty}
+              onPress={handleRequestTeacher}
+              activeOpacity={0.7}
+            >
+              <Text style={styles.requestLinkText}>
+                Don't see your teacher?{' '}
+                <Text style={styles.requestLinkHighlight}>Request to add them</Text>
+              </Text>
+            </TouchableOpacity>
           </View>
         ) : (
-          <View style={styles.cardGroup}>
-            {filteredTeachers.map((teacher, index) => {
-              const starred = isTeacherStarred(teacher.id);
-              const isPending = pendingToggles.has(teacher.id);
-              const isLast = index === filteredTeachers.length - 1;
+          <View>
+            <View style={styles.cardGroup}>
+              {filteredTeachers.map((teacher, index) => {
+                const starred = isTeacherStarred(teacher.id);
+                const isPending = pendingToggles.has(teacher.id);
+                const isLast = index === filteredTeachers.length - 1;
 
-              return (
-                <TouchableOpacity
-                  key={teacher.id}
-                  style={[styles.teacherRow, !isLast && styles.rowDivider]}
-                  onPress={() => handleToggle(teacher)}
-                  activeOpacity={0.7}
-                >
-                  <View style={styles.teacherInfo}>
-                    <Text style={[styles.teacherName, starred && styles.teacherNameStarred]}>
-                      {teacher.name}
-                    </Text>
-                  </View>
+                return (
+                  <TouchableOpacity
+                    key={teacher.id}
+                    style={[styles.teacherRow, !isLast && styles.rowDivider]}
+                    onPress={() => handleToggle(teacher)}
+                    activeOpacity={0.7}
+                  >
+                    <View style={styles.teacherInfo}>
+                      <Text style={[styles.teacherName, starred && styles.teacherNameStarred]}>
+                        {teacher.name}
+                      </Text>
+                    </View>
 
-                  <View style={styles.starAction}>
-                    {isPending ? (
-                      <ActivityIndicator size="small" color="#F59E0B" />
-                    ) : (
-                      <Ionicons
-                        name={starred ? 'star' : 'star-outline'}
-                        size={22}
-                        color={starred ? '#F59E0B' : '#94A3B8'}
-                      />
-                    )}
-                  </View>
-                </TouchableOpacity>
-              );
-            })}
+                    <View style={styles.starAction}>
+                      {isPending ? (
+                        <ActivityIndicator size="small" color="#F59E0B" />
+                      ) : (
+                        <Ionicons
+                          name={starred ? 'star' : 'star-outline'}
+                          size={22}
+                          color={starred ? '#F59E0B' : '#94A3B8'}
+                        />
+                      )}
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <View style={styles.footerLinkContainer}>
+              <TouchableOpacity
+                style={styles.requestLinkBottom}
+                onPress={handleRequestTeacher}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.requestLinkText}>
+                  Don't see your teacher?{' '}
+                  <Text style={styles.requestLinkHighlight}>Request to add them</Text>
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </ScrollView>
@@ -284,5 +319,30 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginTop: 4,
     textAlign: 'center',
+  },
+  requestLinkEmpty: {
+    marginTop: 16,
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  footerLinkContainer: {
+    marginTop: 20,
+    marginBottom: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  requestLinkBottom: {
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+  },
+  requestLinkText: {
+    fontSize: 13,
+    color: '#64748B',
+    textAlign: 'center',
+  },
+  requestLinkHighlight: {
+    color: '#2563EB',
+    fontWeight: '600',
+    textDecorationLine: 'underline',
   },
 });
