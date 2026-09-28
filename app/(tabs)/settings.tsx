@@ -161,7 +161,7 @@ export default function SettingsScreen() {
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
-                  <Text style={styles.linkLabel}>Request a Teacher</Text>
+                  <Text style={styles.linkLabel}>Request Teacher</Text>
                   <Text style={styles.linkTarget}>bcaway.app/requestteacher</Text>
                 </View>
                 <Ionicons name="person-add-outline" size={16} color="#64748B" />
