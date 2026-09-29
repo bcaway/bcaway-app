@@ -183,12 +183,27 @@ export default function TodayScreen() {
                 <Text style={styles.heroTitle}>No School Today</Text>
                 <Text style={styles.heroSubtitle}>Enjoy your day off!</Text>
               </View>
-            ) : (
+            ) : absentTeachers.length === 0 ? (
               <View style={styles.heroEmpty}>
                 <Text style={styles.heroEmoji}>🎉</Text>
-                <Text style={styles.heroTitle}>All Teachers Present</Text>
-                <Text style={styles.heroSubtitle}>No absences reported for today</Text>
+                <Text style={styles.heroTitle}>No Absences Today</Text>
+                <Text style={styles.heroSubtitle}>No faculty absences reported today</Text>
               </View>
+            ) : (
+              <TouchableOpacity
+                style={styles.heroEmpty}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/(tabs)/absences');
+                }}
+                activeOpacity={0.7}
+              >
+                <Text style={styles.heroEmoji}>🎉</Text>
+                <Text style={styles.heroTitle}>Your Teachers are Present</Text>
+                <Text style={styles.heroSubtitle}>
+                  {`None of your starred teachers are absent today (${absentTeachers.length} other ${absentTeachers.length === 1 ? 'teacher' : 'teachers'} absent)`}
+                </Text>
+              </TouchableOpacity>
             )}
           </View>
 
@@ -330,6 +345,7 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginTop: 3,
     fontWeight: '500',
+    textAlign: 'center',
   },
   heroDivider: {
     height: StyleSheet.hairlineWidth,
