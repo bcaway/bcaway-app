@@ -169,12 +169,12 @@ export default function SettingsScreen() {
 
               <TouchableOpacity
                 style={styles.linkRow}
-                onPress={() => openLink('mailto:kabsek30@bergen.org')}
+                onPress={() => openLink('mailto:support@bcaway.app')}
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
                   <Text style={styles.linkLabel}>Contact Developer</Text>
-                  <Text style={styles.linkTarget}>kabsek30@bergen.org</Text>
+                  <Text style={styles.linkTarget}>support@bcaway.app</Text>
                 </View>
                 <Ionicons name="mail-outline" size={16} color="#64748B" />
               </TouchableOpacity>
