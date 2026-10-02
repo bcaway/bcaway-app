@@ -38,16 +38,20 @@ export async function syncPushTokenWithBackend(
     // ignore
   }
   try {
+    const payload: { token: string; platform: string; starredTeachers?: string[] } = {
+      token,
+      platform: Platform.OS,
+    };
+    if (Array.isArray(starredTeachers)) {
+      payload.starredTeachers = starredTeachers;
+    }
+
     const response = await fetch(`${NOTIFICATION_BACKEND_URL}/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
-        token,
-        platform: Platform.OS,
-        starredTeachers: starredTeachers || [],
-      }),
+      body: JSON.stringify(payload),
     });
 
     if (response.ok) {
