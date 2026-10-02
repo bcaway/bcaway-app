@@ -13,6 +13,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
+import Constants from 'expo-constants';
 import { useAuth, isBcawayEmail } from '../../src/context/AuthContext';
 
 export default function SettingsScreen() {
@@ -227,7 +228,7 @@ export default function SettingsScreen() {
 
               <View style={styles.metaRow}>
                 <Text style={styles.metaLabel}>Version</Text>
-                <Text style={styles.metaValue}>1.0</Text>
+                <Text style={styles.metaValue}>{Constants.expoConfig?.version ?? '1.1'}</Text>
               </View>
             </View>
           </View>
