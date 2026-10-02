@@ -62,11 +62,58 @@ export default function StarredTeachersScreen() {
     });
   };
 
-  const filteredTeachers = useMemo(() => {
-    if (!searchQuery.trim()) return teachers;
+  const { starredList, unstarredList } = useMemo(() => {
     const q = searchQuery.toLowerCase().trim();
-    return teachers.filter(t => t.name.toLowerCase().includes(q));
-  }, [teachers, searchQuery]);
+    const matches = teachers.filter(t => !q || t.name.toLowerCase().includes(q));
+
+    const starred: Teacher[] = [];
+    const unstarred: Teacher[] = [];
+
+    for (const t of matches) {
+      if (isTeacherStarred(t.id)) {
+        starred.push(t);
+      } else {
+        unstarred.push(t);
+      }
+    }
+
+    return { starredList: starred, unstarredList: unstarred };
+  }, [teachers, searchQuery, isTeacherStarred]);
+
+  const totalMatches = starredList.length + unstarredList.length;
+
+  const renderTeacherRow = (teacher: Teacher, index: number, total: number) => {
+    const starred = isTeacherStarred(teacher.id);
+    const isPending = pendingToggles.has(teacher.id);
+    const isLast = index === total - 1;
+
+    return (
+      <TouchableOpacity
+        key={teacher.id}
+        style={[styles.teacherRow, !isLast && styles.rowDivider]}
+        onPress={() => handleToggle(teacher)}
+        activeOpacity={0.7}
+      >
+        <View style={styles.teacherInfo}>
+          <Text style={[styles.teacherName, starred && styles.teacherNameStarred]}>
+            {teacher.name}
+          </Text>
+        </View>
+
+        <View style={styles.starAction}>
+          {isPending ? (
+            <ActivityIndicator size="small" color="#F59E0B" />
+          ) : (
+            <Ionicons
+              name={starred ? 'star' : 'star-outline'}
+              size={22}
+              color={starred ? '#F59E0B' : '#94A3B8'}
+            />
+          )}
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -129,7 +176,7 @@ export default function StarredTeachersScreen() {
             <ActivityIndicator size="small" color="#2563EB" />
             <Text style={styles.loadingText}>Loading faculty directory...</Text>
           </View>
-        ) : filteredTeachers.length === 0 ? (
+        ) : totalMatches === 0 ? (
           <View style={styles.emptyState}>
             <Ionicons name="search-outline" size={36} color="#94A3B8" />
             <Text style={styles.emptyTitle}>No teachers found</Text>
@@ -149,40 +196,31 @@ export default function StarredTeachersScreen() {
           </View>
         ) : (
           <View>
-            <View style={styles.cardGroup}>
-              {filteredTeachers.map((teacher, index) => {
-                const starred = isTeacherStarred(teacher.id);
-                const isPending = pendingToggles.has(teacher.id);
-                const isLast = index === filteredTeachers.length - 1;
+            {starredList.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionHeading}>STARRED ({starredList.length})</Text>
+                <View style={styles.cardGroup}>
+                  {starredList.map((teacher, index) =>
+                    renderTeacherRow(teacher, index, starredList.length)
+                  )}
+                </View>
+              </View>
+            )}
 
-                return (
-                  <TouchableOpacity
-                    key={teacher.id}
-                    style={[styles.teacherRow, !isLast && styles.rowDivider]}
-                    onPress={() => handleToggle(teacher)}
-                    activeOpacity={0.7}
-                  >
-                    <View style={styles.teacherInfo}>
-                      <Text style={[styles.teacherName, starred && styles.teacherNameStarred]}>
-                        {teacher.name}
-                      </Text>
-                    </View>
-
-                    <View style={styles.starAction}>
-                      {isPending ? (
-                        <ActivityIndicator size="small" color="#F59E0B" />
-                      ) : (
-                        <Ionicons
-                          name={starred ? 'star' : 'star-outline'}
-                          size={22}
-                          color={starred ? '#F59E0B' : '#94A3B8'}
-                        />
-                      )}
-                    </View>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+            {unstarredList.length > 0 && (
+              <View style={styles.section}>
+                {starredList.length > 0 && (
+                  <Text style={styles.sectionHeading}>
+                    {searchQuery.trim() ? 'OTHER FACULTY' : 'ALL FACULTY'}
+                  </Text>
+                )}
+                <View style={styles.cardGroup}>
+                  {unstarredList.map((teacher, index) =>
+                    renderTeacherRow(teacher, index, unstarredList.length)
+                  )}
+                </View>
+              </View>
+            )}
 
             <View style={styles.footerLinkContainer}>
               <TouchableOpacity
@@ -259,6 +297,17 @@ const styles = StyleSheet.create({
   content: {
     padding: 20,
     paddingBottom: 40,
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionHeading: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+    letterSpacing: 0.6,
+    marginBottom: 8,
+    marginLeft: 2,
   },
   cardGroup: {
     backgroundColor: '#FFFFFF',
