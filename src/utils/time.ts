@@ -40,3 +40,14 @@ export function isTimeBetween(current: string, start: string, end: string): bool
   const endSec = timeToSeconds(end);
   return currentSec >= startSec && currentSec <= endSec;
 }
+
+export function getTimeRemainingInPeriod(endPeriodTime: string): string | null {
+  if (!endPeriodTime) return null;
+  const currentSec = timeToSeconds(getCurrentTimeStr());
+  const endSec = timeToSeconds(endPeriodTime);
+  const diffSec = endSec - currentSec;
+  if (diffSec <= 0) return null;
+  const mins = Math.ceil(diffSec / 60);
+  if (mins <= 1) return '<1m left';
+  return `${mins}m left`;
+}

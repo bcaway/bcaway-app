@@ -12,24 +12,54 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { format } from 'date-fns';
-import { useAbsences } from '../../src/hooks/useAbsences';
+import { useData } from '../../src/context/DataContext';
 import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { BCAwayLoading } from '../../src/components/common/BCAwayLoading';
 
 export default function AbsencesScreen() {
-  const { absentTeachers, isLoading, error, refresh } = useAbsences();
+  const {
+    absentTeachers,
+    starredAbsences,
+    absencesLoading: isLoading,
+    absencesError: error,
+    refreshAll: refresh,
+  } = useData();
+
   const [searchQuery, setSearchQuery] = useState('');
   const [refreshing, setRefreshing] = useState(false);
 
-  const filteredTeachers = useMemo(() => {
-    if (!searchQuery.trim()) return absentTeachers;
-    const lowerQuery = searchQuery.toLowerCase().trim();
-    return absentTeachers.filter(teacher =>
-      teacher.teacher.toLowerCase().includes(lowerQuery) ||
-      teacher.periodsImpacted.toLowerCase().includes(lowerQuery)
-    );
-  }, [absentTeachers, searchQuery]);
+  const starredTeacherNames = useMemo(() => {
+    return new Set(starredAbsences.map(a => a.teacher.trim().toLowerCase()));
+  }, [starredAbsences]);
+
+  const { filteredStarred, filteredOther, totalFilteredCount } = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    const matches = absentTeachers.filter(teacher => {
+      if (!q) return true;
+      return (
+        teacher.teacher.toLowerCase().includes(q) ||
+        teacher.periodsImpacted.toLowerCase().includes(q)
+      );
+    });
+
+    const starred: typeof absentTeachers = [];
+    const other: typeof absentTeachers = [];
+
+    for (const item of matches) {
+      if (starredTeacherNames.has(item.teacher.trim().toLowerCase())) {
+        starred.push(item);
+      } else {
+        other.push(item);
+      }
+    }
+
+    return {
+      filteredStarred: starred,
+      filteredOther: other,
+      totalFilteredCount: matches.length,
+    };
+  }, [absentTeachers, searchQuery, starredTeacherNames]);
 
   const onRefresh = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -78,7 +108,7 @@ export default function AbsencesScreen() {
 
           {searchQuery.trim().length > 0 && (
             <Text style={styles.searchMeta}>
-              Showing {filteredTeachers.length} of {absentTeachers.length} {absentTeachers.length === 1 ? 'teacher' : 'teachers'}
+              Showing {totalFilteredCount} of {absentTeachers.length} {absentTeachers.length === 1 ? 'teacher' : 'teachers'}
             </Text>
           )}
         </View>
@@ -111,15 +141,43 @@ export default function AbsencesScreen() {
                 subtitle="Could not connect to the database. Pull down to retry."
               />
             </View>
-          ) : filteredTeachers.length > 0 ? (
-            <View style={styles.ledger}>
-              {filteredTeachers.map((teacher, index) => (
-                <AbsenceListItem
-                  key={teacher.id}
-                  teacher={teacher}
-                  showDivider={index < filteredTeachers.length - 1}
-                />
-              ))}
+          ) : totalFilteredCount > 0 ? (
+            <View>
+              {filteredStarred.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionHeading}>MY TEACHERS ({filteredStarred.length})</Text>
+                  <View style={styles.ledger}>
+                    {filteredStarred.map((teacher, index) => (
+                      <AbsenceListItem
+                        key={teacher.id}
+                        teacher={teacher}
+                        isStarred={true}
+                        showDivider={index < filteredStarred.length - 1}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {filteredOther.length > 0 && (
+                <View style={styles.section}>
+                  {filteredStarred.length > 0 && (
+                    <Text style={styles.sectionHeading}>
+                      {searchQuery.trim() ? 'OTHER ABSENCES' : 'ALL ABSENCES'}
+                    </Text>
+                  )}
+                  <View style={styles.ledger}>
+                    {filteredOther.map((teacher, index) => (
+                      <AbsenceListItem
+                        key={teacher.id}
+                        teacher={teacher}
+                        isStarred={false}
+                        showDivider={index < filteredOther.length - 1}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
             </View>
           ) : (
             <View style={styles.emptyCard}>
@@ -207,6 +265,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     paddingBottom: 100,
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionHeading: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+    letterSpacing: 0.6,
+    marginBottom: 8,
+    marginLeft: 2,
   },
   ledger: {
     backgroundColor: '#FFFFFF',

@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { SchedulePeriod } from '../../types';
-import { formatTimeRange } from '../../utils/time';
+import { formatTimeRange, getTimeRemainingInPeriod } from '../../utils/time';
 
 interface PeriodCardProps {
   period: SchedulePeriod;
@@ -23,6 +23,19 @@ export function PeriodCard({
   showDivider = true,
 }: PeriodCardProps) {
   const hasAbsences = absentCount > 0;
+
+  const [remainingText, setRemainingText] = useState<string | null>(() =>
+    isCurrentPeriod ? getTimeRemainingInPeriod(period.end) : null
+  );
+
+  useEffect(() => {
+    if (!isCurrentPeriod) return;
+    setRemainingText(getTimeRemainingInPeriod(period.end));
+    const timer = setInterval(() => {
+      setRemainingText(getTimeRemainingInPeriod(period.end));
+    }, 15000);
+    return () => clearInterval(timer);
+  }, [isCurrentPeriod, period.end]);
 
   const handlePress = () => {
     if (onPress) {
@@ -65,7 +78,12 @@ export function PeriodCard({
       {/* Status & Absences Column */}
       <View style={styles.statusCol}>
         {isCurrentPeriod && (
-          <Text style={styles.nowText}>Now</Text>
+          <View style={styles.nowBadge}>
+            <Text style={styles.nowText}>Now</Text>
+            {remainingText ? (
+              <Text style={styles.remainingText}>• {remainingText}</Text>
+            ) : null}
+          </View>
         )}
 
         {hasAbsences ? (
@@ -142,10 +160,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
+  nowBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
   nowText: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     color: '#2563EB',
+  },
+  remainingText: {
+    fontSize: 11,
+    fontWeight: '500',
+    color: '#64748B',
   },
   absenceCountText: {
     fontSize: 13,

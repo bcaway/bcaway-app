@@ -146,7 +146,13 @@ export default function TodayScreen() {
                 </View>
               </TouchableOpacity>
             ) : firstAbsent ? (
-              <View>
+              <TouchableOpacity
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/(tabs)/absences');
+                }}
+                activeOpacity={0.7}
+              >
                 <View style={styles.heroMain}>
                   <View style={styles.heroTextGroup}>
                     <Text style={styles.heroTitle}>{firstAbsent.teacher}</Text>
@@ -164,19 +170,15 @@ export default function TodayScreen() {
                       </View>
                     ))}
                     {otherAbsentTeachers.length > 2 && (
-                      <TouchableOpacity
-                        onPress={() => router.push('/(tabs)/absences')}
-                        activeOpacity={0.7}
-                        style={{ marginTop: 8 }}
-                      >
+                      <View style={{ marginTop: 8 }}>
                         <Text style={styles.heroMoreText}>
                           +{otherAbsentTeachers.length - 2} more absent today
                         </Text>
-                      </TouchableOpacity>
+                      </View>
                     )}
                   </View>
                 )}
-              </View>
+              </TouchableOpacity>
             ) : schedule && !schedule.hasSchool ? (
               <View style={styles.heroEmpty}>
                 <Text style={styles.heroEmoji}>🎉</Text>
@@ -215,7 +217,9 @@ export default function TodayScreen() {
             </View>
             {currentPeriod && (
               <Text style={styles.currentPeriodIndicator}>
-                In Mod {currentPeriod.period}
+                {currentPeriod.period.toUpperCase() === 'IGS'
+                  ? 'In IGS'
+                  : `In Period ${currentPeriod.period}`}
               </Text>
             )}
           </View>
