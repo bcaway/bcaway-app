@@ -6,7 +6,7 @@ export interface SchedulePeriod {
 
 export interface DaySchedule {
   hasSchool: boolean;
-  scheduleType: 'fullDays' | 'abbreviatedDays' | 'delayedOpeningDays' | null;
+  scheduleType: string | null;
   periods: SchedulePeriod[];
 }
 

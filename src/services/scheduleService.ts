@@ -3,13 +3,14 @@ import { SchedulePeriod, DaySchedule } from '../types';
 import { getCachedSchedules, setCachedSchedules } from './storage';
 import { timeToSeconds } from '../utils/time';
 
-export type ScheduleType = 'fullDays' | 'abbreviatedDays' | 'delayedOpeningDays';
+export type ScheduleType = 'fullDays' | 'abbreviatedDays' | 'delayedOpeningDays' | string;
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes fresh cache TTL
+const NO_SCHOOL_VALUES = new Set(['noschool', 'no_school', 'none', 'closed', 'holiday', 'off', 'false']);
 
 interface ScheduleCache {
-  periods: Record<ScheduleType, SchedulePeriod[]>;
-  csvs: Record<ScheduleType | 'specialDays', string>;
+  periods: Record<string, SchedulePeriod[]>;
+  csvs: Record<string, string>;
   lastUpdated: number;
 }
 
@@ -54,7 +55,7 @@ async function fetchWithFallback(urls: string[]): Promise<Response | null> {
   return null;
 }
 
-export async function fetchScheduleJSON(type: ScheduleType, forceRefresh: boolean = false): Promise<SchedulePeriod[]> {
+export async function fetchScheduleJSON(type: string, forceRefresh: boolean = false): Promise<SchedulePeriod[]> {
   const candidateUrls = getCandidateUrls(`schedules/${type}.json`, forceRefresh);
   const response = await fetchWithFallback(candidateUrls);
   if (!response) {
@@ -100,18 +101,38 @@ export async function loadAllScheduleData(forceRefresh: boolean = false): Promis
       fetchCalendarCSV('specialDays', forceRefresh),
     ]);
 
-    const periods: Record<ScheduleType, SchedulePeriod[]> = {
+    const periods: Record<string, SchedulePeriod[]> = {
       fullDays: fullP,
       abbreviatedDays: abbrP,
       delayedOpeningDays: delayP,
     };
 
-    const csvs: Record<ScheduleType | 'specialDays', string> = {
+    const csvs: Record<string, string> = {
       fullDays: fullC,
       abbreviatedDays: abbrC,
       delayedOpeningDays: delayC,
       specialDays: specC,
     };
+
+    // Preload all unique schedules specified in specialDays.csv
+    const specialDaysMap = parseSpecialDaysCsv(specC);
+    const uniqueSpecialTypes = new Set<string>();
+    for (const sType of specialDaysMap.values()) {
+      const lower = sType.toLowerCase();
+      if (!NO_SCHOOL_VALUES.has(lower) && !periods[sType]) {
+        uniqueSpecialTypes.add(sType);
+      }
+    }
+
+    await Promise.all(
+      Array.from(uniqueSpecialTypes).map(async (sType) => {
+        try {
+          periods[sType] = await fetchScheduleJSON(sType, forceRefresh);
+        } catch (error) {
+          console.warn(`Could not preload schedule for special day type: ${sType}`, error);
+        }
+      })
+    );
 
     const cacheData: ScheduleCache = { periods, csvs, lastUpdated: Date.now() };
     await setCachedSchedules(cacheData);
@@ -216,8 +237,6 @@ export function parseSpecialDaysCsv(csvText: string): Map<string, string> {
   return map;
 }
 
-const NO_SCHOOL_VALUES = new Set(['noschool', 'no_school', 'none', 'closed', 'holiday', 'off', 'false']);
-
 export async function getScheduleForDate(date: Date, forceRefresh: boolean = false): Promise<DaySchedule> {
   const cache = await loadAllScheduleData(forceRefresh);
   const month = date.getMonth() + 1;
@@ -239,9 +258,17 @@ export async function getScheduleForDate(date: Date, forceRefresh: boolean = fal
         return { hasSchool: false, scheduleType: null, periods: [] };
       }
 
-      const typeKey = schedType as ScheduleType;
-      if (cache.periods[typeKey]) {
-        return { hasSchool: true, scheduleType: typeKey, periods: cache.periods[typeKey] };
+      if (!cache.periods[schedType]) {
+        try {
+          cache.periods[schedType] = await fetchScheduleJSON(schedType, forceRefresh);
+          await setCachedSchedules(cache);
+        } catch (error) {
+          console.error(`Failed to fetch schedule for special day type: ${schedType}`, error);
+        }
+      }
+
+      if (cache.periods[schedType]) {
+        return { hasSchool: true, scheduleType: schedType, periods: cache.periods[schedType] };
       }
     }
   }
