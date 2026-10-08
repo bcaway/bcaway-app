@@ -247,7 +247,7 @@ export async function getScheduleForDate(date: Date, forceRefresh: boolean = fal
   const dd = String(day).padStart(2, '0');
   const lookupKeys = [`${year}-${mm}-${dd}`, `${mm}-${dd}-${year}`, `${month}-${day}-${year}`];
 
-  // 1. Check special days first
+  // 1. Check special days first - always prioritized over full days, abbreviated, delayed, etc.
   const specialDays = parseSpecialDaysCsv(cache.csvs.specialDays);
   for (const key of lookupKeys) {
     if (specialDays.has(key)) {
@@ -267,9 +267,12 @@ export async function getScheduleForDate(date: Date, forceRefresh: boolean = fal
         }
       }
 
-      if (cache.periods[schedType]) {
-        return { hasSchool: true, scheduleType: schedType, periods: cache.periods[schedType] };
-      }
+      // Always prioritize specialDays — do not fall through to fullDays or other calendars
+      return {
+        hasSchool: true,
+        scheduleType: schedType,
+        periods: cache.periods[schedType] || [],
+      };
     }
   }
 
