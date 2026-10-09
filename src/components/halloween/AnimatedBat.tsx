@@ -15,6 +15,7 @@ interface AnimatedBatProps {
   color?: string;
   style?: StyleProp<ViewStyle>;
   delay?: number;
+  swoopTrigger?: number;
 }
 
 export function AnimatedBat({
@@ -22,6 +23,7 @@ export function AnimatedBat({
   color = '#1E293B',
   style,
   delay = 0,
+  swoopTrigger,
 }: AnimatedBatProps) {
   // Proportional height ~ 0.58 of width
   const height = size * 0.58;
@@ -29,6 +31,12 @@ export function AnimatedBat({
   const translateY = useSharedValue(0);
   const rotate = useSharedValue(0);
   const scaleX = useSharedValue(1);
+
+  // Easter egg swoop shared values
+  const swoopX = useSharedValue(0);
+  const swoopY = useSharedValue(0);
+  const swoopRotate = useSharedValue(0);
+  const swoopScale = useSharedValue(1);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -66,12 +74,39 @@ export function AnimatedBat({
     return () => clearTimeout(timer);
   }, [translateY, rotate, scaleX, delay]);
 
+  // Handle Easter egg swoop sequence
+  useEffect(() => {
+    if (swoopTrigger && swoopTrigger > 0) {
+      swoopX.value = withSequence(
+        withTiming(-36, { duration: 250, easing: Easing.out(Easing.quad) }),
+        withTiming(16, { duration: 350, easing: Easing.inOut(Easing.quad) }),
+        withTiming(0, { duration: 250, easing: Easing.inOut(Easing.quad) })
+      );
+      swoopY.value = withSequence(
+        withTiming(20, { duration: 250, easing: Easing.out(Easing.quad) }),
+        withTiming(-14, { duration: 350, easing: Easing.inOut(Easing.quad) }),
+        withTiming(0, { duration: 250, easing: Easing.inOut(Easing.quad) })
+      );
+      swoopRotate.value = withSequence(
+        withTiming(-25, { duration: 140 }),
+        withTiming(360, { duration: 550, easing: Easing.inOut(Easing.quad) }),
+        withTiming(0, { duration: 160 })
+      );
+      swoopScale.value = withSequence(
+        withTiming(1.35, { duration: 250, easing: Easing.out(Easing.back(1.5)) }),
+        withTiming(1, { duration: 600, easing: Easing.inOut(Easing.quad) })
+      );
+    }
+  }, [swoopTrigger, swoopX, swoopY, swoopRotate, swoopScale]);
+
   const animatedStyle = useAnimatedStyle(() => {
     return {
       transform: [
-        { translateY: translateY.value },
-        { rotate: `${rotate.value}deg` },
+        { translateX: swoopX.value },
+        { translateY: translateY.value + swoopY.value },
+        { rotate: `${rotate.value + swoopRotate.value}deg` },
         { scaleX: scaleX.value },
+        { scale: swoopScale.value },
       ],
     };
   });

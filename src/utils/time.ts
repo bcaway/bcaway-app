@@ -26,6 +26,17 @@ export function getGreeting(): string {
   return 'Good evening 🎃';
 }
 
+export function getDaysUntilHalloween(): number {
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  let halloween = new Date(currentYear, 9, 31, 23, 59, 59); // Oct 31 end of day
+  if (now.getTime() > halloween.getTime()) {
+    halloween = new Date(currentYear + 1, 9, 31, 23, 59, 59);
+  }
+  const diffMs = halloween.getTime() - now.getTime();
+  return Math.max(0, Math.ceil(diffMs / (1000 * 60 * 60 * 24)));
+}
+
 export function getCurrentTimeStr(): string {
   const now = new Date();
   const hours = now.getHours().toString().padStart(2, '0');

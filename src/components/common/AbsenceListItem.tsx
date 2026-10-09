@@ -17,13 +17,14 @@ export function AbsenceListItem({
 }: AbsenceListItemProps) {
   const formattedPeriods = formatPeriodsImpacted(teacher.periodsImpacted);
   const isAllDay = formattedPeriods.toLowerCase() === 'all day';
+  const absenceDisplay = isAllDay ? 'Haunting elsewhere (All Day) 👻' : `${formattedPeriods} 👻`;
 
   return (
     <View style={[styles.row, showDivider && styles.divider]}>
       <View style={styles.left}>
         <View style={styles.nameRow}>
           {isStarred && (
-            <Ionicons name="star" size={14} color="#EA580C" style={styles.starIcon} />
+            <Text style={styles.pumpkinIcon}>🎃</Text>
           )}
           <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
             {teacher.teacher}
@@ -36,7 +37,7 @@ export function AbsenceListItem({
           style={[styles.periodsText, isAllDay ? styles.periodsAllDay : styles.periodsPartial]}
           numberOfLines={1}
         >
-          {formattedPeriods}
+          {absenceDisplay}
         </Text>
       </View>
     </View>
@@ -65,8 +66,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 6,
   },
-  starIcon: {
-    marginRight: -1,
+  pumpkinIcon: {
+    fontSize: 13,
+    marginRight: 2,
   },
   name: {
     fontSize: 15,

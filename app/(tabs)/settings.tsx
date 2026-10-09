@@ -63,7 +63,7 @@ export default function SettingsScreen() {
         <View style={styles.wrapper}>
           {/* Section: Starred Teachers */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>MY TEACHERS</Text>
+            <Text style={styles.sectionHeading}>MY TEACHERS 🎃</Text>
             <View style={styles.cardGroup}>
               <TouchableOpacity
                 style={styles.starredRow}
@@ -75,10 +75,10 @@ export default function SettingsScreen() {
               >
                 <View style={styles.starredLeft}>
                   <View style={styles.starBadge}>
-                    <Ionicons name="star" size={16} color="#EA580C" />
+                    <Text style={{ fontSize: 16 }}>🎃</Text>
                   </View>
                   <View style={styles.starredTextContainer}>
-                    <Text style={styles.starredTitle}>Starred Teachers</Text>
+                    <Text style={styles.starredTitle}>Tracked Faculty</Text>
                   </View>
                 </View>
                 <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
@@ -286,11 +286,16 @@ const styles = StyleSheet.create({
   },
   cardGroup: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(234, 88, 12, 0.18)',
     overflow: 'hidden',
     width: '100%',
+    shadowColor: '#EA580C',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.05,
+    shadowRadius: 8,
+    elevation: 2,
   },
   linkRow: {
     flexDirection: 'row',

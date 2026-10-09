@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../../src/context/DataContext';
-import { getGreeting, getCurrentTimeStr, timeToSeconds } from '../../src/utils/time';
+import { getGreeting, getCurrentTimeStr, timeToSeconds, getDaysUntilHalloween } from '../../src/utils/time';
 import { formatPeriodsImpacted, getAbsentTeachersForPeriod } from '../../src/services/absenceService';
 import { TodaySchedule } from '../../src/components/schedule/TodaySchedule';
 import { PeriodWithStatus } from '../../src/types';
@@ -20,6 +20,7 @@ import { BCAwayLogo } from '../../src/components/common/BCAwayLogo';
 import { LoadingScreen } from '../../src/components/common/LoadingScreen';
 import { CornerSpiderWebs } from '../../src/components/halloween/CornerSpiderWebs';
 import { AnimatedBat } from '../../src/components/halloween/AnimatedBat';
+import { GhostEasterEgg } from '../../src/components/halloween/GhostEasterEgg';
 import { PumpkinIllustration } from '../../src/components/halloween/PumpkinIllustration';
 import { MarginLeaves, BottomCornerPumpkins } from '../../src/components/halloween/HalloweenAccents';
 
@@ -42,12 +43,19 @@ export default function TodayScreen() {
   } = useData();
 
   const [refreshing, setRefreshing] = useState(false);
+  const [logoTapTrigger, setLogoTapTrigger] = useState(0);
 
   const onRefresh = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setRefreshing(true);
     await refreshAll();
     setRefreshing(false);
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+  };
+
+  const handleLogoPress = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+    setLogoTapTrigger(prev => prev + 1);
   };
 
   const periodsWithStatus: PeriodWithStatus[] = useMemo(() => {
@@ -70,6 +78,7 @@ export default function TodayScreen() {
   }, [periods, currentPeriod, absentTeachers]);
 
   const greeting = getGreeting();
+  const daysUntilHalloween = getDaysUntilHalloween();
   const isLoading = scheduleLoading || absencesLoading;
   const firstAbsent = starredAbsences.length > 0 ? starredAbsences[0] : null;
   const otherAbsentTeachers = starredAbsences.slice(1);
@@ -97,17 +106,39 @@ export default function TodayScreen() {
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor="#EA580C"
+            title="Summoning today's schedule... 🎃"
+            titleColor="#EA580C"
           />
         }
       >
         <View style={styles.wrapper}>
+          {refreshing && (
+            <View style={styles.cauldronBanner}>
+              <Text style={styles.cauldronBannerText}>
+                🔮 Stirring the cauldron & checking absences... 🎃
+              </Text>
+            </View>
+          )}
+
           {/* Centered Brand Header + Greeting */}
           <View style={styles.header}>
             <View style={styles.logoRow}>
-              <BCAwayLogo width={64} color="#EA580C" />
-              <AnimatedBat size={32} style={styles.headerBat} />
+              <GhostEasterEgg trigger={logoTapTrigger} />
+              <TouchableOpacity
+                onPress={handleLogoPress}
+                activeOpacity={0.8}
+                hitSlop={{ top: 12, bottom: 12, left: 12, right: 12 }}
+              >
+                <BCAwayLogo width={64} color="#EA580C" />
+              </TouchableOpacity>
+              <AnimatedBat size={32} style={styles.headerBat} swoopTrigger={logoTapTrigger} />
             </View>
             <Text style={styles.greeting}>{greeting}</Text>
+            <Text style={styles.countdownSubtext}>
+              {daysUntilHalloween === 0
+                ? '🎃 Happy Halloween! 👻'
+                : `✨ ${daysUntilHalloween} ${daysUntilHalloween === 1 ? 'day' : 'days'} 'til Halloween 🕸️`}
+            </Text>
           </View>
 
           {/* Section: Teacher Absences */}
@@ -145,11 +176,11 @@ export default function TodayScreen() {
                 activeOpacity={0.7}
               >
                 <View style={styles.starPromptIconCircle}>
-                  <Ionicons name="star" size={26} color="#EA580C" />
+                  <Text style={{ fontSize: 24 }}>🎃</Text>
                 </View>
                 <Text style={styles.starPromptTitle}>Track Your Teachers</Text>
                 <View style={styles.starPromptButton}>
-                  <Text style={styles.starPromptButtonText}>Choose Starred Teachers</Text>
+                  <Text style={styles.starPromptButtonText}>Pick Favorite Faculty 🎃</Text>
                   <Ionicons name="arrow-forward" size={13} color="#EA580C" style={{ marginLeft: 4 }} />
                 </View>
               </TouchableOpacity>
@@ -180,7 +211,7 @@ export default function TodayScreen() {
                     {otherAbsentTeachers.length > 2 && (
                       <View style={{ marginTop: 8 }}>
                         <Text style={styles.heroMoreText}>
-                          +{otherAbsentTeachers.length - 2} more absent today
+                          +{otherAbsentTeachers.length - 2} more haunting elsewhere 👻
                         </Text>
                       </View>
                     )}
@@ -190,14 +221,14 @@ export default function TodayScreen() {
             ) : schedule && !schedule.hasSchool ? (
               <View style={styles.heroEmpty}>
                 <PumpkinIllustration size={36} showSparkles={true} />
-                <Text style={styles.heroTitle}>No School Today</Text>
-                <Text style={styles.heroSubtitle}>Enjoy your day off!</Text>
+                <Text style={styles.heroTitle}>No School Today 🎃</Text>
+                <Text style={styles.heroSubtitle}>Enjoy your spooky day off!</Text>
               </View>
             ) : absentTeachers.length === 0 ? (
               <View style={styles.heroEmpty}>
                 <PumpkinIllustration size={36} showSparkles={true} />
-                <Text style={styles.heroTitle}>All Teachers Present</Text>
-                <Text style={styles.heroSubtitle}>No absences reported for today</Text>
+                <Text style={styles.heroTitle}>No Ghosts in Sight! 🎃</Text>
+                <Text style={styles.heroSubtitle}>All faculty accounted for today</Text>
               </View>
             ) : (
               <TouchableOpacity
@@ -209,9 +240,9 @@ export default function TodayScreen() {
                 activeOpacity={0.7}
               >
                 <PumpkinIllustration size={36} showSparkles={true} />
-                <Text style={styles.heroTitle}>Your Teachers are Present</Text>
+                <Text style={styles.heroTitle}>All Your Faculty Present 🎃</Text>
                 <Text style={styles.heroSubtitle}>
-                  {`None of your starred teachers are absent today (${absentTeachers.length} other ${absentTeachers.length === 1 ? 'teacher' : 'teachers'} absent)`}
+                  {`None of your tracked teachers are ghosting today (${absentTeachers.length} other ${absentTeachers.length === 1 ? 'faculty away in the mist' : 'faculty away in the mist'})`}
                 </Text>
               </TouchableOpacity>
             )}
@@ -315,12 +346,42 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#EA580C',
   },
+  countdownSubtext: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#EA580C',
+    marginTop: 4,
+    letterSpacing: -0.2,
+  },
+  cauldronBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF7ED',
+    borderWidth: 1,
+    borderColor: 'rgba(234, 88, 12, 0.25)',
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    marginBottom: 16,
+    alignSelf: 'center',
+  },
+  cauldronBannerText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: '#EA580C',
+  },
   heroCard: {
     padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(234, 88, 12, 0.22)',
     backgroundColor: '#FFFFFF',
+    shadowColor: '#EA580C',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 12,
+    elevation: 3,
   },
   starPromptContainer: {
     paddingVertical: 14,

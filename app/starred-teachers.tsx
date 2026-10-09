@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useData } from '../src/context/DataContext';
 import { Teacher } from '../src/types';
+import { JackOLanternFavorite } from '../src/components/halloween/JackOLanternFavorite';
 
 const REQUEST_TEACHER_URL = 'https://www.bcaway.app/requestteacher';
 
@@ -104,10 +105,10 @@ export default function StarredTeachersScreen() {
           {isPending ? (
             <ActivityIndicator size="small" color="#EA580C" />
           ) : (
-            <Ionicons
-              name={starred ? 'star' : 'star-outline'}
-              size={22}
-              color={starred ? '#EA580C' : '#94A3B8'}
+            <JackOLanternFavorite
+              isStarred={starred}
+              size={24}
+              onPress={() => handleToggle(teacher)}
             />
           )}
         </View>
@@ -198,7 +199,7 @@ export default function StarredTeachersScreen() {
           <View>
             {starredList.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionHeading}>STARRED ({starredList.length})</Text>
+                <Text style={styles.sectionHeading}>TRACKED FACULTY 🎃 ({starredList.length})</Text>
                 <View style={styles.cardGroup}>
                   {starredList.map((teacher, index) =>
                     renderTeacherRow(teacher, index, starredList.length)
@@ -315,9 +316,14 @@ const styles = StyleSheet.create({
   cardGroup: {
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderWidth: 1.5,
+    borderColor: 'rgba(234, 88, 12, 0.22)',
     overflow: 'hidden',
+    shadowColor: '#EA580C',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
   },
   teacherRow: {
     flexDirection: 'row',

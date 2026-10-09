@@ -1,7 +1,11 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons';
 import { Platform, StyleSheet } from 'react-native';
+import {
+  TodayTabIcon,
+  AbsencesTabIcon,
+  SettingsTabIcon,
+} from '../../src/components/halloween/TabBarIcons';
 
 export default function TabLayout() {
   return (
@@ -32,11 +36,7 @@ export default function TabLayout() {
         options={{
           title: 'Today',
           tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons
-              name={focused ? 'calendar' : 'calendar-outline'}
-              size={size - 2}
-              color={color}
-            />
+            <TodayTabIcon color={color} size={size + 2} focused={focused} />
           ),
         }}
       />
@@ -45,11 +45,7 @@ export default function TabLayout() {
         options={{
           title: 'Absences',
           tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons
-              name={focused ? 'people' : 'people-outline'}
-              size={size - 2}
-              color={color}
-            />
+            <AbsencesTabIcon color={color} size={size + 2} focused={focused} />
           ),
         }}
       />
@@ -58,11 +54,7 @@ export default function TabLayout() {
         options={{
           title: 'Settings',
           tabBarIcon: ({ color, size, focused }) => (
-            <Ionicons
-              name={focused ? 'information-circle' : 'information-circle-outline'}
-              size={size - 1}
-              color={color}
-            />
+            <SettingsTabIcon color={color} size={size + 2} focused={focused} />
           ),
         }}
       />

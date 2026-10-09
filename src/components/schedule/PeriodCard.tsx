@@ -62,7 +62,7 @@ export function PeriodCard({
       {isCurrentPeriod && <View style={styles.activeIndicatorBar} />}
 
       {/* Period Identifier Column */}
-      <View style={styles.periodCol}>
+      <View style={[styles.periodCol, isCurrentPeriod && styles.periodColCurrent]}>
         <Text style={[styles.periodText, isCurrentPeriod && styles.periodTextCurrent]}>
           {periodLabel}
         </Text>
@@ -79,6 +79,7 @@ export function PeriodCard({
       <View style={styles.statusCol}>
         {isCurrentPeriod && (
           <View style={styles.nowBadge}>
+            <Text style={styles.candleIcon}>🕯️</Text>
             <Text style={styles.nowText}>Now</Text>
             {remainingText ? (
               <Text style={styles.remainingText}>• {remainingText}</Text>
@@ -125,22 +126,31 @@ const styles = StyleSheet.create({
     left: 0,
     top: 0,
     bottom: 0,
-    width: 3,
+    width: 3.5,
     backgroundColor: '#EA580C',
   },
   periodCol: {
-    width: 34,
-    marginRight: 8,
+    minWidth: 32,
+    paddingHorizontal: 6,
+    paddingVertical: 2.5,
+    borderRadius: 6,
+    backgroundColor: '#F4ECE1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 10,
+  },
+  periodColCurrent: {
+    backgroundColor: '#EA580C',
   },
   periodText: {
-    fontSize: 13,
-    fontWeight: '600',
+    fontSize: 12,
+    fontWeight: '700',
     color: '#64748B',
     fontVariant: ['tabular-nums'],
   },
   periodTextCurrent: {
-    color: '#EA580C',
-    fontWeight: '700',
+    color: '#FFFFFF',
+    fontWeight: '800',
   },
   timeCol: {
     flex: 1,
@@ -163,21 +173,30 @@ const styles = StyleSheet.create({
   nowBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 4,
+    backgroundColor: '#FFEDD5',
+    borderWidth: 1,
+    borderColor: '#FED7AA',
+    borderRadius: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    gap: 3,
+  },
+  candleIcon: {
+    fontSize: 10,
   },
   nowText: {
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '700',
     color: '#EA580C',
   },
   remainingText: {
     fontSize: 11,
-    fontWeight: '500',
-    color: '#64748B',
+    fontWeight: '600',
+    color: '#9A3412',
   },
   absenceCountText: {
     fontSize: 13,
-    fontWeight: '500',
+    fontWeight: '600',
     color: '#DC2626',
   },
   chevron: {

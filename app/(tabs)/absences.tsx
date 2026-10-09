@@ -147,7 +147,7 @@ export default function AbsencesScreen() {
             <View>
               {filteredStarred.length > 0 && (
                 <View style={styles.section}>
-                  <Text style={styles.sectionHeading}>MY TEACHERS ({filteredStarred.length})</Text>
+                  <Text style={styles.sectionHeading}>MY TEACHERS 🎃 ({filteredStarred.length})</Text>
                   <View style={styles.ledger}>
                     {filteredStarred.map((teacher, index) => (
                       <AbsenceListItem
@@ -185,11 +185,11 @@ export default function AbsencesScreen() {
             <View style={styles.emptyCard}>
               <EmptyState
                 icon={searchQuery ? '🔍' : '🎃'}
-                title={searchQuery ? 'No matching teachers' : 'No absences today!'}
+                title={searchQuery ? 'No matching teachers' : 'No ghosts in sight! 🎃'}
                 subtitle={
                   searchQuery
                     ? `No teacher absences match "${searchQuery}".`
-                    : 'All teachers are reported present.'
+                    : 'All faculty are accounted for today.'
                 }
               />
             </View>
@@ -234,12 +234,12 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    borderRadius: 8,
-    borderWidth: 1,
-    borderColor: '#E8E2D9',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 10,
+    borderWidth: 1.5,
+    borderColor: 'rgba(234, 88, 12, 0.20)',
     paddingHorizontal: 12,
-    height: 40,
+    height: 42,
   },
   searchIcon: {
     marginRight: 8,
@@ -281,19 +281,29 @@ const styles = StyleSheet.create({
   },
   ledger: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(234, 88, 12, 0.20)',
     overflow: 'hidden',
     width: '100%',
+    shadowColor: '#EA580C',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
   },
   emptyCard: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderRadius: 14,
+    borderWidth: 1.5,
+    borderColor: 'rgba(234, 88, 12, 0.20)',
     paddingVertical: 20,
     width: '100%',
+    shadowColor: '#EA580C',
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 2,
   },
   loadingContainer: {
     paddingVertical: 80,
