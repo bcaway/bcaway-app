@@ -19,6 +19,7 @@ import { formatTimeRange } from '../../src/utils/time';
 import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { BCAwayLoading } from '../../src/components/common/BCAwayLoading';
+import { CornerSpiderWebs } from '../../src/components/halloween/CornerSpiderWebs';
 
 export default function PeriodDetailScreen() {
   const router = useRouter();
@@ -62,6 +63,7 @@ export default function PeriodDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <CornerSpiderWebs topOffset={0} />
       {/* Navigation Bar */}
       <View style={styles.navBar}>
         <View style={styles.wrapper}>
@@ -72,7 +74,7 @@ export default function PeriodDetailScreen() {
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
               activeOpacity={0.7}
             >
-              <Ionicons name="arrow-back" size={18} color="#2563EB" />
+              <Ionicons name="arrow-back" size={18} color="#EA580C" />
               <Text style={styles.backButtonText}>Today</Text>
             </TouchableOpacity>
 
@@ -91,7 +93,7 @@ export default function PeriodDetailScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#2563EB"
+            tintColor="#EA580C"
           />
         }
       >
@@ -146,7 +148,7 @@ export default function PeriodDetailScreen() {
             ) : (
               <View style={styles.emptyBox}>
                 <EmptyState
-                  icon="🎉"
+                  icon="🎃"
                   title="No teachers absent"
                   subtitle={`All teachers are present for ${displayTitle} today.`}
                 />
@@ -162,12 +164,12 @@ export default function PeriodDetailScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F2',
   },
   navBar: {
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E8E2D9',
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
@@ -186,17 +188,17 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 14,
-    color: '#2563EB',
+    color: '#EA580C',
     fontWeight: '600',
   },
   nowText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#EA580C',
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F2',
   },
   content: {
     paddingHorizontal: 20,
@@ -207,7 +209,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E8E2D9',
   },
   title: {
     fontSize: 22,
@@ -225,7 +227,7 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#EA580C',
     fontVariant: ['tabular-nums'],
   },
   bullet: {
@@ -260,15 +262,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     overflow: 'hidden',
     width: '100%',
   },
   emptyBox: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     paddingVertical: 20,
     width: '100%',
   },

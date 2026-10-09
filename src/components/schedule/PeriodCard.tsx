@@ -108,17 +108,17 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   rowCurrent: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFF7ED',
   },
   rowPast: {
     opacity: 0.5,
   },
   rowPressed: {
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#F7EFE6',
   },
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E8E2D9',
   },
   activeIndicatorBar: {
     position: 'absolute',
@@ -126,7 +126,7 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 3,
-    backgroundColor: '#2563EB',
+    backgroundColor: '#EA580C',
   },
   periodCol: {
     width: 34,
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   periodTextCurrent: {
-    color: '#2563EB',
+    color: '#EA580C',
     fontWeight: '700',
   },
   timeCol: {
@@ -168,7 +168,7 @@ const styles = StyleSheet.create({
   nowText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#2563EB',
+    color: '#EA580C',
   },
   remainingText: {
     fontSize: 11,

@@ -1,11 +1,11 @@
 export const theme = {
   colors: {
-    background: '#FFFFFF',
-    surface: '#F8FAFC',
-    surfaceSubtle: '#F1F5F9',
-    primary: '#2563EB',
-    primarySubtle: '#EFF6FF',
-    accentLight: '#EEF4FE',
+    background: '#FAF7F2', // Darker (not dark) warm cozy autumn background
+    surface: '#FFFFFF',
+    surfaceSubtle: '#F6F2EC',
+    primary: '#EA580C', // Halloween pumpkin orange
+    primarySubtle: '#FFF7ED',
+    accentLight: '#FFEDD5',
     absent: '#DC2626',
     absentBg: '#FEF2F2',
     absentText: '#B91C1C',
@@ -15,10 +15,19 @@ export const theme = {
     textSecondary: '#475569',
     textMuted: '#94A3B8',
     textTertiary: '#94A3B8',
-    border: '#E2E8F0',
-    borderLight: '#F1F5F9',
+    border: '#E8E2D9',
+    borderLight: '#F2ECE3',
     borderStrong: '#CBD5E1',
-    divider: '#E2E8F0',
+    divider: '#E8E2D9',
+    halloween: {
+      orange: '#EA580C',
+      orangeLight: '#F97316',
+      orangeSubtle: '#FFF7ED',
+      warmBg: '#FAF7F2',
+      spiderWeb: '#94A3B8',
+      bat: '#1E293B',
+      pumpkin: '#F97316',
+    },
   },
   typography: {
     sizes: {

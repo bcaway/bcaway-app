@@ -102,12 +102,12 @@ export default function StarredTeachersScreen() {
 
         <View style={styles.starAction}>
           {isPending ? (
-            <ActivityIndicator size="small" color="#F59E0B" />
+            <ActivityIndicator size="small" color="#EA580C" />
           ) : (
             <Ionicons
               name={starred ? 'star' : 'star-outline'}
               size={22}
-              color={starred ? '#F59E0B' : '#94A3B8'}
+              color={starred ? '#EA580C' : '#94A3B8'}
             />
           )}
         </View>
@@ -167,13 +167,13 @@ export default function StarredTeachersScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#2563EB"
+            tintColor="#EA580C"
           />
         }
       >
         {teachersLoading && !refreshing && teachers.length === 0 ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="small" color="#2563EB" />
+            <ActivityIndicator size="small" color="#EA580C" />
             <Text style={styles.loadingText}>Loading faculty directory...</Text>
           </View>
         ) : totalMatches === 0 ? (
@@ -244,12 +244,12 @@ export default function StarredTeachersScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FAF7F2',
   },
   header: {
     backgroundColor: '#FFFFFF',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E8E2D9',
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
@@ -277,7 +277,9 @@ const styles = StyleSheet.create({
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E8E2D9',
     borderRadius: 10,
     paddingHorizontal: 12,
     height: 40,
@@ -293,6 +295,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor: '#FAF7F2',
   },
   content: {
     padding: 20,
@@ -313,7 +316,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     overflow: 'hidden',
   },
   teacherRow: {
@@ -324,7 +327,7 @@ const styles = StyleSheet.create({
   },
   rowDivider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E8E2D9',
   },
   teacherInfo: {
     flex: 1,
@@ -390,7 +393,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   requestLinkHighlight: {
-    color: '#2563EB',
+    color: '#EA580C',
     fontWeight: '600',
     textDecorationLine: 'underline',
   },

@@ -43,7 +43,7 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 9999,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F2',
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: undefined,

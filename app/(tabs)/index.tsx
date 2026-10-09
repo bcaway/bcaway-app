@@ -18,6 +18,10 @@ import { TodaySchedule } from '../../src/components/schedule/TodaySchedule';
 import { PeriodWithStatus } from '../../src/types';
 import { BCAwayLogo } from '../../src/components/common/BCAwayLogo';
 import { LoadingScreen } from '../../src/components/common/LoadingScreen';
+import { CornerSpiderWebs } from '../../src/components/halloween/CornerSpiderWebs';
+import { AnimatedBat } from '../../src/components/halloween/AnimatedBat';
+import { PumpkinIllustration } from '../../src/components/halloween/PumpkinIllustration';
+import { MarginLeaves, BottomCornerPumpkins } from '../../src/components/halloween/HalloweenAccents';
 
 export default function TodayScreen() {
   const router = useRouter();
@@ -76,6 +80,7 @@ export default function TodayScreen() {
 
   return (
     <View style={styles.screen}>
+      <CornerSpiderWebs topOffset={insets.top} />
       <ScrollView
         style={styles.container}
         contentContainerStyle={[
@@ -91,14 +96,17 @@ export default function TodayScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#2563EB"
+            tintColor="#EA580C"
           />
         }
       >
         <View style={styles.wrapper}>
           {/* Centered Brand Header + Greeting */}
           <View style={styles.header}>
-            <BCAwayLogo width={54} color="#2563EB" />
+            <View style={styles.logoRow}>
+              <BCAwayLogo width={64} color="#EA580C" />
+              <AnimatedBat size={32} style={styles.headerBat} />
+            </View>
             <Text style={styles.greeting}>{greeting}</Text>
           </View>
 
@@ -115,7 +123,7 @@ export default function TodayScreen() {
               activeOpacity={0.7}
             >
               <Text style={styles.allAbsencesText}>All Absences</Text>
-              <Ionicons name="arrow-forward" size={13} color="#2563EB" style={{ marginLeft: 4 }} />
+              <Ionicons name="arrow-forward" size={13} color="#EA580C" style={{ marginLeft: 4 }} />
             </TouchableOpacity>
           </View>
 
@@ -137,12 +145,12 @@ export default function TodayScreen() {
                 activeOpacity={0.7}
               >
                 <View style={styles.starPromptIconCircle}>
-                  <Ionicons name="star" size={26} color="#94A3B8" />
+                  <Ionicons name="star" size={26} color="#EA580C" />
                 </View>
                 <Text style={styles.starPromptTitle}>Track Your Teachers</Text>
                 <View style={styles.starPromptButton}>
                   <Text style={styles.starPromptButtonText}>Choose Starred Teachers</Text>
-                  <Ionicons name="arrow-forward" size={13} color="#2563EB" style={{ marginLeft: 4 }} />
+                  <Ionicons name="arrow-forward" size={13} color="#EA580C" style={{ marginLeft: 4 }} />
                 </View>
               </TouchableOpacity>
             ) : firstAbsent ? (
@@ -181,15 +189,15 @@ export default function TodayScreen() {
               </TouchableOpacity>
             ) : schedule && !schedule.hasSchool ? (
               <View style={styles.heroEmpty}>
-                <Text style={styles.heroEmoji}>🎉</Text>
+                <PumpkinIllustration size={36} showSparkles={true} />
                 <Text style={styles.heroTitle}>No School Today</Text>
                 <Text style={styles.heroSubtitle}>Enjoy your day off!</Text>
               </View>
             ) : absentTeachers.length === 0 ? (
               <View style={styles.heroEmpty}>
-                <Text style={styles.heroEmoji}>🎉</Text>
-                <Text style={styles.heroTitle}>No Absences Today</Text>
-                <Text style={styles.heroSubtitle}>No faculty absences reported today</Text>
+                <PumpkinIllustration size={36} showSparkles={true} />
+                <Text style={styles.heroTitle}>All Teachers Present</Text>
+                <Text style={styles.heroSubtitle}>No absences reported for today</Text>
               </View>
             ) : (
               <TouchableOpacity
@@ -200,7 +208,7 @@ export default function TodayScreen() {
                 }}
                 activeOpacity={0.7}
               >
-                <Text style={styles.heroEmoji}>🎉</Text>
+                <PumpkinIllustration size={36} showSparkles={true} />
                 <Text style={styles.heroTitle}>Your Teachers are Present</Text>
                 <Text style={styles.heroSubtitle}>
                   {`None of your starred teachers are absent today (${absentTeachers.length} other ${absentTeachers.length === 1 ? 'teacher' : 'teachers'} absent)`}
@@ -211,6 +219,7 @@ export default function TodayScreen() {
 
           {/* Section: Today's Schedule */}
           <View style={[styles.sectionHeaderRow, { marginTop: 28 }]}>
+            <MarginLeaves />
             <View style={styles.sectionTitleGroup}>
               <Ionicons name="time-outline" size={16} color="#64748B" style={{ marginRight: 6 }} />
               <Text style={styles.sectionTitle}>Today's Schedule</Text>
@@ -224,13 +233,18 @@ export default function TodayScreen() {
             )}
           </View>
 
-          <TodaySchedule
-            periods={periodsWithStatus}
-            isLoading={isLoading}
-            error={scheduleError}
-          />
+          <View style={styles.scheduleWrapper}>
+            <TodaySchedule
+              periods={periodsWithStatus}
+              isLoading={isLoading}
+              error={scheduleError}
+            />
+            {/* Flying bat decoration near bottom right of schedule */}
+            <AnimatedBat size={26} style={styles.scheduleBat} delay={500} />
+          </View>
         </View>
       </ScrollView>
+      <BottomCornerPumpkins />
     </View>
   );
 }
@@ -238,7 +252,7 @@ export default function TodayScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F2',
   },
   container: {
     flex: 1,
@@ -254,6 +268,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 32,
   },
+  logoRow: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  headerBat: {
+    position: 'absolute',
+    top: -12,
+    right: -32,
+  },
   greeting: {
     fontSize: 28,
     fontWeight: '800',
@@ -266,6 +290,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 10,
+    position: 'relative',
   },
   sectionTitleGroup: {
     flexDirection: 'row',
@@ -283,18 +308,18 @@ const styles = StyleSheet.create({
   allAbsencesText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#EA580C',
   },
   currentPeriodIndicator: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#EA580C',
   },
   heroCard: {
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     backgroundColor: '#FFFFFF',
   },
   starPromptContainer: {
@@ -306,7 +331,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F1F5F9',
+    backgroundColor: '#FFF7ED',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
@@ -320,7 +345,7 @@ const styles = StyleSheet.create({
   starPromptButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
+    backgroundColor: '#FFF7ED',
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 8,
@@ -328,7 +353,7 @@ const styles = StyleSheet.create({
   starPromptButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#EA580C',
   },
   heroMain: {
     flexDirection: 'row',
@@ -347,13 +372,13 @@ const styles = StyleSheet.create({
   heroSubtitle: {
     fontSize: 14,
     color: '#64748B',
-    marginTop: 3,
+    marginTop: 4,
     fontWeight: '500',
     textAlign: 'center',
   },
   heroDivider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#E2E8F0',
+    backgroundColor: '#E8E2D9',
     marginVertical: 12,
   },
   heroSecondaryList: {
@@ -377,7 +402,7 @@ const styles = StyleSheet.create({
   },
   heroMoreText: {
     fontSize: 13,
-    color: '#2563EB',
+    color: '#EA580C',
     fontWeight: '600',
   },
   heroEmpty: {
@@ -387,5 +412,14 @@ const styles = StyleSheet.create({
   heroEmoji: {
     fontSize: 28,
     marginBottom: 8,
+  },
+  scheduleWrapper: {
+    position: 'relative',
+  },
+  scheduleBat: {
+    position: 'absolute',
+    bottom: -10,
+    right: -4,
+    zIndex: 5,
   },
 });

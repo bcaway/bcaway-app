@@ -75,7 +75,7 @@ export default function SettingsScreen() {
               >
                 <View style={styles.starredLeft}>
                   <View style={styles.starBadge}>
-                    <Ionicons name="star" size={16} color="#F59E0B" />
+                    <Ionicons name="star" size={16} color="#EA580C" />
                   </View>
                   <View style={styles.starredTextContainer}>
                     <Text style={styles.starredTitle}>Starred Teachers</Text>
@@ -241,7 +241,7 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F2',
   },
   header: {
     paddingHorizontal: 20,
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E8E2D9',
   },
   wrapper: {
     width: '100%',
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F2',
   },
   content: {
     paddingHorizontal: 20,
@@ -288,7 +288,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     overflow: 'hidden',
     width: '100%',
   },
@@ -334,7 +334,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E8E2D9',
   },
   signOutRow: {
     flexDirection: 'row',
@@ -366,7 +366,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: '#FEF3C7',
+    backgroundColor: '#FFF7ED',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,

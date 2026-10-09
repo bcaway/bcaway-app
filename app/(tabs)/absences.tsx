@@ -16,6 +16,7 @@ import { useData } from '../../src/context/DataContext';
 import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { BCAwayLoading } from '../../src/components/common/BCAwayLoading';
+import { CornerSpiderWebs } from '../../src/components/halloween/CornerSpiderWebs';
 
 export default function AbsencesScreen() {
   const {
@@ -72,6 +73,7 @@ export default function AbsencesScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+      <CornerSpiderWebs topOffset={0} />
       <View style={styles.header}>
         <View style={styles.wrapper}>
           <Text style={styles.title}>Teacher Absences</Text>
@@ -124,7 +126,7 @@ export default function AbsencesScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#2563EB"
+            tintColor="#EA580C"
           />
         }
       >
@@ -182,7 +184,7 @@ export default function AbsencesScreen() {
           ) : (
             <View style={styles.emptyCard}>
               <EmptyState
-                icon={searchQuery ? '🔍' : '🎉'}
+                icon={searchQuery ? '🔍' : '🎃'}
                 title={searchQuery ? 'No matching teachers' : 'No absences today!'}
                 subtitle={
                   searchQuery
@@ -201,7 +203,7 @@ export default function AbsencesScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F2',
   },
   header: {
     paddingHorizontal: 20,
@@ -209,7 +211,7 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
     backgroundColor: '#FFFFFF',
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E8E2D9',
   },
   wrapper: {
     width: '100%',
@@ -235,7 +237,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FAFC',
     borderRadius: 8,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     paddingHorizontal: 12,
     height: 40,
   },
@@ -259,7 +261,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F2',
   },
   content: {
     paddingHorizontal: 20,
@@ -281,15 +283,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     overflow: 'hidden',
     width: '100%',
   },
   emptyCard: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     paddingVertical: 20,
     width: '100%',
   },

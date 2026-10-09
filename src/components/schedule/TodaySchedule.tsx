@@ -40,7 +40,7 @@ export function TodaySchedule({ periods, isLoading, error, onPeriodPress }: Toda
     return (
       <View style={styles.emptyBox}>
         <EmptyState
-          icon="🎉"
+          icon="🎃"
           title="No School Today"
           subtitle="No periods scheduled for today. Enjoy your day off!"
         />
@@ -81,14 +81,14 @@ const styles = StyleSheet.create({
   },
   emptyBox: {
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     borderRadius: 12,
     backgroundColor: '#FFFFFF',
     width: '100%',
   },
   ledgerContainer: {
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     borderRadius: 12,
     overflow: 'hidden',
     backgroundColor: '#FFFFFF',

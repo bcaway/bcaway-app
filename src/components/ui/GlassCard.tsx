@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     borderRadius: 8,
   },
   elevated: {
@@ -38,8 +38,8 @@ const styles = StyleSheet.create({
     borderColor: '#CBD5E1',
   },
   accent: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFF7ED',
     borderWidth: 1,
-    borderColor: '#BFDBFE',
+    borderColor: '#FED7AA',
   },
 });

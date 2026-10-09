@@ -17,6 +17,7 @@ import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth, isBergenEmail, isBcawayEmail } from '../src/context/AuthContext';
 import { BCAwayLogo } from '../src/components/common/BCAwayLogo';
+import { CornerSpiderWebs } from '../src/components/halloween/CornerSpiderWebs';
 
 const RESEND_COOLDOWN_SECONDS = 60;
 
@@ -165,6 +166,7 @@ export default function LoginScreen() {
       style={styles.screen}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
+      <CornerSpiderWebs topOffset={insets.top} />
       <ScrollView
         contentContainerStyle={[
           styles.scrollContent,
@@ -181,7 +183,7 @@ export default function LoginScreen() {
         <View style={styles.container}>
           {/* Header */}
           <View style={styles.header}>
-            <BCAwayLogo width={54} color="#2563EB" />
+            <BCAwayLogo width={54} color="#EA580C" />
             <Text style={styles.title}>
               {step === 'email' ? 'Sign in to BCAway' : 'Check your email'}
             </Text>
@@ -349,7 +351,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#FAF7F2',
   },
   scrollContent: {
     flexGrow: 1,
@@ -415,9 +417,9 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     borderRadius: 10,
     paddingHorizontal: 14,
     height: 48,
@@ -438,7 +440,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButton: {
-    backgroundColor: '#2563EB',
+    backgroundColor: '#EA580C',
     height: 44,
     borderRadius: 8,
     flexDirection: 'row',
@@ -447,14 +449,14 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   secondaryButton: {
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
     height: 44,
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
+    borderColor: '#E8E2D9',
     marginBottom: 12,
   },
   secondaryButtonText: {
@@ -478,7 +480,7 @@ const styles = StyleSheet.create({
   actionLinkText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
+    color: '#EA580C',
   },
   legalNotice: {
     marginTop: 18,

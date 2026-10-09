@@ -23,7 +23,7 @@ export function AbsenceListItem({
       <View style={styles.left}>
         <View style={styles.nameRow}>
           {isStarred && (
-            <Ionicons name="star" size={14} color="#F59E0B" style={styles.starIcon} />
+            <Ionicons name="star" size={14} color="#EA580C" style={styles.starIcon} />
           )}
           <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
             {teacher.teacher}
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
+    borderBottomColor: '#E8E2D9',
   },
   left: {
     flex: 1,

@@ -9,9 +9,9 @@ interface StatusBadgeProps {
 export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
   const isSm = size === 'sm';
 
-  let bg = '#EFF6FF';
-  let border = '#BFDBFE';
-  let color = '#1D4ED8';
+  let bg = '#FFF7ED';
+  let border = '#FED7AA';
+  let color = '#EA580C';
   let text = 'Free Period';
 
   if (status === 'away') {

@@ -20,17 +20,24 @@ export function BCAwayLogo({
   // Official geometry: 818 x 348
   const height = (width * 348) / 818;
 
+  // Only apply tintColor if an explicit non-orange override is requested
+  const shouldTint = color && color !== '#EA580C' && color !== '#F97316';
+
   return (
     <View style={[styles.container, style]}>
       <Image
         source={BCAWAY_LOGO_ASSET}
         style={[
           { width, height },
-          color ? { tintColor: color } : null,
+          shouldTint ? { tintColor: color } : null,
         ]}
         resizeMode="contain"
       />
-      {showText && <Text style={[styles.brandText, color ? { color } : null]}>BCAway</Text>}
+      {showText && (
+        <Text style={[styles.brandText, { color: color || '#EA580C' }]}>
+          BCAway
+        </Text>
+      )}
     </View>
   );
 }
