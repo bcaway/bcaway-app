@@ -228,7 +228,7 @@ export default function SettingsScreen() {
 
               <View style={styles.metaRow}>
                 <Text style={styles.metaLabel}>Version</Text>
-                <Text style={styles.metaValue}>{Constants.expoConfig?.version ?? '1.1'}</Text>
+                <Text style={styles.metaValue}>{Constants.expoConfig?.version ?? '1.1.1'}</Text>
               </View>
             </View>
           </View>
