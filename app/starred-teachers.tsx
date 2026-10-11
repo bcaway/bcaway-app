@@ -127,7 +127,7 @@ export default function StarredTeachersScreen() {
             hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             activeOpacity={0.7}
           >
-            <Ionicons name="chevron-back" size={24} color="#1E293B" />
+            <Ionicons name="chevron-back" size={24} color="#F8FAFC" />
           </TouchableOpacity>
           <View style={styles.headerTitles}>
             <Text style={styles.headerTitle}>Starred Teachers</Text>
@@ -140,7 +140,7 @@ export default function StarredTeachersScreen() {
           <TextInput
             style={styles.searchInput}
             placeholder="Search teachers..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor="#64748B"
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCorrect={false}
@@ -179,7 +179,7 @@ export default function StarredTeachersScreen() {
           </View>
         ) : totalMatches === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="search-outline" size={36} color="#94A3B8" />
+            <Ionicons name="search-outline" size={36} color="#64748B" />
             <Text style={styles.emptyTitle}>No teachers found</Text>
             <Text style={styles.emptySub}>
               {searchQuery ? `No results matching "${searchQuery}"` : 'No faculty records available'}
@@ -199,7 +199,7 @@ export default function StarredTeachersScreen() {
           <View>
             {starredList.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionHeading}>TRACKED FACULTY 🎃 ({starredList.length})</Text>
+                <Text style={styles.sectionHeading}>TRACKED FACULTY ({starredList.length})</Text>
                 <View style={styles.cardGroup}>
                   {starredList.map((teacher, index) =>
                     renderTeacherRow(teacher, index, starredList.length)
@@ -245,12 +245,12 @@ export default function StarredTeachersScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#0F031E',
   },
   header: {
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E8E2D9',
+    backgroundColor: '#120424',
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 16,
@@ -272,15 +272,15 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#F8FAFC',
     letterSpacing: -0.3,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 10,
     paddingHorizontal: 12,
     height: 40,
@@ -291,12 +291,12 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#0F172A',
+    color: '#F8FAFC',
     paddingVertical: 0,
   },
   container: {
     flex: 1,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#0F031E',
   },
   content: {
     padding: 20,
@@ -308,32 +308,33 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#94A3B8',
     letterSpacing: 0.6,
     marginBottom: 8,
     marginLeft: 2,
   },
   cardGroup: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     borderRadius: 16,
-    borderWidth: 1.5,
-    borderColor: 'rgba(234, 88, 12, 0.22)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     overflow: 'hidden',
-    shadowColor: '#EA580C',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
   },
   teacherRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 14,
     paddingHorizontal: 16,
+    backgroundColor: '#18072B',
   },
   rowDivider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E8E2D9',
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
   teacherInfo: {
     flex: 1,
@@ -342,10 +343,10 @@ const styles = StyleSheet.create({
   teacherName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#F8FAFC',
   },
   teacherNameStarred: {
-    color: '#0F172A',
+    color: '#FEF08A',
     fontWeight: '700',
   },
   starAction: {
@@ -358,7 +359,7 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 13,
-    color: '#64748B',
+    color: '#94A3B8',
     marginTop: 10,
   },
   emptyState: {
@@ -369,12 +370,12 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#F8FAFC',
     marginTop: 12,
   },
   emptySub: {
     fontSize: 13,
-    color: '#64748B',
+    color: '#94A3B8',
     marginTop: 4,
     textAlign: 'center',
   },
@@ -395,11 +396,11 @@ const styles = StyleSheet.create({
   },
   requestLinkText: {
     fontSize: 13,
-    color: '#64748B',
+    color: '#94A3B8',
     textAlign: 'center',
   },
   requestLinkHighlight: {
-    color: '#EA580C',
+    color: '#F97316',
     fontWeight: '600',
     textDecorationLine: 'underline',
   },

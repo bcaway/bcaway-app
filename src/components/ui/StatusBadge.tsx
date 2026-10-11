@@ -9,20 +9,20 @@ interface StatusBadgeProps {
 export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
   const isSm = size === 'sm';
 
-  let bg = '#FFF7ED';
-  let border = '#FED7AA';
-  let color = '#EA580C';
+  let bg = 'rgba(234, 88, 12, 0.14)';
+  let border = 'rgba(234, 88, 12, 0.25)';
+  let color = '#F97316';
   let text = 'Free Period';
 
   if (status === 'away') {
-    bg = '#FEF2F2';
-    border = '#FECACA';
-    color = '#B91C1C';
+    bg = 'rgba(239, 68, 68, 0.14)';
+    border = 'rgba(239, 68, 68, 0.25)';
+    color = '#FCA5A5';
     text = 'Away';
   } else if (status === 'present') {
-    bg = '#F0FDF4';
-    border = '#BBF7D0';
-    color = '#15803D';
+    bg = 'rgba(34, 197, 94, 0.14)';
+    border = 'rgba(34, 197, 94, 0.25)';
+    color = '#86EFAC';
     text = 'In Class';
   }
 

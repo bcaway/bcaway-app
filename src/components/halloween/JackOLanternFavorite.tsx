@@ -36,10 +36,10 @@ export function JackOLanternFavorite({
     transform: [{ scale: scale.value }],
   }));
 
-  const iconColor = isStarred ? '#EA580C' : '#94A3B8';
-  const innerRidge = isStarred ? '#FB923C' : '#CBD5E1';
-  const faceColor = isStarred ? '#431407' : '#FFFFFF';
-  const stemColor = isStarred ? '#15803D' : '#94A3B8';
+  const iconColor = isStarred ? '#EA580C' : '#475569';
+  const innerRidge = isStarred ? '#FB923C' : '#64748B';
+  const faceColor = '#1C0B35';
+  const stemColor = isStarred ? '#22C55E' : '#475569';
 
   return (
     <Pressable

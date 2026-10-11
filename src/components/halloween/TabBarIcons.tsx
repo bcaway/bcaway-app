@@ -13,14 +13,14 @@ interface TabIconProps {
 export function TodayTabIcon({ color, size = 24, focused = false }: TabIconProps) {
   const iconColor = focused ? '#EA580C' : color;
   const secondaryColor = focused ? '#FB923C' : color;
-  const faceColor = focused ? '#431407' : '#FFFFFF';
+  const faceColor = '#0D021A';
 
   return (
     <Svg width={size} height={size} viewBox="0 0 28 28" fill="none">
       {/* Stem */}
       <Path
         d="M 14 6 C 14 3 16 2 18 1 C 17 4 16 5 15 6 Z"
-        fill={focused ? '#15803D' : iconColor}
+        fill={focused ? '#22C55E' : iconColor}
       />
       {/* Outer Pumpkin Lobes */}
       <Ellipse cx={14} cy={16} rx={12} ry={10} fill={iconColor} />
@@ -43,9 +43,9 @@ export function TodayTabIcon({ color, size = 24, focused = false }: TabIconProps
  * Friendly floating ghost icon for the Absences tab.
  */
 export function AbsencesTabIcon({ color, size = 24, focused = false }: TabIconProps) {
-  const ghostFill = focused ? '#FFFFFF' : '#F1F5F9';
-  const strokeColor = focused ? '#EA580C' : color;
-  const eyeColor = focused ? '#1E293B' : color;
+  const ghostFill = focused ? '#FFFFFF' : '#334155';
+  const strokeColor = focused ? '#F97316' : color;
+  const eyeColor = '#0D021A';
 
   return (
     <Svg width={size} height={size} viewBox="0 0 28 28" fill="none">
@@ -82,9 +82,9 @@ export function AbsencesTabIcon({ color, size = 24, focused = false }: TabIconPr
  * Witch's hat icon for the Settings tab.
  */
 export function SettingsTabIcon({ color, size = 24, focused = false }: TabIconProps) {
-  const hatFill = focused ? '#1E1B4B' : color;
-  const bandColor = focused ? '#EA580C' : '#FFFFFF';
-  const buckleColor = focused ? '#FBBF24' : color;
+  const hatFill = focused ? '#2E1065' : '#1E293B';
+  const bandColor = focused ? '#EA580C' : color;
+  const buckleColor = focused ? '#FEF08A' : color;
 
   return (
     <Svg width={size} height={size} viewBox="0 0 28 28" fill="none">

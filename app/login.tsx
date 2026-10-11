@@ -351,7 +351,7 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#0F031E',
   },
   scrollContent: {
     flexGrow: 1,
@@ -369,7 +369,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#0F172A',
+    color: '#F8FAFC',
     letterSpacing: -0.5,
     marginTop: 16,
     marginBottom: 8,
@@ -377,7 +377,7 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#64748B',
+    color: '#94A3B8',
     lineHeight: 20,
     textAlign: 'center',
     paddingHorizontal: 8,
@@ -385,9 +385,9 @@ const styles = StyleSheet.create({
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#FEF2F2',
+    backgroundColor: 'rgba(239, 68, 68, 0.15)',
     borderWidth: 1,
-    borderColor: '#FECACA',
+    borderColor: 'rgba(239, 68, 68, 0.35)',
     borderRadius: 8,
     padding: 12,
     marginBottom: 20,
@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   errorText: {
     flex: 1,
     fontSize: 13,
-    color: '#B91C1C',
+    color: '#FCA5A5',
     fontWeight: '500',
     lineHeight: 18,
   },
@@ -409,7 +409,7 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#94A3B8',
     letterSpacing: 0.6,
     marginBottom: 8,
     marginLeft: 2,
@@ -417,9 +417,9 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 10,
     paddingHorizontal: 14,
     height: 48,
@@ -431,7 +431,7 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 15,
-    color: '#0F172A',
+    color: '#F8FAFC',
     height: '100%',
   },
   eyeButton: {
@@ -449,20 +449,20 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   secondaryButton: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     height: 44,
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     marginBottom: 12,
   },
   secondaryButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#F8FAFC',
   },
   buttonDisabled: {
     opacity: 0.55,
@@ -480,18 +480,18 @@ const styles = StyleSheet.create({
   actionLinkText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#EA580C',
+    color: '#F97316',
   },
   legalNotice: {
     marginTop: 18,
     fontSize: 12,
     lineHeight: 18,
-    color: '#94A3B8',
+    color: '#64748B',
     textAlign: 'center',
     paddingHorizontal: 8,
   },
   legalLink: {
-    color: '#64748B',
+    color: '#94A3B8',
     textDecorationLine: 'underline',
     fontWeight: '500',
   },

@@ -27,19 +27,19 @@ export function GlassCard({ variant = 'default', children, style, ...props }: Gl
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 8,
   },
   elevated: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#200D3D',
     borderWidth: 1,
-    borderColor: '#CBD5E1',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
   },
   accent: {
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#220E3E',
     borderWidth: 1,
-    borderColor: '#FED7AA',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
   },
 });

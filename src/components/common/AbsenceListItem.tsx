@@ -17,7 +17,7 @@ export function AbsenceListItem({
 }: AbsenceListItemProps) {
   const formattedPeriods = formatPeriodsImpacted(teacher.periodsImpacted);
   const isAllDay = formattedPeriods.toLowerCase() === 'all day';
-  const absenceDisplay = isAllDay ? 'Haunting elsewhere (All Day) 👻' : `${formattedPeriods} 👻`;
+  const absenceDisplay = isAllDay ? 'Haunting elsewhere (All Day)' : formattedPeriods;
 
   return (
     <View style={[styles.row, showDivider && styles.divider]}>
@@ -51,11 +51,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 13,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1C0B35',
   },
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E8E2D9',
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
   left: {
     flex: 1,
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#F8FAFC',
     letterSpacing: -0.2,
   },
   right: {
@@ -85,9 +85,9 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   periodsAllDay: {
-    color: '#DC2626',
+    color: '#F87171',
   },
   periodsPartial: {
-    color: '#64748B',
+    color: '#94A3B8',
   },
 });

@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   RefreshControl,
   TouchableOpacity,
+  AppState,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -22,7 +23,6 @@ import { CornerSpiderWebs } from '../../src/components/halloween/CornerSpiderWeb
 import { AnimatedBat } from '../../src/components/halloween/AnimatedBat';
 import { GhostEasterEgg } from '../../src/components/halloween/GhostEasterEgg';
 import { PumpkinIllustration } from '../../src/components/halloween/PumpkinIllustration';
-import { MarginLeaves, BottomCornerPumpkins } from '../../src/components/halloween/HalloweenAccents';
 
 export default function TodayScreen() {
   const router = useRouter();
@@ -44,9 +44,30 @@ export default function TodayScreen() {
 
   const [refreshing, setRefreshing] = useState(false);
   const [logoTapTrigger, setLogoTapTrigger] = useState(0);
+  const [daysUntilHalloween, setDaysUntilHalloween] = useState(() => getDaysUntilHalloween());
+
+  useEffect(() => {
+    const updateDays = () => {
+      setDaysUntilHalloween(getDaysUntilHalloween());
+    };
+
+    const subscription = AppState.addEventListener('change', nextAppState => {
+      if (nextAppState === 'active') {
+        updateDays();
+      }
+    });
+
+    const interval = setInterval(updateDays, 30000);
+
+    return () => {
+      subscription.remove();
+      clearInterval(interval);
+    };
+  }, []);
 
   const onRefresh = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setDaysUntilHalloween(getDaysUntilHalloween());
     setRefreshing(true);
     await refreshAll();
     setRefreshing(false);
@@ -78,7 +99,6 @@ export default function TodayScreen() {
   }, [periods, currentPeriod, absentTeachers]);
 
   const greeting = getGreeting();
-  const daysUntilHalloween = getDaysUntilHalloween();
   const isLoading = scheduleLoading || absencesLoading;
   const firstAbsent = starredAbsences.length > 0 ? starredAbsences[0] : null;
   const otherAbsentTeachers = starredAbsences.slice(1);
@@ -106,8 +126,8 @@ export default function TodayScreen() {
             refreshing={refreshing}
             onRefresh={onRefresh}
             tintColor="#EA580C"
-            title="Summoning today's schedule... 🎃"
-            titleColor="#EA580C"
+            title="Summoning today's schedule..."
+            titleColor="#F97316"
           />
         }
       >
@@ -115,7 +135,7 @@ export default function TodayScreen() {
           {refreshing && (
             <View style={styles.cauldronBanner}>
               <Text style={styles.cauldronBannerText}>
-                🔮 Stirring the cauldron & checking absences... 🎃
+                🔮 Stirring the cauldron & checking absences...
               </Text>
             </View>
           )}
@@ -136,15 +156,15 @@ export default function TodayScreen() {
             <Text style={styles.greeting}>{greeting}</Text>
             <Text style={styles.countdownSubtext}>
               {daysUntilHalloween === 0
-                ? '🎃 Happy Halloween! 👻'
-                : `✨ ${daysUntilHalloween} ${daysUntilHalloween === 1 ? 'day' : 'days'} 'til Halloween 🕸️`}
+                ? 'Happy Halloween!'
+                : `${daysUntilHalloween} ${daysUntilHalloween === 1 ? 'day' : 'days'} until Halloween`}
             </Text>
           </View>
 
           {/* Section: Teacher Absences */}
           <View style={styles.sectionHeaderRow}>
             <View style={styles.sectionTitleGroup}>
-              <Ionicons name="people-outline" size={16} color="#64748B" style={{ marginRight: 6 }} />
+              <Ionicons name="people-outline" size={16} color="#94A3B8" style={{ marginRight: 6 }} />
               <Text style={styles.sectionTitle}>Teacher Absences</Text>
             </View>
             <TouchableOpacity
@@ -154,7 +174,7 @@ export default function TodayScreen() {
               activeOpacity={0.7}
             >
               <Text style={styles.allAbsencesText}>All Absences</Text>
-              <Ionicons name="arrow-forward" size={13} color="#EA580C" style={{ marginLeft: 4 }} />
+              <Ionicons name="arrow-forward" size={13} color="#F97316" style={{ marginLeft: 4 }} />
             </TouchableOpacity>
           </View>
 
@@ -180,8 +200,8 @@ export default function TodayScreen() {
                 </View>
                 <Text style={styles.starPromptTitle}>Track Your Teachers</Text>
                 <View style={styles.starPromptButton}>
-                  <Text style={styles.starPromptButtonText}>Pick Favorite Faculty 🎃</Text>
-                  <Ionicons name="arrow-forward" size={13} color="#EA580C" style={{ marginLeft: 4 }} />
+                  <Text style={styles.starPromptButtonText}>Pick Favorite Faculty</Text>
+                  <Ionicons name="arrow-forward" size={13} color="#F97316" style={{ marginLeft: 4 }} />
                 </View>
               </TouchableOpacity>
             ) : firstAbsent ? (
@@ -211,7 +231,7 @@ export default function TodayScreen() {
                     {otherAbsentTeachers.length > 2 && (
                       <View style={{ marginTop: 8 }}>
                         <Text style={styles.heroMoreText}>
-                          +{otherAbsentTeachers.length - 2} more haunting elsewhere 👻
+                          +{otherAbsentTeachers.length - 2} more haunting elsewhere
                         </Text>
                       </View>
                     )}
@@ -221,13 +241,13 @@ export default function TodayScreen() {
             ) : schedule && !schedule.hasSchool ? (
               <View style={styles.heroEmpty}>
                 <PumpkinIllustration size={36} showSparkles={true} />
-                <Text style={styles.heroTitle}>No School Today 🎃</Text>
+                <Text style={styles.heroTitle}>No School Today</Text>
                 <Text style={styles.heroSubtitle}>Enjoy your spooky day off!</Text>
               </View>
             ) : absentTeachers.length === 0 ? (
               <View style={styles.heroEmpty}>
                 <PumpkinIllustration size={36} showSparkles={true} />
-                <Text style={styles.heroTitle}>No Ghosts in Sight! 🎃</Text>
+                <Text style={styles.heroTitle}>No Ghosts in Sight!</Text>
                 <Text style={styles.heroSubtitle}>All faculty accounted for today</Text>
               </View>
             ) : (
@@ -240,9 +260,9 @@ export default function TodayScreen() {
                 activeOpacity={0.7}
               >
                 <PumpkinIllustration size={36} showSparkles={true} />
-                <Text style={styles.heroTitle}>All Your Faculty Present 🎃</Text>
+                <Text style={styles.heroTitle}>All Your Faculty Present</Text>
                 <Text style={styles.heroSubtitle}>
-                  {`None of your tracked teachers are ghosting today (${absentTeachers.length} other ${absentTeachers.length === 1 ? 'faculty away in the mist' : 'faculty away in the mist'})`}
+                  {`None of your tracked teachers are absent today (${absentTeachers.length} other ${absentTeachers.length === 1 ? 'faculty away in the mist' : 'faculty away in the mist'})`}
                 </Text>
               </TouchableOpacity>
             )}
@@ -250,9 +270,8 @@ export default function TodayScreen() {
 
           {/* Section: Today's Schedule */}
           <View style={[styles.sectionHeaderRow, { marginTop: 28 }]}>
-            <MarginLeaves />
             <View style={styles.sectionTitleGroup}>
-              <Ionicons name="time-outline" size={16} color="#64748B" style={{ marginRight: 6 }} />
+              <Ionicons name="time-outline" size={16} color="#94A3B8" style={{ marginRight: 6 }} />
               <Text style={styles.sectionTitle}>Today's Schedule</Text>
             </View>
             {currentPeriod && (
@@ -275,7 +294,6 @@ export default function TodayScreen() {
           </View>
         </View>
       </ScrollView>
-      <BottomCornerPumpkins />
     </View>
   );
 }
@@ -283,7 +301,7 @@ export default function TodayScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#0F031E',
   },
   container: {
     flex: 1,
@@ -312,7 +330,7 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#0F172A',
+    color: '#F8FAFC',
     marginTop: 14,
     letterSpacing: -0.6,
   },
@@ -330,7 +348,7 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#475569',
+    color: '#CBD5E1',
   },
   allAbsencesButton: {
     flexDirection: 'row',
@@ -339,17 +357,17 @@ const styles = StyleSheet.create({
   allAbsencesText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#EA580C',
+    color: '#F97316',
   },
   currentPeriodIndicator: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#EA580C',
+    color: '#FEF08A',
   },
   countdownSubtext: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#EA580C',
+    color: '#F97316',
     marginTop: 4,
     letterSpacing: -0.2,
   },
@@ -357,9 +375,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#1E0B33',
     borderWidth: 1,
-    borderColor: 'rgba(234, 88, 12, 0.25)',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     borderRadius: 20,
     paddingHorizontal: 14,
     paddingVertical: 6,
@@ -369,18 +387,18 @@ const styles = StyleSheet.create({
   cauldronBannerText: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#EA580C',
+    color: '#F97316',
   },
   heroCard: {
     padding: 16,
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(234, 88, 12, 0.22)',
-    backgroundColor: '#FFFFFF',
-    shadowColor: '#EA580C',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    backgroundColor: '#18072B',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
     elevation: 3,
   },
   starPromptContainer: {
@@ -392,7 +410,9 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#200B3B',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
@@ -400,13 +420,15 @@ const styles = StyleSheet.create({
   starPromptTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#F8FAFC',
     marginBottom: 12,
   },
   starPromptButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#230E3E',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 8,
@@ -414,7 +436,7 @@ const styles = StyleSheet.create({
   starPromptButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#EA580C',
+    color: '#F97316',
   },
   heroMain: {
     flexDirection: 'row',
@@ -427,19 +449,19 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#F8FAFC',
     letterSpacing: -0.3,
   },
   heroSubtitle: {
     fontSize: 14,
-    color: '#64748B',
+    color: '#94A3B8',
     marginTop: 4,
     fontWeight: '500',
     textAlign: 'center',
   },
   heroDivider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#E8E2D9',
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
     marginVertical: 12,
   },
   heroSecondaryList: {
@@ -454,16 +476,16 @@ const styles = StyleSheet.create({
   heroSecondaryName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1E293B',
+    color: '#F8FAFC',
   },
   heroSecondaryDuration: {
     fontSize: 13,
-    color: '#64748B',
+    color: '#94A3B8',
     fontWeight: '500',
   },
   heroMoreText: {
     fontSize: 13,
-    color: '#EA580C',
+    color: '#F97316',
     fontWeight: '600',
   },
   heroEmpty: {

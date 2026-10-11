@@ -147,7 +147,7 @@ export default function AbsencesScreen() {
             <View>
               {filteredStarred.length > 0 && (
                 <View style={styles.section}>
-                  <Text style={styles.sectionHeading}>MY TEACHERS 🎃 ({filteredStarred.length})</Text>
+                  <Text style={styles.sectionHeading}>MY TEACHERS ({filteredStarred.length})</Text>
                   <View style={styles.ledger}>
                     {filteredStarred.map((teacher, index) => (
                       <AbsenceListItem
@@ -185,7 +185,7 @@ export default function AbsencesScreen() {
             <View style={styles.emptyCard}>
               <EmptyState
                 icon={searchQuery ? '🔍' : '🎃'}
-                title={searchQuery ? 'No matching teachers' : 'No ghosts in sight! 🎃'}
+                title={searchQuery ? 'No matching teachers' : 'No ghosts in sight!'}
                 subtitle={
                   searchQuery
                     ? `No teacher absences match "${searchQuery}".`
@@ -203,15 +203,15 @@ export default function AbsencesScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#0F031E',
   },
   header: {
     paddingHorizontal: 20,
     paddingTop: 14,
     paddingBottom: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#120424',
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E2D9',
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
   wrapper: {
     width: '100%',
@@ -219,12 +219,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#F8FAFC',
     letterSpacing: -0.4,
   },
   subtitle: {
     fontSize: 13,
-    color: '#64748B',
+    color: '#94A3B8',
     marginTop: 2,
     marginBottom: 10,
   },
@@ -234,10 +234,10 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     borderRadius: 10,
-    borderWidth: 1.5,
-    borderColor: 'rgba(234, 88, 12, 0.20)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: 12,
     height: 42,
   },
@@ -247,7 +247,7 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#0F172A',
+    color: '#F8FAFC',
     height: '100%',
     padding: 0,
   },
@@ -256,12 +256,12 @@ const styles = StyleSheet.create({
   },
   searchMeta: {
     fontSize: 12,
-    color: '#64748B',
+    color: '#94A3B8',
     marginTop: 6,
   },
   container: {
     flex: 1,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#0F031E',
   },
   content: {
     paddingHorizontal: 20,
@@ -274,36 +274,36 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#94A3B8',
     letterSpacing: 0.6,
     marginBottom: 8,
     marginLeft: 2,
   },
   ledger: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(234, 88, 12, 0.20)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     overflow: 'hidden',
     width: '100%',
-    shadowColor: '#EA580C',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
   },
   emptyCard: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(234, 88, 12, 0.20)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     paddingVertical: 20,
     width: '100%',
-    shadowColor: '#EA580C',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.06,
-    shadowRadius: 10,
-    elevation: 2,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 8,
+    elevation: 3,
   },
   loadingContainer: {
     paddingVertical: 80,

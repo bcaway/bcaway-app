@@ -105,21 +105,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#1C0B35',
     position: 'relative',
   },
   rowCurrent: {
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#230E3E',
   },
   rowPast: {
-    opacity: 0.5,
+    opacity: 0.45,
   },
   rowPressed: {
-    backgroundColor: '#F7EFE6',
+    backgroundColor: '#271047',
   },
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E8E2D9',
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
   activeIndicatorBar: {
     position: 'absolute',
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6,
     paddingVertical: 2.5,
     borderRadius: 6,
-    backgroundColor: '#F4ECE1',
+    backgroundColor: '#271147',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 10,
@@ -145,7 +145,7 @@ const styles = StyleSheet.create({
   periodText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#94A3B8',
     fontVariant: ['tabular-nums'],
   },
   periodTextCurrent: {
@@ -158,12 +158,12 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#0F172A',
+    color: '#F8FAFC',
     fontVariant: ['tabular-nums'],
   },
   timeTextCurrent: {
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#FEF08A',
   },
   statusCol: {
     flexDirection: 'row',
@@ -173,9 +173,9 @@ const styles = StyleSheet.create({
   nowBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFEDD5',
+    backgroundColor: '#2A1248',
     borderWidth: 1,
-    borderColor: '#FED7AA',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
     borderRadius: 6,
     paddingHorizontal: 6,
     paddingVertical: 2,
@@ -187,17 +187,17 @@ const styles = StyleSheet.create({
   nowText: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#EA580C',
+    color: '#F97316',
   },
   remainingText: {
     fontSize: 11,
     fontWeight: '600',
-    color: '#9A3412',
+    color: '#FDBA74',
   },
   absenceCountText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#DC2626',
+    color: '#F87171',
   },
   chevron: {
     marginLeft: 2,

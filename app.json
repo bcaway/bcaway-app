@@ -5,7 +5,7 @@
     "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "dark",
     "scheme": "bcaway",
     "newArchEnabled": true,
     "experiments": {

@@ -1,31 +1,36 @@
 export const theme = {
   colors: {
-    background: '#FAF7F2', // Darker (not dark) warm cozy autumn background
-    surface: '#FFFFFF',
-    surfaceSubtle: '#F6F2EC',
-    primary: '#EA580C', // Halloween pumpkin orange
-    primarySubtle: '#FFF7ED',
-    accentLight: '#FFEDD5',
-    absent: '#DC2626',
-    absentBg: '#FEF2F2',
-    absentText: '#B91C1C',
-    present: '#16A34A',
-    presentBg: '#F0FDF4',
-    textPrimary: '#0F172A',
-    textSecondary: '#475569',
+    background: '#0F031E', // Spooky twilight midnight purple from official Halloween icon
+    surface: '#18072B',    // Clean dark night-sky card surface
+    surfaceSubtle: '#220B3E',
+    primary: '#EA580C',    // BCAway pumpkin orange accent
+    primaryLight: '#F97316',
+    primarySubtle: 'rgba(234, 88, 12, 0.12)',
+    accentLight: 'rgba(254, 240, 138, 0.12)',
+    moon: '#FEF08A',
+    absent: '#EF4444',
+    absentBg: 'rgba(239, 68, 68, 0.15)',
+    absentText: '#FCA5A5',
+    present: '#22C55E',
+    presentBg: 'rgba(34, 197, 94, 0.15)',
+    textPrimary: '#F8FAFC',   // Moonlit bright white
+    textSecondary: '#CBD5E1', // Starlight soft white/lavender
     textMuted: '#94A3B8',
-    textTertiary: '#94A3B8',
-    border: '#E8E2D9',
-    borderLight: '#F2ECE3',
-    borderStrong: '#CBD5E1',
-    divider: '#E8E2D9',
+    textTertiary: '#64748B',
+    border: 'rgba(255, 255, 255, 0.08)',
+    borderLight: 'rgba(255, 255, 255, 0.05)',
+    borderStrong: 'rgba(255, 255, 255, 0.15)',
+    divider: 'rgba(255, 255, 255, 0.08)',
     halloween: {
+      nightSky: '#0F031E',
+      nightSkyDeep: '#0D021A',
+      cardSurface: '#18072B',
       orange: '#EA580C',
       orangeLight: '#F97316',
-      orangeSubtle: '#FFF7ED',
-      warmBg: '#FAF7F2',
-      spiderWeb: '#94A3B8',
-      bat: '#1E293B',
+      orangeSubtle: 'rgba(234, 88, 12, 0.12)',
+      moon: '#FEF08A',
+      spiderWeb: 'rgba(255, 255, 255, 0.35)',
+      bat: '#0D021A',
       pumpkin: '#F97316',
     },
   },

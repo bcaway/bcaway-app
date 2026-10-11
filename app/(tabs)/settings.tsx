@@ -63,7 +63,7 @@ export default function SettingsScreen() {
         <View style={styles.wrapper}>
           {/* Section: Starred Teachers */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>MY TEACHERS 🎃</Text>
+            <Text style={styles.sectionHeading}>MY TEACHERS</Text>
             <View style={styles.cardGroup}>
               <TouchableOpacity
                 style={styles.starredRow}
@@ -81,7 +81,7 @@ export default function SettingsScreen() {
                     <Text style={styles.starredTitle}>Tracked Faculty</Text>
                   </View>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+                <Ionicons name="chevron-forward" size={18} color="#64748B" />
               </TouchableOpacity>
             </View>
           </View>
@@ -241,15 +241,15 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#0F031E',
   },
   header: {
     paddingHorizontal: 20,
     paddingTop: 14,
     paddingBottom: 14,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#120424',
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E2D9',
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
   wrapper: {
     width: '100%',
@@ -257,17 +257,17 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#F8FAFC',
     letterSpacing: -0.4,
   },
   headerSub: {
     fontSize: 13,
-    color: '#64748B',
+    color: '#94A3B8',
     marginTop: 2,
   },
   container: {
     flex: 1,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#0F031E',
   },
   content: {
     paddingHorizontal: 20,
@@ -280,22 +280,22 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#94A3B8',
     letterSpacing: 0.6,
     marginBottom: 8,
   },
   cardGroup: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     borderRadius: 14,
-    borderWidth: 1.5,
-    borderColor: 'rgba(234, 88, 12, 0.18)',
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     overflow: 'hidden',
     width: '100%',
-    shadowColor: '#EA580C',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 0.05,
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 3,
   },
   linkRow: {
     flexDirection: 'row',
@@ -303,7 +303,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 13,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
   },
   linkLeft: {
     flex: 1,
@@ -312,11 +312,11 @@ const styles = StyleSheet.create({
   linkLabel: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#F8FAFC',
   },
   linkTarget: {
     fontSize: 12,
-    color: '#64748B',
+    color: '#94A3B8',
     marginTop: 1,
   },
   metaRow: {
@@ -325,28 +325,28 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
   },
   metaLabel: {
     fontSize: 14,
     fontWeight: '500',
-    color: '#475569',
+    color: '#94A3B8',
   },
   metaValue: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#F8FAFC',
   },
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E8E2D9',
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
   signOutRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 13,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
   },
   signOutText: {
     fontSize: 14,
@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 14,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
   },
   starredLeft: {
     flexDirection: 'row',
@@ -371,7 +371,7 @@ const styles = StyleSheet.create({
     width: 32,
     height: 32,
     borderRadius: 8,
-    backgroundColor: '#FFF7ED',
+    backgroundColor: '#271047',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -382,6 +382,6 @@ const styles = StyleSheet.create({
   starredTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F172A',
+    color: '#F8FAFC',
   },
 });

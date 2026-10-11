@@ -164,12 +164,12 @@ export default function PeriodDetailScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#0F031E',
   },
   navBar: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#120424',
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E2D9',
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
     paddingHorizontal: 20,
     paddingVertical: 12,
   },
@@ -188,17 +188,17 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 14,
-    color: '#EA580C',
+    color: '#F97316',
     fontWeight: '600',
   },
   nowText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#EA580C',
+    color: '#FEF08A',
   },
   container: {
     flex: 1,
-    backgroundColor: '#FAF7F2',
+    backgroundColor: '#0F031E',
   },
   content: {
     paddingHorizontal: 20,
@@ -209,12 +209,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#E8E2D9',
+    borderBottomColor: 'rgba(255, 255, 255, 0.08)',
   },
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0F172A',
+    color: '#F8FAFC',
     letterSpacing: -0.4,
   },
   metaRow: {
@@ -227,16 +227,16 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#EA580C',
+    color: '#FEF08A',
     fontVariant: ['tabular-nums'],
   },
   bullet: {
-    color: '#94A3B8',
+    color: '#64748B',
     fontSize: 12,
   },
   dateText: {
     fontSize: 13,
-    color: '#64748B',
+    color: '#94A3B8',
   },
   section: {
     marginBottom: 20,
@@ -250,27 +250,27 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
+    color: '#94A3B8',
     letterSpacing: 0.6,
   },
   countText: {
     fontSize: 12,
-    color: '#64748B',
+    color: '#94A3B8',
     fontWeight: '500',
   },
   ledger: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     overflow: 'hidden',
     width: '100%',
   },
   emptyBox: {
-    backgroundColor: '#FFFFFF',
+    backgroundColor: '#18072B',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E8E2D9',
+    borderColor: 'rgba(255, 255, 255, 0.08)',
     paddingVertical: 20,
     width: '100%',
   },
