@@ -22,7 +22,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#0D021A"
       },
       "package": "com.savera.bcaway",
       "versionCode": 3
@@ -36,7 +36,7 @@
       [
         "expo-splash-screen",
         {
-          "backgroundColor": "#FFFFFF",
+          "backgroundColor": "#0D021A",
           "image": "./assets/icon.png",
           "imageWidth": 200
         }
