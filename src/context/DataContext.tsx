@@ -327,7 +327,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         setCurrentPeriod(periodInfo.currentPeriod);
         setNextPeriod(periodInfo.nextPeriod);
       }
-    }, 30000);
+    }, 15000);
     return () => clearInterval(interval);
   }, [periods]);
 

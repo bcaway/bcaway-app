@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   View,
@@ -12,7 +12,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../../src/context/DataContext';
-import { getGreeting, getCurrentTimeStr, timeToSeconds } from '../../src/utils/time';
+import { getGreeting, getCurrentTimeStr, timeToSeconds, getPassingTimeStatus } from '../../src/utils/time';
 import { formatPeriodsImpacted, getAbsentTeachersForPeriod } from '../../src/services/absenceService';
 import { TodaySchedule } from '../../src/components/schedule/TodaySchedule';
 import { PeriodWithStatus } from '../../src/types';
@@ -38,6 +38,17 @@ export default function TodayScreen() {
   } = useData();
 
   const [refreshing, setRefreshing] = useState(false);
+  const [passingTimeStatus, setPassingTimeStatus] = useState<string | null>(() =>
+    getPassingTimeStatus(periods, currentPeriod)
+  );
+
+  useEffect(() => {
+    setPassingTimeStatus(getPassingTimeStatus(periods, currentPeriod));
+    const timer = setInterval(() => {
+      setPassingTimeStatus(getPassingTimeStatus(periods, currentPeriod));
+    }, 15000);
+    return () => clearInterval(timer);
+  }, [periods, currentPeriod]);
 
   const onRefresh = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
@@ -215,13 +226,17 @@ export default function TodayScreen() {
               <Ionicons name="time-outline" size={16} color="#64748B" style={{ marginRight: 6 }} />
               <Text style={styles.sectionTitle}>Today's Schedule</Text>
             </View>
-            {currentPeriod && (
+            {currentPeriod ? (
               <Text style={styles.currentPeriodIndicator}>
                 {currentPeriod.period.toUpperCase() === 'IGS'
                   ? 'In IGS'
                   : `In Period ${currentPeriod.period}`}
               </Text>
-            )}
+            ) : passingTimeStatus ? (
+              <Text style={styles.currentPeriodIndicator}>
+                {passingTimeStatus}
+              </Text>
+            ) : null}
           </View>
 
           <TodaySchedule

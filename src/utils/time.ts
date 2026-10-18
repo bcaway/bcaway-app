@@ -1,3 +1,5 @@
+import { SchedulePeriod } from '../types';
+
 export function timeToSeconds(timeStr: string): number {
   const parts = timeStr.split(':');
   const hours = parseInt(parts[0], 10) || 0;
@@ -50,4 +52,66 @@ export function getTimeRemainingInPeriod(endPeriodTime: string): string | null {
   const mins = Math.ceil(diffSec / 60);
   if (mins <= 1) return '<1m left';
   return `${mins}m left`;
+}
+
+/**
+ * Resolves the passing time / between-periods status message.
+ * Returns e.g. "Period 2 starts in 4m", "IGS starts in 2m", or null if not in a passing/upcoming window.
+ *
+ * Rules:
+ * - When in between periods (meaning there was a period before and there is a period next)
+ * - Or within 10 minutes of the first period
+ */
+export function getPassingTimeStatus(
+  periods: SchedulePeriod[],
+  currentPeriod: SchedulePeriod | null,
+  currentTimeStr?: string
+): string | null {
+  if (!periods || periods.length === 0 || currentPeriod) {
+    return null;
+  }
+
+  const nowSec = timeToSeconds(currentTimeStr || getCurrentTimeStr());
+
+  // Find the next upcoming period that hasn't started yet
+  const nextPeriodIndex = periods.findIndex(p => nowSec < timeToSeconds(p.start));
+  if (nextPeriodIndex === -1) {
+    return null;
+  }
+
+  const nextP = periods[nextPeriodIndex];
+  const nextStartSec = timeToSeconds(nextP.start);
+  const diffSec = nextStartSec - nowSec;
+  if (diffSec <= 0) {
+    return null;
+  }
+
+  const isBeforeFirstPeriod = nextPeriodIndex === 0;
+  const isBetweenPeriods = nextPeriodIndex > 0;
+
+  // If before the first period, only show if within 10 minutes (600 seconds)
+  if (isBeforeFirstPeriod && diffSec > 600) {
+    return null;
+  }
+
+  if (!isBeforeFirstPeriod && !isBetweenPeriods) {
+    return null;
+  }
+
+  // If between periods, verify previous period has actually finished
+  if (isBetweenPeriods) {
+    const prevP = periods[nextPeriodIndex - 1];
+    const prevEndSec = timeToSeconds(prevP.end);
+    if (nowSec < prevEndSec) {
+      return null;
+    }
+  }
+
+  const mins = Math.ceil(diffSec / 60);
+  const timeStr = mins <= 1 ? '<1m' : `${mins}m`;
+  const cleanPeriod = nextP.period.replace(/_+$/, '');
+  const isIGS = cleanPeriod.toUpperCase() === 'IGS';
+  const periodLabel = isIGS ? 'IGS' : `Period ${cleanPeriod}`;
+
+  return `${periodLabel} starts in ${timeStr}`;
 }
