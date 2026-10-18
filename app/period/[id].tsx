@@ -12,8 +12,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { format } from 'date-fns';
-import { useSchedule } from '../../src/hooks/useSchedule';
-import { useAbsences } from '../../src/hooks/useAbsences';
+import { useData } from '../../src/context/DataContext';
 import { getAbsentTeachersForPeriod } from '../../src/services/absenceService';
 import { formatTimeRange } from '../../src/utils/time';
 import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
@@ -25,14 +24,21 @@ export default function PeriodDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const periodId = Array.isArray(id) ? id[0] : id || '';
 
-  const { periods, currentPeriod, refresh: refreshSchedule } = useSchedule();
-  const { absentTeachers, isLoading, error, refresh: refreshAbsences } = useAbsences();
+  const {
+    periods,
+    currentPeriod,
+    absentTeachers,
+    absencesLoading: isLoading,
+    absencesError: error,
+    starredAbsences,
+    refreshAll,
+  } = useData();
   const [refreshing, setRefreshing] = useState(false);
 
   const onRefresh = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     setRefreshing(true);
-    await Promise.all([refreshSchedule(), refreshAbsences()]);
+    await refreshAll();
     setRefreshing(false);
   };
 
@@ -53,9 +59,29 @@ export default function PeriodDetailScreen() {
     return currentPeriod?.period.toLowerCase() === periodId.toLowerCase();
   }, [currentPeriod, periodId]);
 
-  const periodAbsences = useMemo(() => {
-    return getAbsentTeachersForPeriod(absentTeachers, periodId);
-  }, [absentTeachers, periodId]);
+  const starredTeacherNames = useMemo(() => {
+    return new Set(starredAbsences.map(a => a.teacher.trim().toLowerCase()));
+  }, [starredAbsences]);
+
+  const { starredPeriodAbsences, otherPeriodAbsences, totalPeriodCount } = useMemo(() => {
+    const list = getAbsentTeachersForPeriod(absentTeachers, periodId);
+    const starred: typeof list = [];
+    const other: typeof list = [];
+
+    for (const item of list) {
+      if (starredTeacherNames.has(item.teacher.trim().toLowerCase())) {
+        starred.push(item);
+      } else {
+        other.push(item);
+      }
+    }
+
+    return {
+      starredPeriodAbsences: starred,
+      otherPeriodAbsences: other,
+      totalPeriodCount: list.length,
+    };
+  }, [absentTeachers, periodId, starredTeacherNames]);
 
   const displayTitle = periodId.toUpperCase() === 'IGS' ? 'Period IGS' : `Period ${periodId}`;
   const todayString = format(new Date(), 'EEEE, MMMM d');
@@ -114,9 +140,9 @@ export default function PeriodDetailScreen() {
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.sectionTitle}>ABSENT THIS PERIOD</Text>
-              {periodAbsences.length > 0 && (
+              {totalPeriodCount > 0 && (
                 <Text style={styles.countText}>
-                  {periodAbsences.length} {periodAbsences.length === 1 ? 'teacher' : 'teachers'}
+                  {totalPeriodCount} {totalPeriodCount === 1 ? 'teacher' : 'teachers'}
                 </Text>
               )}
             </View>
@@ -133,15 +159,45 @@ export default function PeriodDetailScreen() {
                   subtitle="Could not retrieve database records. Pull down to retry."
                 />
               </View>
-            ) : periodAbsences.length > 0 ? (
-              <View style={styles.ledger}>
-                {periodAbsences.map((teacher, index) => (
-                  <AbsenceListItem
-                    key={teacher.id}
-                    teacher={teacher}
-                    showDivider={index < periodAbsences.length - 1}
-                  />
-                ))}
+            ) : totalPeriodCount > 0 ? (
+              <View>
+                {starredPeriodAbsences.length > 0 && (
+                  <View style={styles.subSection}>
+                    <Text style={styles.subSectionHeading}>
+                      MY TEACHERS ({starredPeriodAbsences.length})
+                    </Text>
+                    <View style={styles.ledger}>
+                      {starredPeriodAbsences.map((teacher, index) => (
+                        <AbsenceListItem
+                          key={teacher.id}
+                          teacher={teacher}
+                          isStarred={true}
+                          showDivider={index < starredPeriodAbsences.length - 1}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                )}
+
+                {otherPeriodAbsences.length > 0 && (
+                  <View style={starredPeriodAbsences.length > 0 ? styles.subSectionOther : undefined}>
+                    {starredPeriodAbsences.length > 0 && (
+                      <Text style={styles.subSectionHeading}>
+                        OTHER ABSENCES ({otherPeriodAbsences.length})
+                      </Text>
+                    )}
+                    <View style={styles.ledger}>
+                      {otherPeriodAbsences.map((teacher, index) => (
+                        <AbsenceListItem
+                          key={teacher.id}
+                          teacher={teacher}
+                          isStarred={false}
+                          showDivider={index < otherPeriodAbsences.length - 1}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                )}
               </View>
             ) : (
               <View style={styles.emptyBox}>
@@ -238,6 +294,20 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 20,
+  },
+  subSection: {
+    marginBottom: 16,
+  },
+  subSectionOther: {
+    marginBottom: 0,
+  },
+  subSectionHeading: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: '#64748B',
+    letterSpacing: 0.6,
+    marginBottom: 8,
+    marginLeft: 2,
   },
   sectionHeader: {
     flexDirection: 'row',

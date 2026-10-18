@@ -53,9 +53,11 @@ export function expandPeriods(periodsImpacted?: string): Set<string> {
       }
       continue;
     }
-    // Single numerical period
-    if (/^\d+$/.test(token)) {
-      result.add(token);
+    // Single numerical period or named token
+    result.add(token);
+    const cleanToken = token.replace(/_+$/, '');
+    if (cleanToken) {
+      result.add(cleanToken);
     }
   }
 
@@ -63,8 +65,53 @@ export function expandPeriods(periodsImpacted?: string): Set<string> {
 }
 
 /**
+ * Compresses an iterable of period tokens into ranges (e.g. ['1', '2', '3', '4'] -> "1-4").
+ */
+export function compressPeriodTokens(tokens: Iterable<string>): string {
+  const numericPeriods: number[] = [];
+  const nonNumericTokens: string[] = [];
+
+  for (const token of tokens) {
+    const trimmed = token.trim();
+    if (!trimmed) continue;
+    if (/^\d+$/.test(trimmed)) {
+      numericPeriods.push(parseInt(trimmed, 10));
+    } else {
+      const cleanToken = trimmed.replace(/_+$/, '');
+      const formatted = cleanToken.toUpperCase() === 'IGS' ? 'IGS' : cleanToken;
+      if (!nonNumericTokens.includes(formatted)) {
+        nonNumericTokens.push(formatted);
+      }
+    }
+  }
+
+  numericPeriods.sort((a, b) => a - b);
+  const uniqueNums = Array.from(new Set(numericPeriods));
+
+  const ranges: string[] = [];
+  let i = 0;
+  while (i < uniqueNums.length) {
+    const start = uniqueNums[i];
+    let end = start;
+    while (i + 1 < uniqueNums.length && uniqueNums[i + 1] === end + 1) {
+      end = uniqueNums[i + 1];
+      i++;
+    }
+    if (start === end) {
+      ranges.push(String(start));
+    } else {
+      ranges.push(`${start}-${end}`);
+    }
+    i++;
+  }
+
+  const allParts = [...nonNumericTokens, ...ranges];
+  return allParts.join(', ');
+}
+
+/**
  * Formats periods impacted for display in the UI.
- * e.g. "All Day" for full days, or "Periods: 1, 2, 3"
+ * e.g. "All Day" for full days, or "Periods: 1-4"
  */
 export function formatPeriodsImpacted(periodsImpacted?: string): string {
   if (!periodsImpacted) return 'All Day';
@@ -77,21 +124,31 @@ export function formatPeriodsImpacted(periodsImpacted?: string): string {
   if (expanded.size >= 10) {
     return 'All Day';
   }
-  if (lower.startsWith('period')) {
+  const compressed = compressPeriodTokens(expanded);
+  if (!compressed) {
     return trimmed;
   }
-  return `Periods: ${trimmed}`;
+  return `Periods: ${compressed}`;
 }
 
 /**
  * Checks whether a teacher's absence includes the specified period.
- * e.g. periodName = '1', 'IGS', '2', etc.
+ * e.g. periodName = '1', 'IGS', 'PSAT_', etc.
+ * All-day absences match every period of the day.
  */
 export function isTeacherAbsentInPeriod(periodsImpacted: string, periodName: string): boolean {
   if (!periodName) return false;
-  const p = periodName.trim().toLowerCase();
+  if (!periodsImpacted) return true;
+  const lower = periodsImpacted.trim().toLowerCase();
+  if (lower === 'all' || lower === 'all day') {
+    return true;
+  }
   const expanded = expandPeriods(periodsImpacted);
-  return expanded.has(p);
+  if (expanded.size >= 10) {
+    return true;
+  }
+  const p = periodName.trim().toLowerCase();
+  return expanded.has(p) || expanded.has(p.replace(/_+$/, ''));
 }
 
 /**
