@@ -61,7 +61,17 @@ export async function fetchScheduleJSON(type: string, forceRefresh: boolean = fa
   if (!response) {
     throw new Error(`Failed to fetch ${type}.json from GitHub`);
   }
-  const rawData = await response.json();
+  const text = await response.text();
+  let rawData: unknown;
+  try {
+    rawData = JSON.parse(text);
+  } catch {
+    // Strip trailing commas before closing braces/brackets and comments, then retry
+    const sanitized = text
+      .replace(/,\s*([}\]])/g, '$1')
+      .replace(/\/\*[\s\S]*?\*\/|([^:]|^)\/\/.*$/gm, '$1');
+    rawData = JSON.parse(sanitized);
+  }
   if (Array.isArray(rawData)) {
     return rawData.map(item => ({
       period: String(item.period),
