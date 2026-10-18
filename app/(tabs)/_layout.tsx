@@ -1,9 +1,32 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
+import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { Platform, StyleSheet } from 'react-native';
 
 export default function TabLayout() {
+  if (Platform.OS === 'ios') {
+    return (
+      <NativeTabs
+        tintColor="#2563EB"
+        minimizeBehavior="automatic"
+      >
+        <NativeTabs.Trigger name="index">
+          <NativeTabs.Trigger.Label>Today</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf="calendar" />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="absences">
+          <NativeTabs.Trigger.Label>Absences</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf="person.2" />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="settings">
+          <NativeTabs.Trigger.Label>Settings</NativeTabs.Trigger.Label>
+          <NativeTabs.Trigger.Icon sf="gearshape" />
+        </NativeTabs.Trigger>
+      </NativeTabs>
+    );
+  }
+
   return (
     <Tabs
       screenOptions={{
@@ -14,9 +37,9 @@ export default function TabLayout() {
           borderTopWidth: StyleSheet.hairlineWidth,
           elevation: 0,
           shadowOpacity: 0,
-          height: Platform.OS === 'ios' ? 84 : 58,
+          height: 58,
           paddingTop: 6,
-          paddingBottom: Platform.OS === 'ios' ? 24 : 6,
+          paddingBottom: 6,
         },
         tabBarActiveTintColor: '#2563EB',
         tabBarInactiveTintColor: '#64748B',
