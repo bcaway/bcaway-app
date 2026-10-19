@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, Pressable } from 'react-native';
+import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { SchedulePeriod } from '../../types';
@@ -50,6 +50,7 @@ export function PeriodCard({
     <Pressable
       onPress={handlePress}
       disabled={!onPress}
+      android_ripple={{ color: 'rgba(0, 0, 0, 0.05)' }}
       style={({ pressed }) => [
         styles.row,
         isCurrentPeriod && styles.rowCurrent,

@@ -5,19 +5,21 @@ import {
   Text,
   ScrollView,
   TextInput,
-  SafeAreaView,
   RefreshControl,
   TouchableOpacity,
+  Platform,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { format } from 'date-fns';
 import { useData } from '../../src/context/DataContext';
 import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { BCAwayLoading } from '../../src/components/common/BCAwayLoading';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AbsencesScreen() {
+  const insets = useSafeAreaInsets();
   const {
     absentTeachers,
     starredAbsences,
@@ -71,7 +73,8 @@ export default function AbsencesScreen() {
   const todayString = format(new Date(), 'EEEE, MMMM d');
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={[styles.screen, { paddingTop: insets.top }]}>
+      {/* Sleek standard-sized header across all platforms */}
       <View style={styles.header}>
         <View style={styles.wrapper}>
           <Text style={styles.title}>Teacher Absences</Text>
@@ -80,9 +83,15 @@ export default function AbsencesScreen() {
             {absentTeachers.length > 0 ? ` • ${absentTeachers.length} absent` : ''}
           </Text>
 
+          {/* Unified search bar adapted to each platform */}
           <View style={styles.searchRow}>
             <View style={styles.searchInputContainer}>
-              <Ionicons name="search" size={16} color="#64748B" style={styles.searchIcon} />
+              <Ionicons
+                name="search"
+                size={16}
+                color="#64748B"
+                style={styles.searchIcon}
+              />
               <TextInput
                 style={styles.searchInput}
                 placeholder="Search by teacher name or period..."
@@ -100,7 +109,11 @@ export default function AbsencesScreen() {
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                   style={styles.clearButton}
                 >
-                  <Ionicons name="close-circle" size={16} color="#94A3B8" />
+                  <Ionicons
+                    name="close-circle"
+                    size={16}
+                    color="#94A3B8"
+                  />
                 </TouchableOpacity>
               )}
             </View>
@@ -116,7 +129,13 @@ export default function AbsencesScreen() {
 
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingLeft: Math.max(insets.left, 20),
+            paddingRight: Math.max(insets.right, 20),
+          },
+        ]}
         showsVerticalScrollIndicator={false}
         keyboardDismissMode="on-drag"
         keyboardShouldPersistTaps="handled"
@@ -137,19 +156,20 @@ export default function AbsencesScreen() {
             <View style={styles.emptyCard}>
               <EmptyState
                 icon="⚠️"
-                title="Unable to load absences"
-                subtitle="Could not connect to the database. Pull down to retry."
+                title="Could not load absences"
+                subtitle="Please check your connection and pull down to refresh."
               />
             </View>
           ) : totalFilteredCount > 0 ? (
             <View>
+              {/* Starred Faculty Section */}
               {filteredStarred.length > 0 && (
                 <View style={styles.section}>
-                  <Text style={styles.sectionHeading}>MY TEACHERS ({filteredStarred.length})</Text>
+                  <Text style={styles.sectionHeading}>Starred Faculty</Text>
                   <View style={styles.ledger}>
                     {filteredStarred.map((teacher, index) => (
                       <AbsenceListItem
-                        key={teacher.id}
+                        key={`starred-${teacher.teacher}-${index}`}
                         teacher={teacher}
                         isStarred={true}
                         showDivider={index < filteredStarred.length - 1}
@@ -159,17 +179,16 @@ export default function AbsencesScreen() {
                 </View>
               )}
 
+              {/* Other Faculty Section */}
               {filteredOther.length > 0 && (
                 <View style={styles.section}>
                   {filteredStarred.length > 0 && (
-                    <Text style={styles.sectionHeading}>
-                      {searchQuery.trim() ? 'OTHER ABSENCES' : 'ALL ABSENCES'}
-                    </Text>
+                    <Text style={styles.sectionHeading}>Other Faculty</Text>
                   )}
                   <View style={styles.ledger}>
                     {filteredOther.map((teacher, index) => (
                       <AbsenceListItem
-                        key={teacher.id}
+                        key={`other-${teacher.teacher}-${index}`}
                         teacher={teacher}
                         isStarred={false}
                         showDivider={index < filteredOther.length - 1}
@@ -194,12 +213,12 @@ export default function AbsencesScreen() {
           )}
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  screen: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
@@ -208,7 +227,7 @@ const styles = StyleSheet.create({
     paddingTop: 14,
     paddingBottom: 14,
     backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E2E8F0',
   },
   wrapper: {
@@ -232,8 +251,8 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
-    borderRadius: 8,
+    backgroundColor: '#F1F5F9',
+    borderRadius: 10,
     borderWidth: 1,
     borderColor: '#E2E8F0',
     paddingHorizontal: 12,
@@ -270,12 +289,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionHeading: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
     color: '#64748B',
-    letterSpacing: 0.6,
+    letterSpacing: 0.5,
     marginBottom: 8,
-    marginLeft: 2,
+    textTransform: 'uppercase',
   },
   ledger: {
     backgroundColor: '#FFFFFF',

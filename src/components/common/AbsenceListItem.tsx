@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { TeacherAbsence } from '../../types';
 import { formatPeriodsImpacted } from '../../services/absenceService';
@@ -19,42 +19,48 @@ export function AbsenceListItem({
   const isAllDay = formattedPeriods.toLowerCase() === 'all day';
 
   return (
-    <View style={[styles.row, showDivider && styles.divider]}>
-      <View style={styles.left}>
-        <View style={styles.nameRow}>
-          {isStarred && (
-            <Ionicons name="star" size={14} color="#F59E0B" style={styles.starIcon} />
-          )}
-          <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
-            {teacher.teacher}
+    <View style={styles.container}>
+      <View style={styles.row}>
+        <View style={styles.left}>
+          <View style={styles.nameRow}>
+            {isStarred && (
+              <Ionicons name="star" size={14} color="#F59E0B" style={styles.starIcon} />
+            )}
+            <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+              {teacher.teacher}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.right}>
+          <Text
+            style={[styles.periodsText, isAllDay ? styles.periodsAllDay : styles.periodsPartial]}
+            numberOfLines={1}
+          >
+            {formattedPeriods}
           </Text>
         </View>
       </View>
-
-      <View style={styles.right}>
-        <Text
-          style={[styles.periodsText, isAllDay ? styles.periodsAllDay : styles.periodsPartial]}
-          numberOfLines={1}
-        >
-          {formattedPeriods}
-        </Text>
-      </View>
+      {showDivider && <View style={styles.divider} />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#FFFFFF',
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 13,
+    paddingVertical: Platform.OS === 'android' ? 14 : 12,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    minHeight: Platform.OS === 'android' ? 48 : 44,
   },
   divider: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
+    height: StyleSheet.hairlineWidth,
+    backgroundColor: '#E2E8F0',
   },
   left: {
     flex: 1,
@@ -89,3 +95,4 @@ const styles = StyleSheet.create({
     color: '#64748B',
   },
 });
+

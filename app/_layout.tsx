@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -38,8 +39,28 @@ function RootLayoutContent() {
       <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">
         <Stack.Screen name="login" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen name="starred-teachers" options={{ headerShown: false }} />
-        <Stack.Screen name="period/[id]" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="starred-teachers"
+          options={{
+            presentation: Platform.OS === 'ios' ? 'formSheet' : 'card',
+            sheetAllowedDetents: [0.8, 1.0],
+            sheetGrabberVisible: true,
+            sheetCornerRadius: 28,
+            sheetExpandsWhenScrolledToEdge: true,
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="period/[id]"
+          options={{
+            presentation: Platform.OS === 'ios' ? 'formSheet' : 'card',
+            sheetAllowedDetents: [0.65, 1.0],
+            sheetGrabberVisible: true,
+            sheetCornerRadius: 28,
+            sheetExpandsWhenScrolledToEdge: true,
+            headerShown: false,
+          }}
+        />
         <Stack.Screen name="+not-found" options={{ presentation: 'modal' }} />
       </Stack>
     </>

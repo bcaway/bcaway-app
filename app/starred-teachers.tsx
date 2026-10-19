@@ -10,6 +10,7 @@ import {
   RefreshControl,
   ActivityIndicator,
   Linking,
+  Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -120,14 +121,16 @@ export default function StarredTeachersScreen() {
       {/* Top Header */}
       <View style={styles.header}>
         <View style={styles.headerRow}>
-          <TouchableOpacity
-            style={styles.backButton}
-            onPress={() => router.back()}
-            hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-            activeOpacity={0.7}
-          >
-            <Ionicons name="chevron-back" size={24} color="#1E293B" />
-          </TouchableOpacity>
+          {Platform.OS !== 'ios' && (
+            <TouchableOpacity
+              style={styles.backButton}
+              onPress={() => router.back()}
+              hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+              activeOpacity={0.7}
+            >
+              <Ionicons name="chevron-back" size={24} color="#1E293B" />
+            </TouchableOpacity>
+          )}
           <View style={styles.headerTitles}>
             <Text style={styles.headerTitle}>Starred Teachers</Text>
           </View>
@@ -244,14 +247,14 @@ export default function StarredTeachersScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F8FAFC',
+    backgroundColor: '#FFFFFF',
   },
   header: {
     backgroundColor: '#FFFFFF',
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E2E8F0',
     paddingHorizontal: 20,
-    paddingTop: 12,
+    paddingTop: Platform.OS === 'ios' ? 24 : 12,
     paddingBottom: 16,
   },
   headerRow: {
@@ -293,6 +296,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+    backgroundColor: '#FFFFFF',
   },
   content: {
     padding: 20,
@@ -311,7 +315,7 @@ const styles = StyleSheet.create({
   },
   cardGroup: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 16,
+    borderRadius: 12,
     borderWidth: 1,
     borderColor: '#E2E8F0',
     overflow: 'hidden',

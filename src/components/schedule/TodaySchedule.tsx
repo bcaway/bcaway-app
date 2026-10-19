@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { useRouter } from 'expo-router';
 import { BCAwayLoading } from '../common/BCAwayLoading';
 import { PeriodCard } from './PeriodCard';
@@ -95,3 +95,4 @@ const styles = StyleSheet.create({
     width: '100%',
   },
 });
+

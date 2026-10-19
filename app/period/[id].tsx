@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   TouchableOpacity,
   RefreshControl,
+  Platform,
 } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
@@ -88,30 +89,39 @@ export default function PeriodDetailScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      {/* Navigation Bar */}
-      <View style={styles.navBar}>
-        <View style={styles.wrapper}>
-          <View style={styles.navBarInner}>
-            <TouchableOpacity
-              style={styles.backButton}
-              onPress={handleBack}
-              hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
-              activeOpacity={0.7}
-            >
-              <Ionicons name="arrow-back" size={18} color="#2563EB" />
-              <Text style={styles.backButtonText}>Today</Text>
-            </TouchableOpacity>
+      {/* Navigation Bar for non-iOS (on iOS sheet popouts, swipe down dismisses) */}
+      {Platform.OS !== 'ios' && (
+        <View style={styles.navBar}>
+          <View style={styles.wrapper}>
+            <View style={styles.navBarInner}>
+              <TouchableOpacity
+                style={styles.backButton}
+                onPress={handleBack}
+                hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                activeOpacity={0.7}
+              >
+                <Ionicons
+                  name="chevron-back"
+                  size={18}
+                  color="#2563EB"
+                />
+                <Text style={styles.backButtonText}>Today</Text>
+              </TouchableOpacity>
 
-            {isCurrentPeriod && (
-              <Text style={styles.nowText}>In progress</Text>
-            )}
+              {isCurrentPeriod && (
+                <Text style={styles.nowText}>In progress</Text>
+              )}
+            </View>
           </View>
         </View>
-      </View>
+      )}
 
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          Platform.OS === 'ios' && { paddingTop: 24 },
+        ]}
         showsVerticalScrollIndicator={false}
         refreshControl={
           <RefreshControl
@@ -124,7 +134,12 @@ export default function PeriodDetailScreen() {
         <View style={styles.wrapper}>
           {/* Period Header */}
           <View style={styles.heroHeader}>
-            <Text style={styles.title}>{displayTitle}</Text>
+            <View style={styles.titleRow}>
+              <Text style={styles.title}>{displayTitle}</Text>
+              {Platform.OS === 'ios' && isCurrentPeriod && (
+                <Text style={styles.nowText}>In progress</Text>
+              )}
+            </View>
             <View style={styles.metaRow}>
               {periodInfo && (
                 <Text style={styles.timeText}>
@@ -155,22 +170,21 @@ export default function PeriodDetailScreen() {
               <View style={styles.emptyBox}>
                 <EmptyState
                   icon="⚠️"
-                  title="Unable to load absences"
-                  subtitle="Could not retrieve database records. Pull down to retry."
+                  title="Could not load absences"
+                  subtitle="Please check your connection and pull down to refresh."
                 />
               </View>
             ) : totalPeriodCount > 0 ? (
               <View>
+                {/* Starred Absences for this period */}
                 {starredPeriodAbsences.length > 0 && (
                   <View style={styles.subSection}>
-                    <Text style={styles.subSectionHeading}>
-                      MY TEACHERS ({starredPeriodAbsences.length})
-                    </Text>
+                    <Text style={styles.subSectionHeading}>STARRED FACULTY</Text>
                     <View style={styles.ledger}>
-                      {starredPeriodAbsences.map((teacher, index) => (
+                      {starredPeriodAbsences.map((item, index) => (
                         <AbsenceListItem
-                          key={teacher.id}
-                          teacher={teacher}
+                          key={`period-starred-${item.teacher}-${index}`}
+                          teacher={item}
                           isStarred={true}
                           showDivider={index < starredPeriodAbsences.length - 1}
                         />
@@ -179,18 +193,17 @@ export default function PeriodDetailScreen() {
                   </View>
                 )}
 
+                {/* Other Absences for this period */}
                 {otherPeriodAbsences.length > 0 && (
-                  <View style={starredPeriodAbsences.length > 0 ? styles.subSectionOther : undefined}>
+                  <View style={styles.subSectionOther}>
                     {starredPeriodAbsences.length > 0 && (
-                      <Text style={styles.subSectionHeading}>
-                        OTHER ABSENCES ({otherPeriodAbsences.length})
-                      </Text>
+                      <Text style={styles.subSectionHeading}>OTHER FACULTY</Text>
                     )}
                     <View style={styles.ledger}>
-                      {otherPeriodAbsences.map((teacher, index) => (
+                      {otherPeriodAbsences.map((item, index) => (
                         <AbsenceListItem
-                          key={teacher.id}
-                          teacher={teacher}
+                          key={`period-other-${item.teacher}-${index}`}
+                          teacher={item}
                           isStarred={false}
                           showDivider={index < otherPeriodAbsences.length - 1}
                         />
@@ -222,10 +235,11 @@ const styles = StyleSheet.create({
   },
   navBar: {
     backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E2E8F0',
     paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingBottom: 12,
   },
   wrapper: {
     width: '100%',
@@ -255,8 +269,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   content: {
-    paddingHorizontal: 20,
-    paddingVertical: 18,
+    padding: 20,
     paddingBottom: 60,
   },
   heroHeader: {
@@ -264,6 +277,11 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#E2E8F0',
+  },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   },
   title: {
     fontSize: 22,
@@ -314,6 +332,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 8,
+    marginLeft: 2,
   },
   sectionTitle: {
     fontSize: 11,

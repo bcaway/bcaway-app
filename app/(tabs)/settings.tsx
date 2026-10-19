@@ -3,21 +3,22 @@ import {
   StyleSheet,
   View,
   Text,
-  SafeAreaView,
   ScrollView,
   TouchableOpacity,
   Linking,
   Alert,
   Platform,
 } from 'react-native';
+import { useRouter } from 'expo-router';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
-import { useRouter } from 'expo-router';
 import Constants from 'expo-constants';
 import { useAuth, isBcawayEmail } from '../../src/context/AuthContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { user, signOut } = useAuth();
 
   const openLink = (url: string) => {
@@ -47,23 +48,30 @@ export default function SettingsScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <View style={[styles.screen, { paddingTop: insets.top }]}>
+      {/* Sleek standard-sized header across all platforms */}
       <View style={styles.header}>
         <View style={styles.wrapper}>
-          <Text style={styles.headerTitle}>About & Links</Text>
-          <Text style={styles.headerSub}>Project information, links, and contact</Text>
+          <Text style={styles.headerTitle}>Settings</Text>
+          <Text style={styles.headerSub}>Preferences and information</Text>
         </View>
       </View>
 
       <ScrollView
         style={styles.container}
-        contentContainerStyle={styles.content}
+        contentContainerStyle={[
+          styles.content,
+          {
+            paddingLeft: Math.max(insets.left, 20),
+            paddingRight: Math.max(insets.right, 20),
+          },
+        ]}
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.wrapper}>
           {/* Section: Starred Teachers */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>MY TEACHERS</Text>
+            <Text style={styles.sectionHeading}>My Teachers</Text>
             <View style={styles.cardGroup}>
               <TouchableOpacity
                 style={styles.starredRow}
@@ -81,14 +89,14 @@ export default function SettingsScreen() {
                     <Text style={styles.starredTitle}>Starred Teachers</Text>
                   </View>
                 </View>
-                <Ionicons name="chevron-forward" size={18} color="#94A3B8" />
+                <Ionicons name="chevron-forward" size={14} color="#94A3B8" />
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Section: Account */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>ACCOUNT</Text>
+            <Text style={styles.sectionHeading}>Account</Text>
             <View style={styles.cardGroup}>
               <View style={[styles.metaRow, styles.divider]}>
                 <Text style={styles.metaLabel}>
@@ -104,7 +112,12 @@ export default function SettingsScreen() {
                 onPress={handleSignOut}
                 activeOpacity={0.7}
               >
-                <Ionicons name="log-out-outline" size={16} color="#DC2626" style={{ marginRight: 8 }} />
+                <Ionicons
+                  name="log-out-outline"
+                  size={16}
+                  color="#DC2626"
+                  style={{ marginRight: 8 }}
+                />
                 <Text style={styles.signOutText}>Sign Out</Text>
               </TouchableOpacity>
             </View>
@@ -112,11 +125,11 @@ export default function SettingsScreen() {
 
           {/* Section: Links & Community */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>ONLINE & COMMUNITY</Text>
+            <Text style={styles.sectionHeading}>Online & Community</Text>
             <View style={styles.cardGroup}>
               <TouchableOpacity
                 style={[styles.linkRow, styles.divider]}
-                onPress={() => openLink('https://bcaway.app')}
+                onPress={() => openLink('https://www.bcaway.app')}
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
@@ -128,7 +141,7 @@ export default function SettingsScreen() {
 
               <TouchableOpacity
                 style={[styles.linkRow, styles.divider]}
-                onPress={() => openLink('https://instagram.com/getbcaway')}
+                onPress={() => openLink('https://www.instagram.com/getbcaway/')}
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
@@ -152,9 +165,9 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          {/* Section: Feedback & Contact */}
+          {/* Section: Support & Feedback */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>FEEDBACK & CONTACT</Text>
+            <Text style={styles.sectionHeading}>Support & Feedback</Text>
             <View style={styles.cardGroup}>
               <TouchableOpacity
                 style={[styles.linkRow, styles.divider]}
@@ -182,13 +195,13 @@ export default function SettingsScreen() {
             </View>
           </View>
 
-          {/* Section: Legal */}
+          {/* Section: Legal & Disclaimers */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>LEGAL & TERMS</Text>
+            <Text style={styles.sectionHeading}>Legal & Disclaimers</Text>
             <View style={styles.cardGroup}>
               <TouchableOpacity
                 style={[styles.linkRow, styles.divider]}
-                onPress={() => openLink('https://bcaway.app/privacy')}
+                onPress={() => openLink('https://www.bcaway.app/privacy')}
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
@@ -200,7 +213,7 @@ export default function SettingsScreen() {
 
               <TouchableOpacity
                 style={styles.linkRow}
-                onPress={() => openLink('https://bcaway.app/terms')}
+                onPress={() => openLink('https://www.bcaway.app/terms')}
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
@@ -214,7 +227,7 @@ export default function SettingsScreen() {
 
           {/* Section: App Information */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>APP INFORMATION</Text>
+            <Text style={styles.sectionHeading}>App Information</Text>
             <View style={styles.cardGroup}>
               <View style={[styles.metaRow, styles.divider]}>
                 <Text style={styles.metaLabel}>Developer</Text>
@@ -234,12 +247,12 @@ export default function SettingsScreen() {
           </View>
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: {
+  screen: {
     flex: 1,
     backgroundColor: '#FFFFFF',
   },
@@ -248,7 +261,7 @@ const styles = StyleSheet.create({
     paddingTop: 14,
     paddingBottom: 14,
     backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
+    borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: '#E2E8F0',
   },
   wrapper: {
@@ -278,11 +291,12 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   sectionHeading: {
-    fontSize: 11,
-    fontWeight: '700',
+    fontSize: 12,
+    fontWeight: '600',
     color: '#64748B',
-    letterSpacing: 0.6,
+    letterSpacing: 0.5,
     marginBottom: 8,
+    textTransform: 'uppercase',
   },
   cardGroup: {
     backgroundColor: '#FFFFFF',
@@ -296,17 +310,18 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 13,
+    paddingVertical: Platform.OS === 'android' ? 14 : 12,
     paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
+    minHeight: Platform.OS === 'android' ? 48 : 44,
   },
   linkLeft: {
     flex: 1,
     paddingRight: 12,
   },
   linkLabel: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
     color: '#0F172A',
   },
   linkTarget: {
@@ -318,19 +333,20 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 12,
+    paddingVertical: Platform.OS === 'android' ? 14 : 12,
     paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
+    minHeight: Platform.OS === 'android' ? 48 : 44,
   },
   metaLabel: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: '#475569',
+    fontSize: 15,
+    fontWeight: '400',
+    color: '#0F172A',
   },
   metaValue: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#0F172A',
+    fontSize: 15,
+    fontWeight: '400',
+    color: '#64748B',
   },
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
@@ -339,22 +355,24 @@ const styles = StyleSheet.create({
   signOutRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 13,
+    paddingVertical: Platform.OS === 'android' ? 14 : 12,
     paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
+    minHeight: Platform.OS === 'android' ? 48 : 44,
   },
   signOutText: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: 15,
+    fontWeight: '500',
     color: '#DC2626',
   },
   starredRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 14,
+    paddingVertical: Platform.OS === 'android' ? 14 : 12,
     paddingHorizontal: 16,
     backgroundColor: '#FFFFFF',
+    minHeight: Platform.OS === 'android' ? 48 : 44,
   },
   starredLeft: {
     flexDirection: 'row',
@@ -363,9 +381,9 @@ const styles = StyleSheet.create({
     paddingRight: 12,
   },
   starBadge: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
+    width: 28,
+    height: 28,
+    borderRadius: 7,
     backgroundColor: '#FEF3C7',
     alignItems: 'center',
     justifyContent: 'center',
@@ -376,7 +394,7 @@ const styles = StyleSheet.create({
   },
   starredTitle: {
     fontSize: 15,
-    fontWeight: '600',
+    fontWeight: '500',
     color: '#0F172A',
   },
 });
