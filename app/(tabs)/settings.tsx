@@ -14,7 +14,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Constants from 'expo-constants';
-import { useAuth, isBcawayEmail } from '../../src/context/AuthContext';
+import { useAuth } from '../../src/context/AuthContext';
 import { useTheme, ThemeMode } from '../../src/context/ThemeContext';
 
 export default function SettingsScreen() {
@@ -24,23 +24,6 @@ export default function SettingsScreen() {
   const { mode, setMode, colors } = useTheme();
 
   const userEmail = user?.email || 'student@bergen.org';
-  const isStaff = isBcawayEmail(userEmail);
-
-  // Derive human-friendly display name and initials (Uber inspo)
-  const rawName = (user?.user_metadata?.full_name || user?.user_metadata?.name || '') as string;
-  const displayName = rawName.trim().length > 0
-    ? rawName
-    : userEmail
-        .split('@')[0]
-        .replace(/[._-]/g, ' ')
-        .replace(/\b\w/g, (c) => c.toUpperCase());
-
-  const userInitials = (displayName || 'BCA')
-    .split(' ')
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0].toUpperCase())
-    .join('') || 'ST';
 
   const openLink = (url: string) => {
     Linking.openURL(url).catch((err) => console.error("Couldn't load page", err));
@@ -87,27 +70,32 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.wrapper}>
-          {/* Header Title */}
+          {/* Header Title with Logged In As line */}
           <View style={styles.header}>
             <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Settings</Text>
+            <Text style={[styles.loggedInText, { color: colors.textSecondary }]}>
+              Logged In As:{' '}
+              <Text style={[styles.loggedInEmail, { color: colors.textPrimary }]}>{userEmail}</Text>
+            </Text>
           </View>
 
-          {/* User Identity Profile Card (Uber Account Tab inspired, zero pills) */}
-          <View style={[styles.profileCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-            <View style={styles.profileLeft}>
-              <Text style={[styles.profileName, { color: colors.textPrimary }]} numberOfLines={1}>
-                {displayName}
-              </Text>
-              <Text style={[styles.profileEmail, { color: colors.textSecondary }]} numberOfLines={1}>
-                {userEmail}
-              </Text>
-              <Text style={[styles.profileRole, { color: colors.textMuted }]}>
-                {isStaff ? 'BCAway Staff' : 'BCA Student'}
-              </Text>
-            </View>
-
-            <View style={[styles.avatarCircle, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
-              <Text style={[styles.avatarText, { color: colors.primary }]}>{userInitials}</Text>
+          {/* Unnamed Section: Starred Faculty (placed directly above Theme) */}
+          <View style={styles.section}>
+            <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <TouchableOpacity
+                style={styles.row}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  router.push('/starred-teachers' as any);
+                }}
+                activeOpacity={0.7}
+              >
+                <View style={styles.rowLeft}>
+                  <Ionicons name="star" size={18} color={colors.star} style={styles.rowIcon} />
+                  <Text style={[styles.rowLabel, { color: colors.textPrimary }]}>Starred Faculty</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
+              </TouchableOpacity>
             </View>
           </View>
 
@@ -169,27 +157,6 @@ export default function SettingsScreen() {
             <Text style={[styles.sectionCaption, { color: colors.textMuted }]}>
               Automatic follows your device's system appearance.
             </Text>
-          </View>
-
-          {/* Section: Preferences / Faculty */}
-          <View style={styles.section}>
-            <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>Preferences</Text>
-            <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
-              <TouchableOpacity
-                style={styles.row}
-                onPress={() => {
-                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                  router.push('/starred-teachers' as any);
-                }}
-                activeOpacity={0.7}
-              >
-                <View style={styles.rowLeft}>
-                  <Ionicons name="star" size={18} color={colors.star} style={styles.rowIcon} />
-                  <Text style={[styles.rowLabel, { color: colors.textPrimary }]}>Starred Faculty</Text>
-                </View>
-                <Ionicons name="chevron-forward" size={16} color={colors.textMuted} />
-              </TouchableOpacity>
-            </View>
           </View>
 
           {/* Section: Combined About & Legal */}
@@ -294,53 +261,21 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   header: {
-    marginBottom: 16,
+    marginBottom: 20,
   },
   headerTitle: {
     fontSize: 28,
     fontWeight: '800',
     letterSpacing: -0.6,
   },
-  profileCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 16,
-    borderRadius: 14,
-    borderWidth: 1,
-    marginBottom: 24,
-  },
-  profileLeft: {
-    flex: 1,
-    paddingRight: 12,
-  },
-  profileName: {
-    fontSize: 18,
-    fontWeight: '700',
-    letterSpacing: -0.3,
-    marginBottom: 2,
-  },
-  profileEmail: {
-    fontSize: 14,
+  loggedInText: {
+    fontSize: 13,
     fontWeight: '400',
-    marginBottom: 3,
+    marginTop: 4,
+    letterSpacing: -0.1,
   },
-  profileRole: {
-    fontSize: 12,
-    fontWeight: '500',
-    letterSpacing: 0.1,
-  },
-  avatarCircle: {
-    width: 46,
-    height: 46,
-    borderRadius: 23,
-    borderWidth: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: {
-    fontSize: 16,
-    fontWeight: '700',
+  loggedInEmail: {
+    fontWeight: '600',
   },
   section: {
     marginBottom: 22,
