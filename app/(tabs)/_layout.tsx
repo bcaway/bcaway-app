@@ -6,12 +6,13 @@ import { Platform, StyleSheet } from 'react-native';
 import { useTheme } from '../../src/context/ThemeContext';
 
 export default function TabLayout() {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
 
   if (Platform.OS === 'ios') {
     return (
       <NativeTabs
         tintColor={colors.primary}
+        blurEffect={isDark ? 'systemChromeMaterialDark' : 'systemChromeMaterialLight'}
         minimizeBehavior="automatic"
       >
         <NativeTabs.Trigger name="index">

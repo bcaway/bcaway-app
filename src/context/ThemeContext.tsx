@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { useColorScheme } from 'react-native';
+import { Appearance, useColorScheme } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { lightColors, darkColors, ThemeColors, theme as baseTheme } from '../constants/theme';
 
@@ -43,6 +43,19 @@ export function ThemeProvider({ children }: ThemeProviderProps) {
         console.warn('Failed to load theme preference', err);
       });
   }, []);
+
+  // Sync native app-wide appearance (controls native iOS liquid glass, sheets, alerts)
+  useEffect(() => {
+    try {
+      if (mode === 'system') {
+        Appearance.setColorScheme('unspecified');
+      } else {
+        Appearance.setColorScheme(mode);
+      }
+    } catch (err) {
+      console.warn('Failed to sync native Appearance colorScheme', err);
+    }
+  }, [mode]);
 
   const setMode = async (newMode: ThemeMode) => {
     setModeState(newMode);

@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, StyleSheet, ViewProps, StyleProp, ViewStyle } from 'react-native';
+import { View, StyleSheet, Platform, ViewProps, StyleProp, ViewStyle } from 'react-native';
+import { GlassView, isLiquidGlassAvailable } from 'expo-glass-effect';
 import { useTheme } from '../../context/ThemeContext';
 
 interface GlassCardProps extends ViewProps {
@@ -9,10 +10,10 @@ interface GlassCardProps extends ViewProps {
 
 /**
  * Clean surface container with a crisp border and subtle background.
- * Replaces blur/glassmorphism with clean, utilitarian structure.
+ * Automatically adapts to iOS native liquid glass in both light and dark themes.
  */
 export function GlassCard({ variant = 'default', children, style, ...props }: GlassCardProps) {
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
 
   const variantStyle =
     variant === 'elevated'
@@ -26,6 +27,28 @@ export function GlassCard({ variant = 'default', children, style, ...props }: Gl
     variantStyle,
     style,
   ];
+
+  let liquidGlassSupported = false;
+  if (Platform.OS === 'ios') {
+    try {
+      liquidGlassSupported = isLiquidGlassAvailable();
+    } catch {
+      liquidGlassSupported = false;
+    }
+  }
+
+  if (liquidGlassSupported) {
+    return (
+      <View style={[baseStyle, { overflow: 'hidden' }]} {...props}>
+        <GlassView
+          style={StyleSheet.absoluteFill}
+          colorScheme={isDark ? 'dark' : 'light'}
+          glassEffectStyle="regular"
+        />
+        {children}
+      </View>
+    );
+  }
 
   return (
     <View style={baseStyle} {...props}>
