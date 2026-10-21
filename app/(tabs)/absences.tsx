@@ -72,58 +72,60 @@ export default function AbsencesScreen() {
     setRefreshing(false);
   };
 
-  const todayString = format(new Date(), 'EEEE, MMMM d');
+  const todayDateStr = format(new Date(), 'EEEE, MMMM d');
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.background, paddingTop: insets.top }]}>
-      {/* Sleek standard-sized header across all platforms */}
-      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+      <View style={styles.header}>
         <View style={styles.wrapper}>
-          <Text style={[styles.title, { color: colors.textPrimary }]}>Teacher Absences</Text>
+          <Text style={[styles.dateCaption, { color: colors.textSecondary }]}>
+            {todayDateStr.toUpperCase()}
+          </Text>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Absences</Text>
           <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-            {todayString}
-            {absentTeachers.length > 0 ? ` • ${absentTeachers.length} absent` : ''}
+            {absentTeachers.length > 0
+              ? `${absentTeachers.length} ${absentTeachers.length === 1 ? 'teacher' : 'teachers'} absent today`
+              : 'All faculty present today'}
           </Text>
 
-          {/* Unified search bar adapted to each platform */}
-          <View style={styles.searchRow}>
-            <View style={[styles.searchInputContainer, { backgroundColor: colors.searchBg, borderColor: colors.border }]}>
-              <Ionicons
-                name="search"
-                size={16}
-                color={colors.textSecondary}
-                style={styles.searchIcon}
-              />
-              <TextInput
-                style={[styles.searchInput, { color: colors.textPrimary }]}
-                placeholder="Search by teacher name or period..."
-                placeholderTextColor={colors.textMuted}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                clearButtonMode="never"
-                returnKeyType="search"
-                autoCorrect={false}
-                autoCapitalize="none"
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity
-                  onPress={() => setSearchQuery('')}
-                  hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
-                  style={styles.clearButton}
-                >
-                  <Ionicons
-                    name="close-circle"
-                    size={16}
-                    color={colors.textMuted}
-                  />
-                </TouchableOpacity>
-              )}
-            </View>
+          {/* Search Box */}
+          <View style={[styles.searchBox, { backgroundColor: colors.surfaceSubtle, borderColor: colors.border }]}>
+            <Ionicons
+              name="search"
+              size={18}
+              color={colors.textSecondary}
+              style={styles.searchIcon}
+            />
+            <TextInput
+              style={[styles.searchInput, { color: colors.textPrimary }]}
+              placeholder="Search faculty or period..."
+              placeholderTextColor={colors.textMuted}
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              clearButtonMode="never"
+              returnKeyType="search"
+              autoCorrect={false}
+              autoCapitalize="none"
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity
+                onPress={() => setSearchQuery('')}
+                hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+                style={styles.clearButton}
+              >
+                <Ionicons
+                  name="close-circle"
+                  size={16}
+                  color={colors.textMuted}
+                />
+              </TouchableOpacity>
+            )}
           </View>
 
           {searchQuery.trim().length > 0 && (
             <Text style={[styles.searchMeta, { color: colors.textSecondary }]}>
-              Showing {totalFilteredCount} of {absentTeachers.length} {absentTeachers.length === 1 ? 'teacher' : 'teachers'}
+              Showing {totalFilteredCount} of {absentTeachers.length}{' '}
+              {absentTeachers.length === 1 ? 'teacher' : 'teachers'}
             </Text>
           )}
         </View>
@@ -155,7 +157,7 @@ export default function AbsencesScreen() {
               <BCAwayLoading />
             </View>
           ) : error ? (
-            <View style={[styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.emptyCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <EmptyState
                 icon="⚠️"
                 title="Could not load absences"
@@ -201,14 +203,18 @@ export default function AbsencesScreen() {
               )}
             </View>
           ) : (
-            <View style={[styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+            <View style={[styles.emptyCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <EmptyState
                 icon={searchQuery ? '🔍' : '🎉'}
-                title={searchQuery ? 'No matching teachers' : 'No absences today!'}
+                title={
+                  searchQuery
+                    ? 'No matching faculty'
+                    : 'All teachers present!'
+                }
                 subtitle={
                   searchQuery
                     ? `No teacher absences match "${searchQuery}".`
-                    : 'All teachers are reported present.'
+                    : 'No faculty absences reported today.'
                 }
               />
             </View>
@@ -225,40 +231,44 @@ const styles = StyleSheet.create({
   },
   header: {
     paddingHorizontal: 20,
-    paddingTop: 14,
-    paddingBottom: 14,
-    borderBottomWidth: StyleSheet.hairlineWidth,
+    paddingTop: 16,
+    paddingBottom: 12,
   },
   wrapper: {
     width: '100%',
   },
-  title: {
-    fontSize: 22,
+  dateCaption: {
+    fontSize: 11,
     fontWeight: '700',
-    letterSpacing: -0.4,
+    letterSpacing: 0.8,
+    marginBottom: 2,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '800',
+    letterSpacing: -0.6,
   },
   subtitle: {
-    fontSize: 13,
-    marginTop: 2,
-    marginBottom: 10,
+    fontSize: 14,
+    fontWeight: '500',
+    marginTop: 3,
+    marginBottom: 14,
+    letterSpacing: -0.2,
   },
-  searchRow: {
-    marginTop: 2,
-  },
-  searchInputContainer: {
+  searchBox: {
     flexDirection: 'row',
     alignItems: 'center',
     borderRadius: 10,
     borderWidth: 1,
     paddingHorizontal: 12,
-    height: 40,
+    height: 42,
   },
   searchIcon: {
-    marginRight: 8,
+    marginRight: 10,
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 15,
     height: '100%',
     padding: 0,
   },
@@ -267,14 +277,15 @@ const styles = StyleSheet.create({
   },
   searchMeta: {
     fontSize: 12,
-    marginTop: 6,
+    fontWeight: '500',
+    marginTop: 8,
   },
   container: {
     flex: 1,
   },
   content: {
     paddingHorizontal: 20,
-    paddingVertical: 16,
+    paddingTop: 10,
     paddingBottom: 100,
   },
   section: {
@@ -296,7 +307,7 @@ const styles = StyleSheet.create({
   emptyCard: {
     borderRadius: 12,
     borderWidth: 1,
-    paddingVertical: 20,
+    paddingVertical: 24,
     width: '100%',
   },
   loadingContainer: {
