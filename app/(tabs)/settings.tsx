@@ -105,7 +105,7 @@ export default function SettingsScreen() {
             <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
               {/* Automatic */}
               <TouchableOpacity
-                style={[styles.row, { borderBottomColor: colors.border }]}
+                style={styles.row}
                 onPress={() => handleSelectTheme('system')}
                 activeOpacity={0.7}
               >
@@ -122,7 +122,7 @@ export default function SettingsScreen() {
 
               {/* Light */}
               <TouchableOpacity
-                style={[styles.row, { borderBottomColor: colors.border }]}
+                style={styles.row}
                 onPress={() => handleSelectTheme('light')}
                 activeOpacity={0.7}
               >
@@ -164,7 +164,7 @@ export default function SettingsScreen() {
             <Text style={[styles.sectionHeading, { color: colors.textPrimary }]}>About & Legal</Text>
             <View style={[styles.card, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <TouchableOpacity
-                style={[styles.row, { borderBottomColor: colors.border }]}
+                style={styles.row}
                 onPress={() => openLink('https://www.bcaway.app')}
                 activeOpacity={0.7}
               >
@@ -176,7 +176,7 @@ export default function SettingsScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.row, { borderBottomColor: colors.border }]}
+                style={styles.row}
                 onPress={() => openLink('https://github.com/bcaway')}
                 activeOpacity={0.7}
               >
@@ -188,7 +188,7 @@ export default function SettingsScreen() {
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.row, { borderBottomColor: colors.border }]}
+                style={styles.row}
                 onPress={() => openLink('https://www.bcaway.app/privacy')}
                 activeOpacity={0.7}
               >
@@ -306,7 +306,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: Platform.OS === 'android' ? 14 : 13,
     paddingHorizontal: 16,
-    borderBottomWidth: StyleSheet.hairlineWidth,
     minHeight: 48,
   },
   rowLeft: {
