@@ -3,12 +3,15 @@ import { Tabs } from 'expo-router';
 import { NativeTabs } from 'expo-router/unstable-native-tabs';
 import { Ionicons } from '@expo/vector-icons';
 import { Platform, StyleSheet } from 'react-native';
+import { useTheme } from '../../src/context/ThemeContext';
 
 export default function TabLayout() {
+  const { colors } = useTheme();
+
   if (Platform.OS === 'ios') {
     return (
       <NativeTabs
-        tintColor="#2563EB"
+        tintColor={colors.primary}
         minimizeBehavior="automatic"
       >
         <NativeTabs.Trigger name="index">
@@ -32,8 +35,8 @@ export default function TabLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E2E8F0',
+          backgroundColor: colors.card,
+          borderTopColor: colors.border,
           borderTopWidth: StyleSheet.hairlineWidth,
           elevation: 0,
           shadowOpacity: 0,
@@ -41,8 +44,8 @@ export default function TabLayout() {
           paddingTop: 6,
           paddingBottom: 6,
         },
-        tabBarActiveTintColor: '#2563EB',
-        tabBarInactiveTintColor: '#64748B',
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSecondary,
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',

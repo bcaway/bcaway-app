@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
 
 interface EmptyStateProps {
   icon?: string;
@@ -8,11 +9,13 @@ interface EmptyStateProps {
 }
 
 export function EmptyState({ icon, title, subtitle }: EmptyStateProps) {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.container}>
       {icon ? <Text style={styles.icon}>{icon}</Text> : null}
-      <Text style={styles.title}>{title}</Text>
-      {subtitle ? <Text style={styles.subtitle}>{subtitle}</Text> : null}
+      <Text style={[styles.title, { color: colors.textPrimary }]}>{title}</Text>
+      {subtitle ? <Text style={[styles.subtitle, { color: colors.textSecondary }]}>{subtitle}</Text> : null}
     </View>
   );
 }
@@ -32,13 +35,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#1E293B',
     textAlign: 'center',
     letterSpacing: -0.2,
   },
   subtitle: {
     fontSize: 13,
-    color: '#64748B',
     textAlign: 'center',
     marginTop: 3,
     lineHeight: 18,

@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { format } from 'date-fns';
 import { useData } from '../../src/context/DataContext';
+import { useTheme } from '../../src/context/ThemeContext';
 import { getAbsentTeachersForPeriod } from '../../src/services/absenceService';
 import { formatTimeRange } from '../../src/utils/time';
 import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
@@ -22,6 +23,7 @@ import { BCAwayLoading } from '../../src/components/common/BCAwayLoading';
 
 export default function PeriodDetailScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const { id } = useLocalSearchParams<{ id: string }>();
   const periodId = Array.isArray(id) ? id[0] : id || '';
 
@@ -88,10 +90,10 @@ export default function PeriodDetailScreen() {
   const todayString = format(new Date(), 'EEEE, MMMM d');
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       {/* Navigation Bar for non-iOS (on iOS sheet popouts, swipe down dismisses) */}
       {Platform.OS !== 'ios' && (
-        <View style={styles.navBar}>
+        <View style={[styles.navBar, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
           <View style={styles.wrapper}>
             <View style={styles.navBarInner}>
               <TouchableOpacity
@@ -103,13 +105,13 @@ export default function PeriodDetailScreen() {
                 <Ionicons
                   name="chevron-back"
                   size={18}
-                  color="#2563EB"
+                  color={colors.primary}
                 />
-                <Text style={styles.backButtonText}>Today</Text>
+                <Text style={[styles.backButtonText, { color: colors.primary }]}>Today</Text>
               </TouchableOpacity>
 
               {isCurrentPeriod && (
-                <Text style={styles.nowText}>In progress</Text>
+                <Text style={[styles.nowText, { color: colors.primary }]}>In progress</Text>
               )}
             </View>
           </View>
@@ -117,7 +119,7 @@ export default function PeriodDetailScreen() {
       )}
 
       <ScrollView
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={[
           styles.content,
           Platform.OS === 'ios' && { paddingTop: 24 },
@@ -127,36 +129,36 @@ export default function PeriodDetailScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#2563EB"
+            tintColor={colors.primary}
           />
         }
       >
         <View style={styles.wrapper}>
           {/* Period Header */}
-          <View style={styles.heroHeader}>
+          <View style={[styles.heroHeader, { borderBottomColor: colors.border }]}>
             <View style={styles.titleRow}>
-              <Text style={styles.title}>{displayTitle}</Text>
+              <Text style={[styles.title, { color: colors.textPrimary }]}>{displayTitle}</Text>
               {Platform.OS === 'ios' && isCurrentPeriod && (
-                <Text style={styles.nowText}>In progress</Text>
+                <Text style={[styles.nowText, { color: colors.primary }]}>In progress</Text>
               )}
             </View>
             <View style={styles.metaRow}>
               {periodInfo && (
-                <Text style={styles.timeText}>
+                <Text style={[styles.timeText, { color: colors.primary }]}>
                   {formatTimeRange(periodInfo.start, periodInfo.end)}
                 </Text>
               )}
-              <Text style={styles.bullet}>•</Text>
-              <Text style={styles.dateText}>{todayString}</Text>
+              <Text style={[styles.bullet, { color: colors.textMuted }]}>•</Text>
+              <Text style={[styles.dateText, { color: colors.textSecondary }]}>{todayString}</Text>
             </View>
           </View>
 
           {/* Section: Absent Teachers */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}>ABSENT THIS PERIOD</Text>
+              <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>ABSENT THIS PERIOD</Text>
               {totalPeriodCount > 0 && (
-                <Text style={styles.countText}>
+                <Text style={[styles.countText, { color: colors.textSecondary }]}>
                   {totalPeriodCount} {totalPeriodCount === 1 ? 'teacher' : 'teachers'}
                 </Text>
               )}
@@ -167,7 +169,7 @@ export default function PeriodDetailScreen() {
                 <BCAwayLoading />
               </View>
             ) : error ? (
-              <View style={styles.emptyBox}>
+              <View style={[styles.emptyBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 <EmptyState
                   icon="⚠️"
                   title="Could not load absences"
@@ -179,8 +181,8 @@ export default function PeriodDetailScreen() {
                 {/* Starred Absences for this period */}
                 {starredPeriodAbsences.length > 0 && (
                   <View style={styles.subSection}>
-                    <Text style={styles.subSectionHeading}>STARRED FACULTY</Text>
-                    <View style={styles.ledger}>
+                    <Text style={[styles.subSectionHeading, { color: colors.textSecondary }]}>STARRED FACULTY</Text>
+                    <View style={[styles.ledger, { backgroundColor: colors.card, borderColor: colors.border }]}>
                       {starredPeriodAbsences.map((item, index) => (
                         <AbsenceListItem
                           key={`period-starred-${item.teacher}-${index}`}
@@ -197,9 +199,9 @@ export default function PeriodDetailScreen() {
                 {otherPeriodAbsences.length > 0 && (
                   <View style={styles.subSectionOther}>
                     {starredPeriodAbsences.length > 0 && (
-                      <Text style={styles.subSectionHeading}>OTHER FACULTY</Text>
+                      <Text style={[styles.subSectionHeading, { color: colors.textSecondary }]}>OTHER FACULTY</Text>
                     )}
-                    <View style={styles.ledger}>
+                    <View style={[styles.ledger, { backgroundColor: colors.card, borderColor: colors.border }]}>
                       {otherPeriodAbsences.map((item, index) => (
                         <AbsenceListItem
                           key={`period-other-${item.teacher}-${index}`}
@@ -213,7 +215,7 @@ export default function PeriodDetailScreen() {
                 )}
               </View>
             ) : (
-              <View style={styles.emptyBox}>
+              <View style={[styles.emptyBox, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                 <EmptyState
                   icon="🎉"
                   title="No teachers absent"
@@ -231,12 +233,9 @@ export default function PeriodDetailScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   navBar: {
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
     paddingHorizontal: 20,
     paddingTop: 12,
     paddingBottom: 12,
@@ -256,17 +255,14 @@ const styles = StyleSheet.create({
   },
   backButtonText: {
     fontSize: 14,
-    color: '#2563EB',
     fontWeight: '600',
   },
   nowText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   content: {
     padding: 20,
@@ -276,7 +272,6 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     paddingBottom: 14,
     borderBottomWidth: 1,
-    borderBottomColor: '#E2E8F0',
   },
   titleRow: {
     flexDirection: 'row',
@@ -286,7 +281,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0F172A',
     letterSpacing: -0.4,
   },
   metaRow: {
@@ -299,16 +293,13 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#2563EB',
     fontVariant: ['tabular-nums'],
   },
   bullet: {
-    color: '#94A3B8',
     fontSize: 12,
   },
   dateText: {
     fontSize: 13,
-    color: '#64748B',
   },
   section: {
     marginBottom: 20,
@@ -322,7 +313,6 @@ const styles = StyleSheet.create({
   subSectionHeading: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
     letterSpacing: 0.6,
     marginBottom: 8,
     marginLeft: 2,
@@ -337,27 +327,21 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
     letterSpacing: 0.6,
   },
   countText: {
     fontSize: 12,
-    color: '#64748B',
     fontWeight: '500',
   },
   ledger: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     overflow: 'hidden',
     width: '100%',
   },
   emptyBox: {
-    backgroundColor: '#F8FAFC',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     paddingVertical: 20,
     width: '100%',
   },

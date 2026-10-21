@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, ViewProps, StyleProp, ViewStyle } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
 
 interface GlassCardProps extends ViewProps {
   variant?: 'default' | 'elevated' | 'accent';
@@ -11,10 +12,18 @@ interface GlassCardProps extends ViewProps {
  * Replaces blur/glassmorphism with clean, utilitarian structure.
  */
 export function GlassCard({ variant = 'default', children, style, ...props }: GlassCardProps) {
+  const { colors } = useTheme();
+
+  const variantStyle =
+    variant === 'elevated'
+      ? { backgroundColor: colors.card, borderColor: colors.borderStrong }
+      : variant === 'accent'
+      ? { backgroundColor: colors.surfaceSubtle, borderColor: colors.accentLight }
+      : { backgroundColor: colors.card, borderColor: colors.border };
+
   const baseStyle: StyleProp<ViewStyle> = [
     styles.container,
-    variant === 'elevated' && styles.elevated,
-    variant === 'accent' && styles.accent,
+    variantStyle,
     style,
   ];
 
@@ -27,19 +36,7 @@ export function GlassCard({ variant = 'default', children, style, ...props }: Gl
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: 8,
-  },
-  elevated: {
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#CBD5E1',
-  },
-  accent: {
-    backgroundColor: '#F8FAFC',
-    borderWidth: 1,
-    borderColor: '#BFDBFE',
   },
 });

@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
 
 interface StatusBadgeProps {
   status: 'away' | 'present' | 'free';
@@ -7,22 +8,23 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, size = 'sm' }: StatusBadgeProps) {
+  const { colors } = useTheme();
   const isSm = size === 'sm';
 
-  let bg = '#EFF6FF';
-  let border = '#BFDBFE';
-  let color = '#1D4ED8';
+  let bg = colors.primarySubtle;
+  let border = colors.accentLight;
+  let color = colors.primary;
   let text = 'Free Period';
 
   if (status === 'away') {
-    bg = '#FEF2F2';
-    border = '#FECACA';
-    color = '#B91C1C';
+    bg = colors.absentBg;
+    border = colors.absentBorder;
+    color = colors.absentText;
     text = 'Away';
   } else if (status === 'present') {
-    bg = '#F0FDF4';
-    border = '#BBF7D0';
-    color = '#15803D';
+    bg = colors.presentBg;
+    border = colors.presentBorder;
+    color = colors.presentText;
     text = 'In Class';
   }
 

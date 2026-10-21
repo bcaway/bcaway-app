@@ -1,17 +1,20 @@
 import React from 'react';
 import { Link, Stack } from 'expo-router';
 import { StyleSheet, Text, View } from 'react-native';
+import { useTheme } from '../src/context/ThemeContext';
 
 export default function NotFoundScreen() {
+  const { colors } = useTheme();
+
   return (
     <>
       <Stack.Screen options={{ title: 'Not Found', headerShown: false }} />
-      <View style={styles.container}>
-        <Text style={styles.title}>Page not found</Text>
-        <Text style={styles.subtitle}>This screen does not exist.</Text>
+      <View style={[styles.container, { backgroundColor: colors.background }]}>
+        <Text style={[styles.title, { color: colors.textPrimary }]}>Page not found</Text>
+        <Text style={[styles.subtitle, { color: colors.textSecondary }]}>This screen does not exist.</Text>
 
-        <Link href="/" style={styles.link}>
-          <Text style={styles.linkText}>← Return to Today</Text>
+        <Link href="/" style={[styles.link, { borderColor: colors.border, backgroundColor: colors.surface }]}>
+          <Text style={[styles.linkText, { color: colors.primary }]}>← Return to Today</Text>
         </Link>
       </View>
     </>
@@ -24,17 +27,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#FFFFFF',
   },
   title: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#0F172A',
     letterSpacing: -0.3,
   },
   subtitle: {
     fontSize: 14,
-    color: '#64748B',
     marginTop: 4,
     marginBottom: 20,
   },
@@ -43,12 +43,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderRadius: 6,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#F8FAFC',
   },
   linkText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
   },
 });

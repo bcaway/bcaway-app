@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { TeacherAbsence } from '../../types';
 import { formatPeriodsImpacted } from '../../services/absenceService';
+import { useTheme } from '../../context/ThemeContext';
 
 interface AbsenceListItemProps {
   teacher: TeacherAbsence;
@@ -15,18 +16,19 @@ export function AbsenceListItem({
   showDivider = true,
   isStarred = false,
 }: AbsenceListItemProps) {
+  const { colors } = useTheme();
   const formattedPeriods = formatPeriodsImpacted(teacher.periodsImpacted);
   const isAllDay = formattedPeriods.toLowerCase() === 'all day';
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { backgroundColor: colors.card }]}>
       <View style={styles.row}>
         <View style={styles.left}>
           <View style={styles.nameRow}>
             {isStarred && (
-              <Ionicons name="star" size={14} color="#F59E0B" style={styles.starIcon} />
+              <Ionicons name="star" size={14} color={colors.star} style={styles.starIcon} />
             )}
-            <Text style={styles.name} numberOfLines={1} ellipsizeMode="tail">
+            <Text style={[styles.name, { color: colors.textPrimary }]} numberOfLines={1} ellipsizeMode="tail">
               {teacher.teacher}
             </Text>
           </View>
@@ -34,21 +36,24 @@ export function AbsenceListItem({
 
         <View style={styles.right}>
           <Text
-            style={[styles.periodsText, isAllDay ? styles.periodsAllDay : styles.periodsPartial]}
+            style={[
+              styles.periodsText,
+              { color: isAllDay ? colors.absent : colors.textSecondary },
+            ]}
             numberOfLines={1}
           >
             {formattedPeriods}
           </Text>
         </View>
       </View>
-      {showDivider && <View style={styles.divider} />}
+      {showDivider && <View style={[styles.divider, { backgroundColor: colors.divider }]} />}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#FFFFFF',
+    width: '100%',
   },
   row: {
     flexDirection: 'row',
@@ -60,7 +65,6 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#E2E8F0',
   },
   left: {
     flex: 1,
@@ -77,7 +81,6 @@ const styles = StyleSheet.create({
   name: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F172A',
     letterSpacing: -0.2,
   },
   right: {
@@ -88,11 +91,4 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '500',
   },
-  periodsAllDay: {
-    color: '#DC2626',
-  },
-  periodsPartial: {
-    color: '#64748B',
-  },
 });
-

@@ -16,12 +16,14 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useData } from '../src/context/DataContext';
+import { useTheme } from '../src/context/ThemeContext';
 import { Teacher } from '../src/types';
 
 const REQUEST_TEACHER_URL = 'https://www.bcaway.app/requestteacher';
 
 export default function StarredTeachersScreen() {
   const router = useRouter();
+  const { colors } = useTheme();
   const {
     teachers,
     starredTeacherIds,
@@ -91,24 +93,27 @@ export default function StarredTeachersScreen() {
     return (
       <TouchableOpacity
         key={teacher.id}
-        style={[styles.teacherRow, !isLast && styles.rowDivider]}
+        style={[
+          styles.teacherRow,
+          !isLast && [styles.rowDivider, { borderBottomColor: colors.border }],
+        ]}
         onPress={() => handleToggle(teacher)}
         activeOpacity={0.7}
       >
         <View style={styles.teacherInfo}>
-          <Text style={[styles.teacherName, starred && styles.teacherNameStarred]}>
+          <Text style={[styles.teacherName, { color: colors.textPrimary }, starred && styles.teacherNameStarred]}>
             {teacher.name}
           </Text>
         </View>
 
         <View style={styles.starAction}>
           {isPending ? (
-            <ActivityIndicator size="small" color="#F59E0B" />
+            <ActivityIndicator size="small" color={colors.star} />
           ) : (
             <Ionicons
               name={starred ? 'star' : 'star-outline'}
               size={22}
-              color={starred ? '#F59E0B' : '#94A3B8'}
+              color={starred ? colors.star : colors.textMuted}
             />
           )}
         </View>
@@ -117,9 +122,9 @@ export default function StarredTeachersScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: colors.background }]}>
       {/* Top Header */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
         <View style={styles.headerRow}>
           {Platform.OS !== 'ios' && (
             <TouchableOpacity
@@ -128,21 +133,21 @@ export default function StarredTeachersScreen() {
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.7}
             >
-              <Ionicons name="chevron-back" size={24} color="#1E293B" />
+              <Ionicons name="chevron-back" size={24} color={colors.textPrimary} />
             </TouchableOpacity>
           )}
           <View style={styles.headerTitles}>
-            <Text style={styles.headerTitle}>Starred Teachers</Text>
+            <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Starred Teachers</Text>
           </View>
         </View>
 
         {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={16} color="#64748B" style={styles.searchIcon} />
+        <View style={[styles.searchContainer, { backgroundColor: colors.searchBg }]}>
+          <Ionicons name="search" size={16} color={colors.textSecondary} style={styles.searchIcon} />
           <TextInput
-            style={styles.searchInput}
+            style={[styles.searchInput, { color: colors.textPrimary }]}
             placeholder="Search teachers..."
-            placeholderTextColor="#94A3B8"
+            placeholderTextColor={colors.textMuted}
             value={searchQuery}
             onChangeText={setSearchQuery}
             autoCorrect={false}
@@ -154,7 +159,7 @@ export default function StarredTeachersScreen() {
               onPress={() => setSearchQuery('')}
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
             >
-              <Ionicons name="close-circle" size={16} color="#94A3B8" />
+              <Ionicons name="close-circle" size={16} color={colors.textMuted} />
             </TouchableOpacity>
           )}
         </View>
@@ -162,7 +167,7 @@ export default function StarredTeachersScreen() {
 
       {/* Teachers List */}
       <ScrollView
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={styles.content}
         showsVerticalScrollIndicator={false}
         keyboardDismissMode="on-drag"
@@ -170,20 +175,20 @@ export default function StarredTeachersScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#2563EB"
+            tintColor={colors.primary}
           />
         }
       >
         {teachersLoading && !refreshing && teachers.length === 0 ? (
           <View style={styles.loadingContainer}>
-            <ActivityIndicator size="small" color="#2563EB" />
-            <Text style={styles.loadingText}>Loading faculty directory...</Text>
+            <ActivityIndicator size="small" color={colors.primary} />
+            <Text style={[styles.loadingText, { color: colors.textSecondary }]}>Loading faculty directory...</Text>
           </View>
         ) : totalMatches === 0 ? (
           <View style={styles.emptyState}>
-            <Ionicons name="search-outline" size={36} color="#94A3B8" />
-            <Text style={styles.emptyTitle}>No teachers found</Text>
-            <Text style={styles.emptySub}>
+            <Ionicons name="search-outline" size={36} color={colors.textMuted} />
+            <Text style={[styles.emptyTitle, { color: colors.textPrimary }]}>No teachers found</Text>
+            <Text style={[styles.emptySub, { color: colors.textSecondary }]}>
               {searchQuery ? `No results matching "${searchQuery}"` : 'No faculty records available'}
             </Text>
             <TouchableOpacity
@@ -191,9 +196,9 @@ export default function StarredTeachersScreen() {
               onPress={handleRequestTeacher}
               activeOpacity={0.7}
             >
-              <Text style={styles.requestLinkText}>
+              <Text style={[styles.requestLinkText, { color: colors.textSecondary }]}>
                 Don't see your teacher?{' '}
-                <Text style={styles.requestLinkHighlight}>Request to add them</Text>
+                <Text style={[styles.requestLinkHighlight, { color: colors.primary }]}>Request to add them</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -201,8 +206,8 @@ export default function StarredTeachersScreen() {
           <View>
             {starredList.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionHeading}>STARRED ({starredList.length})</Text>
-                <View style={styles.cardGroup}>
+                <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>STARRED ({starredList.length})</Text>
+                <View style={[styles.cardGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
                   {starredList.map((teacher, index) =>
                     renderTeacherRow(teacher, index, starredList.length)
                   )}
@@ -213,11 +218,11 @@ export default function StarredTeachersScreen() {
             {unstarredList.length > 0 && (
               <View style={styles.section}>
                 {starredList.length > 0 && (
-                  <Text style={styles.sectionHeading}>
+                  <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>
                     {searchQuery.trim() ? 'OTHER FACULTY' : 'ALL FACULTY'}
                   </Text>
                 )}
-                <View style={styles.cardGroup}>
+                <View style={[styles.cardGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
                   {unstarredList.map((teacher, index) =>
                     renderTeacherRow(teacher, index, unstarredList.length)
                   )}
@@ -231,9 +236,9 @@ export default function StarredTeachersScreen() {
                 onPress={handleRequestTeacher}
                 activeOpacity={0.7}
               >
-                <Text style={styles.requestLinkText}>
+                <Text style={[styles.requestLinkText, { color: colors.textSecondary }]}>
                   Don't see your teacher?{' '}
-                  <Text style={styles.requestLinkHighlight}>Request to add them</Text>
+                  <Text style={[styles.requestLinkHighlight, { color: colors.primary }]}>Request to add them</Text>
                 </Text>
               </TouchableOpacity>
             </View>
@@ -247,12 +252,9 @@ export default function StarredTeachersScreen() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   header: {
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
     paddingHorizontal: 20,
     paddingTop: Platform.OS === 'ios' ? 24 : 12,
     paddingBottom: 16,
@@ -274,13 +276,11 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#0F172A',
     letterSpacing: -0.3,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
     borderRadius: 10,
     paddingHorizontal: 12,
     height: 40,
@@ -291,12 +291,10 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#0F172A',
     paddingVertical: 0,
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   content: {
     padding: 20,
@@ -308,16 +306,13 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
     letterSpacing: 0.6,
     marginBottom: 8,
     marginLeft: 2,
   },
   cardGroup: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     overflow: 'hidden',
   },
   teacherRow: {
@@ -328,7 +323,6 @@ const styles = StyleSheet.create({
   },
   rowDivider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
   },
   teacherInfo: {
     flex: 1,
@@ -337,10 +331,8 @@ const styles = StyleSheet.create({
   teacherName: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0F172A',
   },
   teacherNameStarred: {
-    color: '#0F172A',
     fontWeight: '700',
   },
   starAction: {
@@ -353,7 +345,6 @@ const styles = StyleSheet.create({
   },
   loadingText: {
     fontSize: 13,
-    color: '#64748B',
     marginTop: 10,
   },
   emptyState: {
@@ -364,12 +355,10 @@ const styles = StyleSheet.create({
   emptyTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#0F172A',
     marginTop: 12,
   },
   emptySub: {
     fontSize: 13,
-    color: '#64748B',
     marginTop: 4,
     textAlign: 'center',
   },
@@ -390,11 +379,9 @@ const styles = StyleSheet.create({
   },
   requestLinkText: {
     fontSize: 13,
-    color: '#64748B',
     textAlign: 'center',
   },
   requestLinkHighlight: {
-    color: '#2563EB',
     fontWeight: '600',
     textDecorationLine: 'underline',
   },

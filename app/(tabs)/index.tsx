@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useData } from '../../src/context/DataContext';
+import { useTheme } from '../../src/context/ThemeContext';
 import { getGreeting, getCurrentTimeStr, timeToSeconds, getPassingTimeStatus } from '../../src/utils/time';
 import { formatPeriodsImpacted, getAbsentTeachersForPeriod } from '../../src/services/absenceService';
 import { TodaySchedule } from '../../src/components/schedule/TodaySchedule';
@@ -23,6 +24,7 @@ import { LoadingScreen } from '../../src/components/common/LoadingScreen';
 export default function TodayScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
 
   const {
     schedule,
@@ -87,9 +89,9 @@ export default function TodayScreen() {
   }
 
   return (
-    <View style={styles.screen}>
+    <View style={[styles.screen, { backgroundColor: colors.background }]}>
       <ScrollView
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={[
           styles.content,
           {
@@ -103,22 +105,22 @@ export default function TodayScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#2563EB"
+            tintColor={colors.primary}
           />
         }
       >
         <View style={styles.wrapper}>
           {/* Centered Brand Header + Greeting */}
           <View style={styles.header}>
-            <BCAwayLogo width={54} color="#2563EB" />
-            <Text style={styles.greeting}>{greeting}</Text>
+            <BCAwayLogo width={54} color={colors.primary} />
+            <Text style={[styles.greeting, { color: colors.textPrimary }]}>{greeting}</Text>
           </View>
 
           {/* Section: Teacher Absences */}
           <View style={styles.sectionHeaderRow}>
             <View style={styles.sectionTitleGroup}>
-              <Ionicons name="people-outline" size={16} color="#64748B" style={{ marginRight: 6 }} />
-              <Text style={styles.sectionTitle}>Teacher Absences</Text>
+              <Ionicons name="people-outline" size={16} color={colors.textSecondary} style={{ marginRight: 6 }} />
+              <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Teacher Absences</Text>
             </View>
             <TouchableOpacity
               style={styles.allAbsencesButton}
@@ -126,18 +128,18 @@ export default function TodayScreen() {
               hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               activeOpacity={0.7}
             >
-              <Text style={styles.allAbsencesText}>All Absences</Text>
-              <Ionicons name="arrow-forward" size={13} color="#2563EB" style={{ marginLeft: 4 }} />
+              <Text style={[styles.allAbsencesText, { color: colors.primary }]}>All Absences</Text>
+              <Ionicons name="arrow-forward" size={13} color={colors.primary} style={{ marginLeft: 4 }} />
             </TouchableOpacity>
           </View>
 
           {/* Teacher Absences Hero Card */}
-          <View style={styles.heroCard}>
+          <View style={[styles.heroCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
             {absencesError ? (
               <View style={styles.heroEmpty}>
                 <Text style={styles.heroEmoji}>⚠️</Text>
-                <Text style={styles.heroTitle}>Absences Unavailable</Text>
-                <Text style={styles.heroSubtitle}>Could not load today's absence data</Text>
+                <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>Absences Unavailable</Text>
+                <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>Could not load today's absence data</Text>
               </View>
             ) : starredTeacherIds.length === 0 ? (
               <TouchableOpacity
@@ -148,13 +150,13 @@ export default function TodayScreen() {
                 }}
                 activeOpacity={0.7}
               >
-                <View style={styles.starPromptIconCircle}>
-                  <Ionicons name="star" size={26} color="#94A3B8" />
+                <View style={[styles.starPromptIconCircle, { backgroundColor: colors.surfaceSubtle }]}>
+                  <Ionicons name="star" size={26} color={colors.textMuted} />
                 </View>
-                <Text style={styles.starPromptTitle}>Track Your Teachers</Text>
-                <View style={styles.starPromptButton}>
-                  <Text style={styles.starPromptButtonText}>Choose Starred Teachers</Text>
-                  <Ionicons name="arrow-forward" size={13} color="#2563EB" style={{ marginLeft: 4 }} />
+                <Text style={[styles.starPromptTitle, { color: colors.textPrimary }]}>Track Your Teachers</Text>
+                <View style={[styles.starPromptButton, { backgroundColor: colors.primarySubtle }]}>
+                  <Text style={[styles.starPromptButtonText, { color: colors.primary }]}>Choose Starred Teachers</Text>
+                  <Ionicons name="arrow-forward" size={13} color={colors.primary} style={{ marginLeft: 4 }} />
                 </View>
               </TouchableOpacity>
             ) : firstAbsent ? (
@@ -167,23 +169,23 @@ export default function TodayScreen() {
               >
                 <View style={styles.heroMain}>
                   <View style={styles.heroTextGroup}>
-                    <Text style={styles.heroTitle}>{firstAbsent.teacher}</Text>
-                    <Text style={styles.heroSubtitle}>{formatPeriodsImpacted(firstAbsent.periodsImpacted)}</Text>
+                    <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>{firstAbsent.teacher}</Text>
+                    <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>{formatPeriodsImpacted(firstAbsent.periodsImpacted)}</Text>
                   </View>
                 </View>
 
                 {otherAbsentTeachers.length > 0 && (
                   <View style={styles.heroSecondaryList}>
-                    <View style={styles.heroDivider} />
+                    <View style={[styles.heroDivider, { backgroundColor: colors.divider }]} />
                     {otherAbsentTeachers.slice(0, 2).map(t => (
                       <View key={t.id} style={styles.heroSecondaryRow}>
-                        <Text style={styles.heroSecondaryName}>{t.teacher}</Text>
-                        <Text style={styles.heroSecondaryDuration}>{formatPeriodsImpacted(t.periodsImpacted)}</Text>
+                        <Text style={[styles.heroSecondaryName, { color: colors.textPrimary }]}>{t.teacher}</Text>
+                        <Text style={[styles.heroSecondaryDuration, { color: colors.textSecondary }]}>{formatPeriodsImpacted(t.periodsImpacted)}</Text>
                       </View>
                     ))}
                     {otherAbsentTeachers.length > 2 && (
                       <View style={{ marginTop: 8 }}>
-                        <Text style={styles.heroMoreText}>
+                        <Text style={[styles.heroMoreText, { color: colors.primary }]}>
                           +{otherAbsentTeachers.length - 2} more absent today
                         </Text>
                       </View>
@@ -194,14 +196,14 @@ export default function TodayScreen() {
             ) : schedule && !schedule.hasSchool ? (
               <View style={styles.heroEmpty}>
                 <Text style={styles.heroEmoji}>🎉</Text>
-                <Text style={styles.heroTitle}>No School Today</Text>
-                <Text style={styles.heroSubtitle}>Enjoy your day off!</Text>
+                <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>No School Today</Text>
+                <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>Enjoy your day off!</Text>
               </View>
             ) : absentTeachers.length === 0 ? (
               <View style={styles.heroEmpty}>
                 <Text style={styles.heroEmoji}>🎉</Text>
-                <Text style={styles.heroTitle}>No Absences Today</Text>
-                <Text style={styles.heroSubtitle}>No faculty absences reported today</Text>
+                <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>No Absences Today</Text>
+                <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>No faculty absences reported today</Text>
               </View>
             ) : (
               <TouchableOpacity
@@ -213,8 +215,8 @@ export default function TodayScreen() {
                 activeOpacity={0.7}
               >
                 <Text style={styles.heroEmoji}>🎉</Text>
-                <Text style={styles.heroTitle}>Your Teachers are Present</Text>
-                <Text style={styles.heroSubtitle}>
+                <Text style={[styles.heroTitle, { color: colors.textPrimary }]}>Your Teachers are Present</Text>
+                <Text style={[styles.heroSubtitle, { color: colors.textSecondary }]}>
                   {`None of your starred teachers are absent today (${absentTeachers.length} other ${absentTeachers.length === 1 ? 'teacher' : 'teachers'} absent)`}
                 </Text>
               </TouchableOpacity>
@@ -224,17 +226,17 @@ export default function TodayScreen() {
           {/* Section: Today's Schedule */}
           <View style={[styles.sectionHeaderRow, { marginTop: 28 }]}>
             <View style={styles.sectionTitleGroup}>
-              <Ionicons name="time-outline" size={16} color="#64748B" style={{ marginRight: 6 }} />
-              <Text style={styles.sectionTitle}>Today's Schedule</Text>
+              <Ionicons name="time-outline" size={16} color={colors.textSecondary} style={{ marginRight: 6 }} />
+              <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Today's Schedule</Text>
             </View>
             {currentPeriod ? (
-              <Text style={styles.currentPeriodIndicator}>
+              <Text style={[styles.currentPeriodIndicator, { color: colors.primary }]}>
                 {currentPeriod.period.toUpperCase() === 'IGS'
                   ? 'In IGS'
                   : `In Period ${currentPeriod.period}`}
               </Text>
             ) : passingTimeStatus ? (
-              <Text style={styles.currentPeriodIndicator}>
+              <Text style={[styles.currentPeriodIndicator, { color: colors.primary }]}>
                 {passingTimeStatus}
               </Text>
             ) : null}
@@ -254,11 +256,9 @@ export default function TodayScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   content: {
     paddingHorizontal: 20,
@@ -274,7 +274,6 @@ const styles = StyleSheet.create({
   greeting: {
     fontSize: 28,
     fontWeight: '800',
-    color: '#0F172A',
     marginTop: 14,
     letterSpacing: -0.6,
   },
@@ -291,7 +290,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#475569',
   },
   allAbsencesButton: {
     flexDirection: 'row',
@@ -300,19 +298,15 @@ const styles = StyleSheet.create({
   allAbsencesText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
   },
   currentPeriodIndicator: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#2563EB',
   },
   heroCard: {
     padding: 16,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
   },
   starPromptContainer: {
     paddingVertical: 14,
@@ -323,7 +317,6 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 24,
-    backgroundColor: '#F1F5F9',
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 10,
@@ -331,13 +324,11 @@ const styles = StyleSheet.create({
   starPromptTitle: {
     fontSize: 17,
     fontWeight: '700',
-    color: '#0F172A',
     marginBottom: 12,
   },
   starPromptButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#EFF6FF',
     paddingHorizontal: 14,
     paddingVertical: 7,
     borderRadius: 8,
@@ -345,7 +336,6 @@ const styles = StyleSheet.create({
   starPromptButtonText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
   },
   heroMain: {
     flexDirection: 'row',
@@ -358,19 +348,16 @@ const styles = StyleSheet.create({
   heroTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#0F172A',
     letterSpacing: -0.3,
   },
   heroSubtitle: {
     fontSize: 14,
-    color: '#64748B',
     marginTop: 3,
     fontWeight: '500',
     textAlign: 'center',
   },
   heroDivider: {
     height: StyleSheet.hairlineWidth,
-    backgroundColor: '#E2E8F0',
     marginVertical: 12,
   },
   heroSecondaryList: {
@@ -385,16 +372,13 @@ const styles = StyleSheet.create({
   heroSecondaryName: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#1E293B',
   },
   heroSecondaryDuration: {
     fontSize: 13,
-    color: '#64748B',
     fontWeight: '500',
   },
   heroMoreText: {
     fontSize: 13,
-    color: '#2563EB',
     fontWeight: '600',
   },
   heroEmpty: {

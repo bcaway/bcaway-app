@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { SchedulePeriod } from '../../types';
 import { formatTimeRange, getTimeRemainingInPeriod } from '../../utils/time';
+import { useTheme } from '../../context/ThemeContext';
 
 interface PeriodCardProps {
   period: SchedulePeriod;
@@ -22,6 +23,7 @@ export function PeriodCard({
   onPress,
   showDivider = true,
 }: PeriodCardProps) {
+  const { colors } = useTheme();
   const hasAbsences = absentCount > 0;
 
   const [remainingText, setRemainingText] = useState<string | null>(() =>
@@ -50,28 +52,43 @@ export function PeriodCard({
     <Pressable
       onPress={handlePress}
       disabled={!onPress}
-      android_ripple={{ color: 'rgba(0, 0, 0, 0.05)' }}
+      android_ripple={{ color: colors.surfaceSubtle }}
       style={({ pressed }) => [
         styles.row,
-        isCurrentPeriod && styles.rowCurrent,
+        { backgroundColor: colors.card },
+        isCurrentPeriod && { backgroundColor: colors.surfaceSubtle },
         isPast && styles.rowPast,
-        pressed && styles.rowPressed,
-        showDivider && styles.divider,
+        pressed && { backgroundColor: colors.surfaceSubtle },
+        showDivider && [styles.divider, { borderBottomColor: colors.border }],
       ]}
     >
       {/* Active period left indicator bar */}
-      {isCurrentPeriod && <View style={styles.activeIndicatorBar} />}
+      {isCurrentPeriod && (
+        <View style={[styles.activeIndicatorBar, { backgroundColor: colors.primary }]} />
+      )}
 
       {/* Period Identifier Column */}
       <View style={styles.periodCol}>
-        <Text style={[styles.periodText, isCurrentPeriod && styles.periodTextCurrent]}>
+        <Text
+          style={[
+            styles.periodText,
+            { color: colors.textSecondary },
+            isCurrentPeriod && [styles.periodTextCurrent, { color: colors.primary }],
+          ]}
+        >
           {periodLabel}
         </Text>
       </View>
 
       {/* Bell Time Range Column */}
       <View style={styles.timeCol}>
-        <Text style={[styles.timeText, isCurrentPeriod && styles.timeTextCurrent]}>
+        <Text
+          style={[
+            styles.timeText,
+            { color: colors.textPrimary },
+            isCurrentPeriod && [styles.timeTextCurrent, { color: colors.textPrimary }],
+          ]}
+        >
           {formatTimeRange(period.start, period.end)}
         </Text>
       </View>
@@ -80,20 +97,20 @@ export function PeriodCard({
       <View style={styles.statusCol}>
         {isCurrentPeriod && (
           <View style={styles.nowBadge}>
-            <Text style={styles.nowText}>Now</Text>
+            <Text style={[styles.nowText, { color: colors.primary }]}>Now</Text>
             {remainingText ? (
-              <Text style={styles.remainingText}>• {remainingText}</Text>
+              <Text style={[styles.remainingText, { color: colors.textSecondary }]}>• {remainingText}</Text>
             ) : null}
           </View>
         )}
 
         {hasAbsences ? (
-          <Text style={styles.absenceCountText}>
+          <Text style={[styles.absenceCountText, { color: colors.absent }]}>
             {absentCount} absent
           </Text>
         ) : null}
 
-        <Ionicons name="chevron-forward" size={14} color="#CBD5E1" style={styles.chevron} />
+        <Ionicons name="chevron-forward" size={14} color={colors.textMuted} style={styles.chevron} />
       </View>
     </Pressable>
   );
@@ -105,21 +122,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 12,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
     position: 'relative',
-  },
-  rowCurrent: {
-    backgroundColor: '#F8FAFC',
   },
   rowPast: {
     opacity: 0.5,
   },
-  rowPressed: {
-    backgroundColor: '#F1F5F9',
-  },
   divider: {
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
   },
   activeIndicatorBar: {
     position: 'absolute',
@@ -127,7 +136,6 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: 3,
-    backgroundColor: '#2563EB',
   },
   periodCol: {
     width: 34,
@@ -136,11 +144,9 @@ const styles = StyleSheet.create({
   periodText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#64748B',
     fontVariant: ['tabular-nums'],
   },
   periodTextCurrent: {
-    color: '#2563EB',
     fontWeight: '700',
   },
   timeCol: {
@@ -149,12 +155,10 @@ const styles = StyleSheet.create({
   timeText: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#0F172A',
     fontVariant: ['tabular-nums'],
   },
   timeTextCurrent: {
     fontWeight: '600',
-    color: '#0F172A',
   },
   statusCol: {
     flexDirection: 'row',
@@ -169,17 +173,14 @@ const styles = StyleSheet.create({
   nowText: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#2563EB',
   },
   remainingText: {
     fontSize: 11,
     fontWeight: '500',
-    color: '#64748B',
   },
   absenceCountText: {
     fontSize: 13,
     fontWeight: '500',
-    color: '#DC2626',
   },
   chevron: {
     marginLeft: 2,

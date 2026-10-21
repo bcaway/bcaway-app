@@ -7,6 +7,7 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { BCAwayLogo } from './BCAwayLogo';
+import { useTheme } from '../../context/ThemeContext';
 
 interface BCAwayLoadingProps {
   fullScreen?: boolean;
@@ -16,14 +17,21 @@ interface BCAwayLoadingProps {
 
 export function BCAwayLoading({ fullScreen = false, size, style }: BCAwayLoadingProps) {
   const { width: screenWidth } = useWindowDimensions();
+  const { colors } = useTheme();
 
   // Proportions matching myBCA loading screen: mark width is ~34% of screen width
   const defaultSize = Math.min(150, Math.max(110, Math.round(screenWidth * 0.34)));
   const logoSize = size ?? defaultSize;
 
   return (
-    <View style={[styles.container, fullScreen && styles.fullScreen, style]}>
-      <BCAwayLogo width={logoSize} />
+    <View
+      style={[
+        styles.container,
+        fullScreen && [styles.fullScreen, { backgroundColor: colors.background }],
+        style,
+      ]}
+    >
+      <BCAwayLogo width={logoSize} color={colors.primary} />
     </View>
   );
 }
@@ -43,7 +51,6 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     zIndex: 9999,
-    backgroundColor: '#FFFFFF',
     alignItems: 'center',
     justifyContent: 'center',
     minHeight: undefined,

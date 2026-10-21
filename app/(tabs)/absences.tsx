@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import * as Haptics from 'expo-haptics';
 import { format } from 'date-fns';
 import { useData } from '../../src/context/DataContext';
+import { useTheme } from '../../src/context/ThemeContext';
 import { AbsenceListItem } from '../../src/components/common/AbsenceListItem';
 import { EmptyState } from '../../src/components/ui/EmptyState';
 import { BCAwayLoading } from '../../src/components/common/BCAwayLoading';
@@ -20,6 +21,7 @@ import { Ionicons } from '@expo/vector-icons';
 
 export default function AbsencesScreen() {
   const insets = useSafeAreaInsets();
+  const { colors } = useTheme();
   const {
     absentTeachers,
     starredAbsences,
@@ -73,29 +75,29 @@ export default function AbsencesScreen() {
   const todayString = format(new Date(), 'EEEE, MMMM d');
 
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background, paddingTop: insets.top }]}>
       {/* Sleek standard-sized header across all platforms */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
         <View style={styles.wrapper}>
-          <Text style={styles.title}>Teacher Absences</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Teacher Absences</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
             {todayString}
             {absentTeachers.length > 0 ? ` • ${absentTeachers.length} absent` : ''}
           </Text>
 
           {/* Unified search bar adapted to each platform */}
           <View style={styles.searchRow}>
-            <View style={styles.searchInputContainer}>
+            <View style={[styles.searchInputContainer, { backgroundColor: colors.searchBg, borderColor: colors.border }]}>
               <Ionicons
                 name="search"
                 size={16}
-                color="#64748B"
+                color={colors.textSecondary}
                 style={styles.searchIcon}
               />
               <TextInput
-                style={styles.searchInput}
+                style={[styles.searchInput, { color: colors.textPrimary }]}
                 placeholder="Search by teacher name or period..."
-                placeholderTextColor="#94A3B8"
+                placeholderTextColor={colors.textMuted}
                 value={searchQuery}
                 onChangeText={setSearchQuery}
                 clearButtonMode="never"
@@ -112,7 +114,7 @@ export default function AbsencesScreen() {
                   <Ionicons
                     name="close-circle"
                     size={16}
-                    color="#94A3B8"
+                    color={colors.textMuted}
                   />
                 </TouchableOpacity>
               )}
@@ -120,7 +122,7 @@ export default function AbsencesScreen() {
           </View>
 
           {searchQuery.trim().length > 0 && (
-            <Text style={styles.searchMeta}>
+            <Text style={[styles.searchMeta, { color: colors.textSecondary }]}>
               Showing {totalFilteredCount} of {absentTeachers.length} {absentTeachers.length === 1 ? 'teacher' : 'teachers'}
             </Text>
           )}
@@ -128,7 +130,7 @@ export default function AbsencesScreen() {
       </View>
 
       <ScrollView
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={[
           styles.content,
           {
@@ -143,7 +145,7 @@ export default function AbsencesScreen() {
           <RefreshControl
             refreshing={refreshing}
             onRefresh={onRefresh}
-            tintColor="#2563EB"
+            tintColor={colors.primary}
           />
         }
       >
@@ -153,7 +155,7 @@ export default function AbsencesScreen() {
               <BCAwayLoading />
             </View>
           ) : error ? (
-            <View style={styles.emptyCard}>
+            <View style={[styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <EmptyState
                 icon="⚠️"
                 title="Could not load absences"
@@ -165,8 +167,8 @@ export default function AbsencesScreen() {
               {/* Starred Faculty Section */}
               {filteredStarred.length > 0 && (
                 <View style={styles.section}>
-                  <Text style={styles.sectionHeading}>Starred Faculty</Text>
-                  <View style={styles.ledger}>
+                  <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>Starred Faculty</Text>
+                  <View style={[styles.ledger, { backgroundColor: colors.card, borderColor: colors.border }]}>
                     {filteredStarred.map((teacher, index) => (
                       <AbsenceListItem
                         key={`starred-${teacher.teacher}-${index}`}
@@ -183,9 +185,9 @@ export default function AbsencesScreen() {
               {filteredOther.length > 0 && (
                 <View style={styles.section}>
                   {filteredStarred.length > 0 && (
-                    <Text style={styles.sectionHeading}>Other Faculty</Text>
+                    <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>Other Faculty</Text>
                   )}
-                  <View style={styles.ledger}>
+                  <View style={[styles.ledger, { backgroundColor: colors.card, borderColor: colors.border }]}>
                     {filteredOther.map((teacher, index) => (
                       <AbsenceListItem
                         key={`other-${teacher.teacher}-${index}`}
@@ -199,7 +201,7 @@ export default function AbsencesScreen() {
               )}
             </View>
           ) : (
-            <View style={styles.emptyCard}>
+            <View style={[styles.emptyCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
               <EmptyState
                 icon={searchQuery ? '🔍' : '🎉'}
                 title={searchQuery ? 'No matching teachers' : 'No absences today!'}
@@ -220,15 +222,12 @@ export default function AbsencesScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   header: {
     paddingHorizontal: 20,
     paddingTop: 14,
     paddingBottom: 14,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
   },
   wrapper: {
     width: '100%',
@@ -236,12 +235,10 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0F172A',
     letterSpacing: -0.4,
   },
   subtitle: {
     fontSize: 13,
-    color: '#64748B',
     marginTop: 2,
     marginBottom: 10,
   },
@@ -251,10 +248,8 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F1F5F9',
     borderRadius: 10,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     paddingHorizontal: 12,
     height: 40,
   },
@@ -264,7 +259,6 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#0F172A',
     height: '100%',
     padding: 0,
   },
@@ -273,12 +267,10 @@ const styles = StyleSheet.create({
   },
   searchMeta: {
     fontSize: 12,
-    color: '#64748B',
     marginTop: 6,
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   content: {
     paddingHorizontal: 20,
@@ -291,24 +283,19 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#64748B',
     letterSpacing: 0.5,
     marginBottom: 8,
     textTransform: 'uppercase',
   },
   ledger: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     overflow: 'hidden',
     width: '100%',
   },
   emptyCard: {
-    backgroundColor: '#F8FAFC',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     paddingVertical: 20,
     width: '100%',
   },

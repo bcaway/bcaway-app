@@ -6,6 +6,7 @@ import { StatusBar } from 'expo-status-bar';
 import { LoadingScreen } from '../src/components/common/LoadingScreen';
 import { DataProvider, useData } from '../src/context/DataContext';
 import { AuthProvider, useAuth } from '../src/context/AuthContext';
+import { ThemeProvider, useTheme } from '../src/context/ThemeContext';
 import { useNotifications } from '../src/hooks/useNotifications';
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -13,6 +14,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 function RootLayoutContent() {
   const { isReady } = useData();
   const { session, isLoading: authLoading } = useAuth();
+  const { isDark, colors } = useTheme();
   const segments = useSegments();
   const router = useRouter();
 
@@ -35,8 +37,14 @@ function RootLayoutContent() {
 
   return (
     <>
-      <StatusBar style="dark" />
-      <Stack screenOptions={{ headerShown: false }} initialRouteName="(tabs)">
+      <StatusBar style={isDark ? 'light' : 'dark'} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+        initialRouteName="(tabs)"
+      >
         <Stack.Screen name="login" options={{ headerShown: false, gestureEnabled: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
@@ -71,10 +79,12 @@ export default function RootLayout() {
   useNotifications();
 
   return (
-    <AuthProvider>
-      <DataProvider>
-        <RootLayoutContent />
-      </DataProvider>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <DataProvider>
+          <RootLayoutContent />
+        </DataProvider>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }

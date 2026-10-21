@@ -15,11 +15,13 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Constants from 'expo-constants';
 import { useAuth, isBcawayEmail } from '../../src/context/AuthContext';
+import { useTheme, ThemeMode } from '../../src/context/ThemeContext';
 
 export default function SettingsScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { user, signOut } = useAuth();
+  const { mode, setMode, colors } = useTheme();
 
   const openLink = (url: string) => {
     Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
@@ -47,18 +49,23 @@ export default function SettingsScreen() {
     }
   };
 
+  const handleSelectTheme = (newMode: ThemeMode) => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    setMode(newMode);
+  };
+
   return (
-    <View style={[styles.screen, { paddingTop: insets.top }]}>
+    <View style={[styles.screen, { backgroundColor: colors.background, paddingTop: insets.top }]}>
       {/* Sleek standard-sized header across all platforms */}
-      <View style={styles.header}>
+      <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
         <View style={styles.wrapper}>
-          <Text style={styles.headerTitle}>Settings</Text>
-          <Text style={styles.headerSub}>Preferences and information</Text>
+          <Text style={[styles.headerTitle, { color: colors.textPrimary }]}>Settings</Text>
+          <Text style={[styles.headerSub, { color: colors.textSecondary }]}>Preferences and information</Text>
         </View>
       </View>
 
       <ScrollView
-        style={styles.container}
+        style={[styles.container, { backgroundColor: colors.background }]}
         contentContainerStyle={[
           styles.content,
           {
@@ -69,10 +76,62 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.wrapper}>
+          {/* Section: Appearance (Dark Mode) */}
+          <View style={styles.section}>
+            <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>Appearance</Text>
+            <View style={[styles.cardGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <View style={styles.themeSelectorRow}>
+                {(['system', 'light', 'dark'] as ThemeMode[]).map((m) => {
+                  const isActive = mode === m;
+                  const label = m === 'system' ? 'System' : m === 'light' ? 'Light' : 'Dark';
+                  const iconName =
+                    m === 'system'
+                      ? 'phone-portrait-outline'
+                      : m === 'light'
+                      ? 'sunny-outline'
+                      : 'moon-outline';
+
+                  return (
+                    <TouchableOpacity
+                      key={m}
+                      style={[
+                        styles.themeButton,
+                        {
+                          backgroundColor: isActive ? colors.primarySubtle : colors.surface,
+                          borderColor: isActive ? colors.primary : colors.border,
+                        },
+                      ]}
+                      onPress={() => handleSelectTheme(m)}
+                      activeOpacity={0.7}
+                    >
+                      <Ionicons
+                        name={iconName}
+                        size={18}
+                        color={isActive ? colors.primary : colors.textSecondary}
+                        style={{ marginBottom: 4 }}
+                      />
+                      <Text
+                        style={[
+                          styles.themeButtonText,
+                          {
+                            color: isActive ? colors.primary : colors.textSecondary,
+                            fontWeight: isActive ? '700' : '500',
+                          },
+                        ]}
+                      >
+                        {label}
+                      </Text>
+                    </TouchableOpacity>
+                  );
+                })}
+              </View>
+            </View>
+          </View>
+
           {/* Section: Starred Teachers */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>My Teachers</Text>
-            <View style={styles.cardGroup}>
+            <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>My Teachers</Text>
+            <View style={[styles.cardGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <TouchableOpacity
                 style={styles.starredRow}
                 onPress={() => {
@@ -82,27 +141,27 @@ export default function SettingsScreen() {
                 activeOpacity={0.7}
               >
                 <View style={styles.starredLeft}>
-                  <View style={styles.starBadge}>
-                    <Ionicons name="star" size={16} color="#F59E0B" />
+                  <View style={[styles.starBadge, { backgroundColor: colors.starBg }]}>
+                    <Ionicons name="star" size={16} color={colors.star} />
                   </View>
                   <View style={styles.starredTextContainer}>
-                    <Text style={styles.starredTitle}>Starred Teachers</Text>
+                    <Text style={[styles.starredTitle, { color: colors.textPrimary }]}>Starred Teachers</Text>
                   </View>
                 </View>
-                <Ionicons name="chevron-forward" size={14} color="#94A3B8" />
+                <Ionicons name="chevron-forward" size={14} color={colors.textMuted} />
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Section: Account */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>Account</Text>
-            <View style={styles.cardGroup}>
-              <View style={[styles.metaRow, styles.divider]}>
-                <Text style={styles.metaLabel}>
+            <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>Account</Text>
+            <View style={[styles.cardGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <View style={[styles.metaRow, { borderBottomColor: colors.border }]}>
+                <Text style={[styles.metaLabel, { color: colors.textPrimary }]}>
                   {isBcawayEmail(user?.email || '') ? 'Account Email' : 'Student Email'}
                 </Text>
-                <Text style={styles.metaValue} numberOfLines={1}>
+                <Text style={[styles.metaValue, { color: colors.textSecondary }]} numberOfLines={1}>
                   {user?.email || 'student@bergen.org'}
                 </Text>
               </View>
@@ -115,40 +174,40 @@ export default function SettingsScreen() {
                 <Ionicons
                   name="log-out-outline"
                   size={16}
-                  color="#DC2626"
+                  color={colors.absent}
                   style={{ marginRight: 8 }}
                 />
-                <Text style={styles.signOutText}>Sign Out</Text>
+                <Text style={[styles.signOutText, { color: colors.absent }]}>Sign Out</Text>
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Section: Links & Community */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>Online & Community</Text>
-            <View style={styles.cardGroup}>
+            <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>Online & Community</Text>
+            <View style={[styles.cardGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <TouchableOpacity
-                style={[styles.linkRow, styles.divider]}
+                style={[styles.linkRow, { borderBottomColor: colors.border }]}
                 onPress={() => openLink('https://www.bcaway.app')}
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
-                  <Text style={styles.linkLabel}>Website</Text>
-                  <Text style={styles.linkTarget}>bcaway.app</Text>
+                  <Text style={[styles.linkLabel, { color: colors.textPrimary }]}>Website</Text>
+                  <Text style={[styles.linkTarget, { color: colors.textSecondary }]}>bcaway.app</Text>
                 </View>
-                <Ionicons name="open-outline" size={15} color="#64748B" />
+                <Ionicons name="open-outline" size={15} color={colors.textSecondary} />
               </TouchableOpacity>
 
               <TouchableOpacity
-                style={[styles.linkRow, styles.divider]}
+                style={[styles.linkRow, { borderBottomColor: colors.border }]}
                 onPress={() => openLink('https://www.instagram.com/getbcaway/')}
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
-                  <Text style={styles.linkLabel}>Instagram</Text>
-                  <Text style={styles.linkTarget}>@getbcaway</Text>
+                  <Text style={[styles.linkLabel, { color: colors.textPrimary }]}>Instagram</Text>
+                  <Text style={[styles.linkTarget, { color: colors.textSecondary }]}>@getbcaway</Text>
                 </View>
-                <Ionicons name="open-outline" size={15} color="#64748B" />
+                <Ionicons name="open-outline" size={15} color={colors.textSecondary} />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -157,28 +216,28 @@ export default function SettingsScreen() {
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
-                  <Text style={styles.linkLabel}>GitHub</Text>
-                  <Text style={styles.linkTarget}>github.com/bcaway</Text>
+                  <Text style={[styles.linkLabel, { color: colors.textPrimary }]}>GitHub</Text>
+                  <Text style={[styles.linkTarget, { color: colors.textSecondary }]}>github.com/bcaway</Text>
                 </View>
-                <Ionicons name="logo-github" size={16} color="#64748B" />
+                <Ionicons name="logo-github" size={16} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Section: Support & Feedback */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>Support & Feedback</Text>
-            <View style={styles.cardGroup}>
+            <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>Support & Feedback</Text>
+            <View style={[styles.cardGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <TouchableOpacity
-                style={[styles.linkRow, styles.divider]}
+                style={[styles.linkRow, { borderBottomColor: colors.border }]}
                 onPress={() => openLink('https://www.bcaway.app/requestteacher')}
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
-                  <Text style={styles.linkLabel}>Request Teacher</Text>
-                  <Text style={styles.linkTarget}>bcaway.app/requestteacher</Text>
+                  <Text style={[styles.linkLabel, { color: colors.textPrimary }]}>Request Teacher</Text>
+                  <Text style={[styles.linkTarget, { color: colors.textSecondary }]}>bcaway.app/requestteacher</Text>
                 </View>
-                <Ionicons name="person-add-outline" size={16} color="#64748B" />
+                <Ionicons name="person-add-outline" size={16} color={colors.textSecondary} />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -187,28 +246,28 @@ export default function SettingsScreen() {
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
-                  <Text style={styles.linkLabel}>Contact Developer</Text>
-                  <Text style={styles.linkTarget}>support@bcaway.app</Text>
+                  <Text style={[styles.linkLabel, { color: colors.textPrimary }]}>Contact Developer</Text>
+                  <Text style={[styles.linkTarget, { color: colors.textSecondary }]}>support@bcaway.app</Text>
                 </View>
-                <Ionicons name="mail-outline" size={16} color="#64748B" />
+                <Ionicons name="mail-outline" size={16} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Section: Legal & Disclaimers */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>Legal & Disclaimers</Text>
-            <View style={styles.cardGroup}>
+            <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>Legal & Disclaimers</Text>
+            <View style={[styles.cardGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
               <TouchableOpacity
-                style={[styles.linkRow, styles.divider]}
+                style={[styles.linkRow, { borderBottomColor: colors.border }]}
                 onPress={() => openLink('https://www.bcaway.app/privacy')}
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
-                  <Text style={styles.linkLabel}>Privacy Policy</Text>
-                  <Text style={styles.linkTarget}>bcaway.app/privacy</Text>
+                  <Text style={[styles.linkLabel, { color: colors.textPrimary }]}>Privacy Policy</Text>
+                  <Text style={[styles.linkTarget, { color: colors.textSecondary }]}>bcaway.app/privacy</Text>
                 </View>
-                <Ionicons name="open-outline" size={15} color="#64748B" />
+                <Ionicons name="open-outline" size={15} color={colors.textSecondary} />
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -217,31 +276,31 @@ export default function SettingsScreen() {
                 activeOpacity={0.7}
               >
                 <View style={styles.linkLeft}>
-                  <Text style={styles.linkLabel}>Terms & Disclaimers</Text>
-                  <Text style={styles.linkTarget}>bcaway.app/terms</Text>
+                  <Text style={[styles.linkLabel, { color: colors.textPrimary }]}>Terms & Disclaimers</Text>
+                  <Text style={[styles.linkTarget, { color: colors.textSecondary }]}>bcaway.app/terms</Text>
                 </View>
-                <Ionicons name="open-outline" size={15} color="#64748B" />
+                <Ionicons name="open-outline" size={15} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
           </View>
 
           {/* Section: App Information */}
           <View style={styles.section}>
-            <Text style={styles.sectionHeading}>App Information</Text>
-            <View style={styles.cardGroup}>
-              <View style={[styles.metaRow, styles.divider]}>
-                <Text style={styles.metaLabel}>Developer</Text>
-                <Text style={styles.metaValue}>Kabir Sekhon</Text>
+            <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>App Information</Text>
+            <View style={[styles.cardGroup, { backgroundColor: colors.card, borderColor: colors.border }]}>
+              <View style={[styles.metaRow, { borderBottomColor: colors.border }]}>
+                <Text style={[styles.metaLabel, { color: colors.textPrimary }]}>Developer</Text>
+                <Text style={[styles.metaValue, { color: colors.textSecondary }]}>Kabir Sekhon</Text>
               </View>
 
-              <View style={[styles.metaRow, styles.divider]}>
-                <Text style={styles.metaLabel}>License</Text>
-                <Text style={styles.metaValue}>AGPL v3.0</Text>
+              <View style={[styles.metaRow, { borderBottomColor: colors.border }]}>
+                <Text style={[styles.metaLabel, { color: colors.textPrimary }]}>License</Text>
+                <Text style={[styles.metaValue, { color: colors.textSecondary }]}>AGPL v3.0</Text>
               </View>
 
               <View style={styles.metaRow}>
-                <Text style={styles.metaLabel}>Version</Text>
-                <Text style={styles.metaValue}>{Constants.expoConfig?.version ?? '1.1.2'}</Text>
+                <Text style={[styles.metaLabel, { color: colors.textPrimary }]}>Version</Text>
+                <Text style={[styles.metaValue, { color: colors.textSecondary }]}>{Constants.expoConfig?.version ?? '1.1.2'}</Text>
               </View>
             </View>
           </View>
@@ -254,15 +313,12 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   header: {
     paddingHorizontal: 20,
     paddingTop: 14,
     paddingBottom: 14,
-    backgroundColor: '#FFFFFF',
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
   },
   wrapper: {
     width: '100%',
@@ -270,17 +326,14 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 22,
     fontWeight: '700',
-    color: '#0F172A',
     letterSpacing: -0.4,
   },
   headerSub: {
     fontSize: 13,
-    color: '#64748B',
     marginTop: 2,
   },
   container: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   content: {
     paddingHorizontal: 20,
@@ -293,18 +346,31 @@ const styles = StyleSheet.create({
   sectionHeading: {
     fontSize: 12,
     fontWeight: '600',
-    color: '#64748B',
     letterSpacing: 0.5,
     marginBottom: 8,
     textTransform: 'uppercase',
   },
   cardGroup: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     overflow: 'hidden',
     width: '100%',
+  },
+  themeSelectorRow: {
+    flexDirection: 'row',
+    padding: 10,
+    gap: 8,
+  },
+  themeButton: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+  },
+  themeButtonText: {
+    fontSize: 13,
   },
   linkRow: {
     flexDirection: 'row',
@@ -312,7 +378,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: Platform.OS === 'android' ? 14 : 12,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    borderBottomWidth: StyleSheet.hairlineWidth,
     minHeight: Platform.OS === 'android' ? 48 : 44,
   },
   linkLeft: {
@@ -322,11 +388,9 @@ const styles = StyleSheet.create({
   linkLabel: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#0F172A',
   },
   linkTarget: {
     fontSize: 12,
-    color: '#64748B',
     marginTop: 1,
   },
   metaRow: {
@@ -335,35 +399,27 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: Platform.OS === 'android' ? 14 : 12,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
+    borderBottomWidth: StyleSheet.hairlineWidth,
     minHeight: Platform.OS === 'android' ? 48 : 44,
   },
   metaLabel: {
     fontSize: 15,
     fontWeight: '400',
-    color: '#0F172A',
   },
   metaValue: {
     fontSize: 15,
     fontWeight: '400',
-    color: '#64748B',
-  },
-  divider: {
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#E2E8F0',
   },
   signOutRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: Platform.OS === 'android' ? 14 : 12,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
     minHeight: Platform.OS === 'android' ? 48 : 44,
   },
   signOutText: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#DC2626',
   },
   starredRow: {
     flexDirection: 'row',
@@ -371,7 +427,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: Platform.OS === 'android' ? 14 : 12,
     paddingHorizontal: 16,
-    backgroundColor: '#FFFFFF',
     minHeight: Platform.OS === 'android' ? 48 : 44,
   },
   starredLeft: {
@@ -384,7 +439,6 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 7,
-    backgroundColor: '#FEF3C7',
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: 12,
@@ -395,6 +449,5 @@ const styles = StyleSheet.create({
   starredTitle: {
     fontSize: 15,
     fontWeight: '500',
-    color: '#0F172A',
   },
 });

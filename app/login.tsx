@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth, isBergenEmail, isBcawayEmail } from '../src/context/AuthContext';
+import { useTheme } from '../src/context/ThemeContext';
 import { BCAwayLogo } from '../src/components/common/BCAwayLogo';
 
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -24,6 +25,7 @@ export default function LoginScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { session, sendMagicLink, signInWithPassword } = useAuth();
+  const { colors } = useTheme();
 
   const [step, setStep] = useState<'email' | 'sent'>('email');
   const [email, setEmail] = useState('');
@@ -162,7 +164,7 @@ export default function LoginScreen() {
 
   return (
     <KeyboardAvoidingView
-      style={styles.screen}
+      style={[styles.screen, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
     >
       <ScrollView
@@ -181,12 +183,12 @@ export default function LoginScreen() {
         <View style={styles.container}>
           {/* Header */}
           <View style={styles.header}>
-            <BCAwayLogo width={54} color="#2563EB" />
-            <Text style={styles.title}>
+            <BCAwayLogo width={54} color={colors.primary} />
+            <Text style={[styles.title, { color: colors.textPrimary }]}>
               {step === 'email' ? 'Sign in to BCAway' : 'Check your email'}
             </Text>
             {step === 'sent' && (
-              <Text style={styles.subtitle}>
+              <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
                 Tap the confirmation link sent to {email} to sign in to BCAway.
               </Text>
             )}
@@ -194,24 +196,24 @@ export default function LoginScreen() {
 
           {/* Error Banner */}
           {errorMessage && (
-            <View style={styles.errorBanner}>
-              <Ionicons name="alert-circle" size={16} color="#DC2626" style={styles.errorIcon} />
-              <Text style={styles.errorText}>{errorMessage}</Text>
+            <View style={[styles.errorBanner, { backgroundColor: colors.absentBg, borderColor: colors.absentBorder }]}>
+              <Ionicons name="alert-circle" size={16} color={colors.absent} style={styles.errorIcon} />
+              <Text style={[styles.errorText, { color: colors.absentText }]}>{errorMessage}</Text>
             </View>
           )}
 
           {/* Form Content */}
           {step === 'email' ? (
             <View style={styles.form}>
-              <Text style={styles.inputLabel}>
+              <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>
                 {isStaffAccount ? 'ACCOUNT EMAIL' : 'SCHOOL EMAIL'}
               </Text>
-              <View style={styles.inputWrapper}>
-                <Ionicons name="mail-outline" size={18} color="#64748B" style={styles.inputIcon} />
+              <View style={[styles.inputWrapper, { backgroundColor: colors.inputBg, borderColor: colors.border }]}>
+                <Ionicons name="mail-outline" size={18} color={colors.textSecondary} style={styles.inputIcon} />
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { color: colors.textPrimary }]}
                   placeholder="student30@bergen.org"
-                  placeholderTextColor="#94A3B8"
+                  placeholderTextColor={colors.textMuted}
                   value={email}
                   onChangeText={text => {
                     setEmail(text);
@@ -235,14 +237,14 @@ export default function LoginScreen() {
               {/* Password Field: ONLY appears for @bcaway.app accounts */}
               {isStaffAccount && (
                 <>
-                  <Text style={styles.inputLabel}>PASSWORD</Text>
-                  <View style={styles.inputWrapper}>
-                    <Ionicons name="lock-closed-outline" size={18} color="#64748B" style={styles.inputIcon} />
+                  <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>PASSWORD</Text>
+                  <View style={[styles.inputWrapper, { backgroundColor: colors.inputBg, borderColor: colors.border }]}>
+                    <Ionicons name="lock-closed-outline" size={18} color={colors.textSecondary} style={styles.inputIcon} />
                     <TextInput
                       ref={passwordInputRef}
-                      style={styles.input}
+                      style={[styles.input, { color: colors.textPrimary }]}
                       placeholder="Account password"
-                      placeholderTextColor="#94A3B8"
+                      placeholderTextColor={colors.textMuted}
                       value={password}
                       onChangeText={text => {
                         setPassword(text);
@@ -264,7 +266,7 @@ export default function LoginScreen() {
                       <Ionicons
                         name={showPassword ? 'eye-off-outline' : 'eye-outline'}
                         size={18}
-                        color="#64748B"
+                        color={colors.textSecondary}
                       />
                     </TouchableOpacity>
                   </View>
@@ -274,6 +276,7 @@ export default function LoginScreen() {
               <TouchableOpacity
                 style={[
                   styles.primaryButton,
+                  { backgroundColor: colors.primary },
                   (isSubmitting || (isStaffAccount && !password.trim())) && styles.buttonDisabled,
                 ]}
                 onPress={isStaffAccount ? handlePasswordSignIn : handleSendLink}
@@ -295,17 +298,17 @@ export default function LoginScreen() {
                 )}
               </TouchableOpacity>
 
-              <Text style={styles.legalNotice}>
+              <Text style={[styles.legalNotice, { color: colors.textMuted }]}>
                 By signing in, you agree to our{' '}
                 <Text
-                  style={styles.legalLink}
+                  style={[styles.legalLink, { color: colors.textSecondary }]}
                   onPress={() => openLink('https://bcaway.app/terms')}
                 >
                   Terms of Service
                 </Text>
                 {' '}and{' '}
                 <Text
-                  style={styles.legalLink}
+                  style={[styles.legalLink, { color: colors.textSecondary }]}
                   onPress={() => openLink('https://bcaway.app/privacy')}
                 >
                   Privacy Policy
@@ -318,13 +321,17 @@ export default function LoginScreen() {
               <TouchableOpacity
                 onPress={handleResend}
                 disabled={resendCooldown > 0 || isSubmitting}
-                style={[styles.secondaryButton, (resendCooldown > 0 || isSubmitting) && styles.buttonDisabled]}
+                style={[
+                  styles.secondaryButton,
+                  { backgroundColor: colors.surface, borderColor: colors.border },
+                  (resendCooldown > 0 || isSubmitting) && styles.buttonDisabled,
+                ]}
                 activeOpacity={0.8}
               >
                 {isSubmitting ? (
-                  <ActivityIndicator color="#0F172A" size="small" />
+                  <ActivityIndicator color={colors.textPrimary} size="small" />
                 ) : (
-                  <Text style={styles.secondaryButtonText}>
+                  <Text style={[styles.secondaryButtonText, { color: colors.textPrimary }]}>
                     {resendCooldown > 0 ? `Resend link (${resendCooldown}s)` : 'Resend link'}
                   </Text>
                 )}
@@ -336,7 +343,7 @@ export default function LoginScreen() {
                 style={styles.textButton}
                 hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
               >
-                <Text style={styles.actionLinkText}>Use a different email</Text>
+                <Text style={[styles.actionLinkText, { color: colors.primary }]}>Use a different email</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -349,7 +356,6 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
   },
   scrollContent: {
     flexGrow: 1,
@@ -367,7 +373,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: '800',
-    color: '#0F172A',
     letterSpacing: -0.5,
     marginTop: 16,
     marginBottom: 8,
@@ -375,7 +380,6 @@ const styles = StyleSheet.create({
   },
   subtitle: {
     fontSize: 14,
-    color: '#64748B',
     lineHeight: 20,
     textAlign: 'center',
     paddingHorizontal: 8,
@@ -383,9 +387,7 @@ const styles = StyleSheet.create({
   errorBanner: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    backgroundColor: '#FEF2F2',
     borderWidth: 1,
-    borderColor: '#FECACA',
     borderRadius: 8,
     padding: 12,
     marginBottom: 20,
@@ -397,7 +399,6 @@ const styles = StyleSheet.create({
   errorText: {
     flex: 1,
     fontSize: 13,
-    color: '#B91C1C',
     fontWeight: '500',
     lineHeight: 18,
   },
@@ -407,7 +408,6 @@ const styles = StyleSheet.create({
   inputLabel: {
     fontSize: 11,
     fontWeight: '700',
-    color: '#64748B',
     letterSpacing: 0.6,
     marginBottom: 8,
     marginLeft: 2,
@@ -415,9 +415,7 @@ const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8FAFC',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: 10,
     paddingHorizontal: 14,
     height: 48,
@@ -429,7 +427,6 @@ const styles = StyleSheet.create({
   input: {
     flex: 1,
     fontSize: 15,
-    color: '#0F172A',
     height: '100%',
   },
   eyeButton: {
@@ -438,7 +435,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   primaryButton: {
-    backgroundColor: '#2563EB',
     height: 44,
     borderRadius: 8,
     flexDirection: 'row',
@@ -447,20 +443,17 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   secondaryButton: {
-    backgroundColor: '#F8FAFC',
     height: 44,
     borderRadius: 8,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     marginBottom: 12,
   },
   secondaryButtonText: {
     fontSize: 15,
     fontWeight: '600',
-    color: '#0F172A',
   },
   buttonDisabled: {
     opacity: 0.55,
@@ -478,18 +471,15 @@ const styles = StyleSheet.create({
   actionLinkText: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#2563EB',
   },
   legalNotice: {
     marginTop: 18,
     fontSize: 12,
     lineHeight: 18,
-    color: '#94A3B8',
     textAlign: 'center',
     paddingHorizontal: 8,
   },
   legalLink: {
-    color: '#64748B',
     textDecorationLine: 'underline',
     fontWeight: '500',
   },

@@ -5,6 +5,7 @@ import { BCAwayLoading } from '../common/BCAwayLoading';
 import { PeriodCard } from './PeriodCard';
 import { EmptyState } from '../ui/EmptyState';
 import { PeriodWithStatus, SchedulePeriod } from '../../types';
+import { useTheme } from '../../context/ThemeContext';
 
 interface TodayScheduleProps {
   periods: PeriodWithStatus[];
@@ -15,6 +16,7 @@ interface TodayScheduleProps {
 
 export function TodaySchedule({ periods, isLoading, error, onPeriodPress }: TodayScheduleProps) {
   const router = useRouter();
+  const { colors } = useTheme();
 
   if (isLoading) {
     return (
@@ -26,7 +28,7 @@ export function TodaySchedule({ periods, isLoading, error, onPeriodPress }: Toda
 
   if (error && periods.length === 0) {
     return (
-      <View style={styles.emptyBox}>
+      <View style={[styles.emptyBox, { borderColor: colors.border, backgroundColor: colors.surface }]}>
         <EmptyState
           icon="⚠️"
           title="Schedule Unavailable"
@@ -38,7 +40,7 @@ export function TodaySchedule({ periods, isLoading, error, onPeriodPress }: Toda
 
   if (periods.length === 0) {
     return (
-      <View style={styles.emptyBox}>
+      <View style={[styles.emptyBox, { borderColor: colors.border, backgroundColor: colors.surface }]}>
         <EmptyState
           icon="🎉"
           title="No School Today"
@@ -57,7 +59,7 @@ export function TodaySchedule({ periods, isLoading, error, onPeriodPress }: Toda
   };
 
   return (
-    <View style={styles.ledgerContainer}>
+    <View style={[styles.ledgerContainer, { borderColor: colors.border, backgroundColor: colors.card }]}>
       {periods.map((item, index) => (
         <PeriodCard
           key={item.period.period}
@@ -81,18 +83,13 @@ const styles = StyleSheet.create({
   },
   emptyBox: {
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: 12,
-    backgroundColor: '#FFFFFF',
     width: '100%',
   },
   ledgerContainer: {
     borderWidth: 1,
-    borderColor: '#E2E8F0',
     borderRadius: 12,
     overflow: 'hidden',
-    backgroundColor: '#FFFFFF',
     width: '100%',
   },
 });
-
