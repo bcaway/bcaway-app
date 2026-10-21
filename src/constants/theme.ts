@@ -28,34 +28,41 @@ export const lightColors = {
   inputBg: '#F8FAFC',
 };
 
+/**
+ * Authentic, untinted deep neutral dark mode.
+ * Styled after Apple's System Dark appearance: pure OLED black base (#000000)
+ * with neutral System Gray 6 (#1C1C1E) surfaces and System Gray 5 (#2C2C2E) elevated states.
+ * Uses native System Blue (#0A84FF) calibrated specifically for neutral dark gray.
+ * Zero artificial navy/indigo/slate tint.
+ */
 export const darkColors: typeof lightColors = {
-  background: '#0B0F1A',
-  surface: '#141927',
-  surfaceSubtle: '#1C2337',
-  card: '#141927',
-  primary: '#3B82F6',
-  primarySubtle: 'rgba(59, 130, 246, 0.15)',
-  accentLight: 'rgba(59, 130, 246, 0.12)',
-  absent: '#EF4444',
-  absentBg: 'rgba(239, 68, 68, 0.14)',
-  absentBorder: 'rgba(239, 68, 68, 0.3)',
-  absentText: '#F87171',
-  present: '#22C55E',
-  presentBg: 'rgba(34, 197, 94, 0.14)',
-  presentBorder: 'rgba(34, 197, 94, 0.3)',
-  presentText: '#4ADE80',
-  star: '#FBBF24',
-  starBg: 'rgba(245, 158, 11, 0.18)',
-  textPrimary: '#F8FAFC',
-  textSecondary: '#94A3B8',
-  textMuted: '#64748B',
-  textTertiary: '#64748B',
-  border: '#1E293B',
-  borderLight: '#182234',
-  borderStrong: '#334155',
-  divider: '#1E293B',
-  searchBg: '#182234',
-  inputBg: '#141927',
+  background: '#000000',
+  surface: '#1C1C1E',
+  surfaceSubtle: '#2C2C2E',
+  card: '#1C1C1E',
+  primary: '#0A84FF',
+  primarySubtle: 'rgba(10, 132, 255, 0.15)',
+  accentLight: 'rgba(10, 132, 255, 0.10)',
+  absent: '#FF453A',
+  absentBg: 'rgba(255, 69, 58, 0.15)',
+  absentBorder: 'rgba(255, 69, 58, 0.28)',
+  absentText: '#FF453A',
+  present: '#30D158',
+  presentBg: 'rgba(48, 209, 88, 0.15)',
+  presentBorder: 'rgba(48, 209, 88, 0.28)',
+  presentText: '#30D158',
+  star: '#FFD60A',
+  starBg: 'rgba(255, 214, 10, 0.16)',
+  textPrimary: '#FFFFFF',
+  textSecondary: '#8E8E93',
+  textMuted: '#636366',
+  textTertiary: '#48484A',
+  border: '#2C2C2E',
+  borderLight: '#242426',
+  borderStrong: '#3A3A3C',
+  divider: '#2C2C2E',
+  searchBg: '#1C1C1E',
+  inputBg: '#1C1C1E',
 };
 
 export type ThemeColors = typeof lightColors;
