@@ -29,40 +29,39 @@ export const lightColors = {
 };
 
 /**
- * Authentic, untinted deep neutral dark mode.
- * Styled after Apple's System Dark appearance: pure OLED black base (#000000)
- * with neutral System Gray 6 (#1C1C1E) surfaces and System Gray 5 (#2C2C2E) elevated states.
- * Uses native System Blue (#0A84FF) calibrated specifically for neutral dark gray.
- * Zero artificial navy/indigo/slate tint.
+ * VS Code-inspired deep charcoal dark theme.
+ * Completely untinted neutral palette: soft dark charcoal background (#181818)
+ * sitting close to card surfaces (#222222) with subtle separators (#303030).
+ * Features VS Code signature focal blue (#3794FF) and soft white typography (#F0F0F0).
  */
 export const darkColors: typeof lightColors = {
-  background: '#000000',
-  surface: '#1C1C1E',
-  surfaceSubtle: '#2C2C2E',
-  card: '#1C1C1E',
-  primary: '#0A84FF',
-  primarySubtle: 'rgba(10, 132, 255, 0.15)',
-  accentLight: 'rgba(10, 132, 255, 0.10)',
-  absent: '#FF453A',
-  absentBg: 'rgba(255, 69, 58, 0.15)',
-  absentBorder: 'rgba(255, 69, 58, 0.28)',
-  absentText: '#FF453A',
-  present: '#30D158',
-  presentBg: 'rgba(48, 209, 88, 0.15)',
-  presentBorder: 'rgba(48, 209, 88, 0.28)',
-  presentText: '#30D158',
-  star: '#FFD60A',
-  starBg: 'rgba(255, 214, 10, 0.16)',
-  textPrimary: '#FFFFFF',
-  textSecondary: '#8E8E93',
-  textMuted: '#636366',
-  textTertiary: '#48484A',
-  border: '#2C2C2E',
-  borderLight: '#242426',
-  borderStrong: '#3A3A3C',
-  divider: '#2C2C2E',
-  searchBg: '#1C1C1E',
-  inputBg: '#1C1C1E',
+  background: '#181818',
+  surface: '#222222',
+  surfaceSubtle: '#2D2D2D',
+  card: '#222222',
+  primary: '#3794FF',
+  primarySubtle: 'rgba(55, 148, 255, 0.15)',
+  accentLight: 'rgba(55, 148, 255, 0.10)',
+  absent: '#F14C4C',
+  absentBg: 'rgba(241, 76, 76, 0.15)',
+  absentBorder: 'rgba(241, 76, 76, 0.28)',
+  absentText: '#F14C4C',
+  present: '#73C991',
+  presentBg: 'rgba(115, 201, 145, 0.15)',
+  presentBorder: 'rgba(115, 201, 145, 0.28)',
+  presentText: '#73C991',
+  star: '#CCA700',
+  starBg: 'rgba(204, 167, 0, 0.16)',
+  textPrimary: '#F0F0F0',
+  textSecondary: '#9E9E9E',
+  textMuted: '#6E6E6E',
+  textTertiary: '#555555',
+  border: '#303030',
+  borderLight: '#282828',
+  borderStrong: '#3E3E3E',
+  divider: '#2D2D2D',
+  searchBg: '#222222',
+  inputBg: '#222222',
 };
 
 export type ThemeColors = typeof lightColors;
